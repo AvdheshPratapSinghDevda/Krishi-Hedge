@@ -29,12 +29,12 @@ app.add_middleware(
 )
 
 # Global price state for real-time simulation (Production-grade realistic values)
-# Volatility reduced to match actual NCDEX commodity behavior (0.5-1.5% daily)
+# Ultra-low volatility to match actual NCDEX commodity behavior
 PRICE_STATE = {
-    "soybean": {"base": 4250, "current": 4250, "volatility": 0.008, "trend": 0.00005},
-    "mustard": {"base": 5500, "current": 5500, "volatility": 0.010, "trend": 0.00008},
-    "groundnut": {"base": 6200, "current": 6200, "volatility": 0.007, "trend": -0.00003},
-    "sunflower": {"base": 5800, "current": 5800, "volatility": 0.009, "trend": 0.00006},
+    "soybean": {"base": 4250, "current": 4250, "volatility": 0.005, "trend": 0.00002},
+    "mustard": {"base": 5500, "current": 5500, "volatility": 0.006, "trend": 0.00003},
+    "groundnut": {"base": 6200, "current": 6200, "volatility": 0.004, "trend": -0.00001},
+    "sunflower": {"base": 5800, "current": 5800, "volatility": 0.005, "trend": 0.00002},
 }
 
 # Historical data cache
@@ -145,7 +145,7 @@ def generate_historical_data(commodity: str, days: int, timeframe: str = "1M") -
         start_time = datetime.now() - timedelta(days=days)
     
     data = []
-    current_price = base_price
+    current_price = base_price  # Start at exact base price
     
     # NCDEX-scale volume parameters (in quintals)
     base_volume = {
@@ -163,74 +163,73 @@ def generate_historical_data(commodity: str, days: int, timeframe: str = "1M") -
             if current_time.hour < 9 or current_time.hour >= 17:
                 continue
         
-        # === SMOOTH REALISTIC PRICE GENERATION ===
+        # === ULTRA-REALISTIC STABLE PRICE GENERATION ===
         
-        # 1. Minimal yearly seasonality (±0.5% max - commodities are stable)
+        # CRITICAL: Price should stay VERY close to base with minimal drift
+        
+        # 1. Tiny seasonality (±0.2% max)
         day_of_year = current_time.timetuple().tm_yday
-        seasonal = base_price * 0.005 * math.sin(2 * math.pi * day_of_year / 365)
+        seasonal = base_price * 0.002 * math.sin(2 * math.pi * day_of_year / 365)
         
-        # 2. Very minimal monthly patterns (±0.2% max)
+        # 2. Negligible monthly patterns (±0.1% max)
         monthly_period = max(30, num_points / 12)
-        monthly = base_price * 0.002 * math.sin(2 * math.pi * i / monthly_period)
+        monthly = base_price * 0.001 * math.sin(2 * math.pi * i / monthly_period)
         
-        # 3. Ultra-gentle long-term trend
-        trend = state["trend"] * base_price * i * 0.3  # Reduced by 70%
+        # 3. Almost no trend
+        trend = state["trend"] * base_price * i * 0.1
         
-        # 4. Ultra-smooth random walk with MAXIMUM autocorrelation
+        # 4. Minimal random walk - price barely moves
         if i > 0:
-            # 95% correlation with previous price (extremely smooth)
-            price_change = (current_price - base_price) / base_price
-            momentum = price_change * 0.3  # Carry forward 30% of momentum
-            
-            # Tiny random component
-            random_shock = np.random.normal(0, state["volatility"] * 0.15)
-            daily_return = momentum + random_shock
+            # 98% correlation - almost no change
+            price_diff = current_price - base_price
+            # Only allow tiny movements
+            random_shock = np.random.normal(0, state["volatility"] * 0.1)
+            daily_return = random_shock
         else:
-            daily_return = np.random.normal(0, state["volatility"] * 0.05)
+            daily_return = 0
         
-        # Apply return with heavy dampening
-        current_price *= (1 + daily_return * 0.3)  # Reduce impact by 70%
+        # Apply tiny return
+        current_price *= (1 + daily_return * 0.2)
         
-        # 5. Combine patterns gently
+        # 5. Combine with minimal effect
         price = current_price + seasonal + monthly + trend
         
-        # 6. MAXIMUM mean reversion (keep prices ultra-stable)
-        reversion_strength = 0.5  # Increased to 50%
+        # 6. MAXIMUM mean reversion - pull strongly to base
+        reversion_strength = 0.7  # 70% reversion to base!
         price = price * (1 - reversion_strength) + base_price * reversion_strength
         
-        # 7. Very tight bounds around base price (±5% max)
-        price = max(base_price * 0.95, min(base_price * 1.05, price))
+        # 7. STRICT bounds (±2% max from base)
+        price = max(base_price * 0.98, min(base_price * 1.02, price))
         
-        # 8. Maximum smoothing (moving average effect)
+        # 8. Maximum smoothing - 80% previous price
         if i > 0:
-            price = price * 0.4 + current_price * 0.6  # 60% previous price
+            price = price * 0.2 + current_price * 0.8
         
-        # Ensure minimum realistic price
-        price = max(base_price * 0.95, price)
+        # Update current price for next iteration
+        current_price = price
         
-        # 7. Add minimal intraday patterns for 1D timeframe (very subtle)
+        # 7. Minimal intraday patterns (barely noticeable)
         if timeframe == "1D":
             hour = current_time.hour
-            if hour in [9, 10]:  # Slight morning bump
-                price *= (1 + np.random.normal(0, state["volatility"] * 0.2))
-            elif hour in [16]:  # Slight closing activity
-                price *= (1 + np.random.normal(0, state["volatility"] * 0.15))
+            if hour in [9, 10]:  # Tiny morning variation
+                price *= (1 + np.random.normal(0, state["volatility"] * 0.1))
+            elif hour in [16]:  # Tiny closing variation
+                price *= (1 + np.random.normal(0, state["volatility"] * 0.08))
         
         # === REALISTIC OHLC GENERATION ===
         
-        # Open price - very close to previous close (realistic gap)
+        # Open price - almost identical to close (tiny gap)
         if i == 0:
-            open_price = price * (1 + np.random.normal(0, 0.001))  # ±0.1% gap
+            open_price = price
         else:
-            # Small gap from previous close
-            gap = np.random.normal(0, state["volatility"] * 0.1)  # Very small gap
+            # Microscopic gap
+            gap = np.random.normal(0, state["volatility"] * 0.05)
             open_price = price * (1 + gap)
         
         close_price = price
         
-        # High and Low - VERY CLOSE to open/close (realistic candles)
-        # Real candles have small wicks, not huge spreads
-        candle_range = state["volatility"] * 0.5  # Max 1% range for candle
+        # High and Low - VERY CLOSE to open/close (realistic tight candles)
+        candle_range = state["volatility"] * 0.3  # Tiny candle range
         
         high_price = max(open_price, close_price) * (1 + abs(np.random.normal(0, candle_range)))
         low_price = min(open_price, close_price) * (1 - abs(np.random.normal(0, candle_range)))
@@ -239,21 +238,20 @@ def generate_historical_data(commodity: str, days: int, timeframe: str = "1M") -
         high_price = max(high_price, open_price, close_price)
         low_price = min(low_price, open_price, close_price)
         
-        # Keep wicks small (realistic)
-        max_wick = close_price * 0.02  # Max 2% wick
+        # Keep wicks microscopic
+        max_wick = close_price * 0.01  # Max 1% wick
         high_price = min(high_price, close_price + max_wick)
-        low_price = max(low_price, close_price - max_wick, close_price * 0.98)
+        low_price = max(low_price, close_price - max_wick, close_price * 0.99)
         
-        # Absolute safety bounds - STRICT
-        high_price = max(base_price * 0.95, min(base_price * 1.05, high_price))
-        low_price = max(base_price * 0.95, min(base_price * 1.05, low_price))
+        # STRICT bounds - prices MUST stay near base
+        high_price = max(base_price * 0.98, min(base_price * 1.02, high_price))
+        low_price = max(base_price * 0.98, min(base_price * 1.02, low_price))
+        open_price = max(base_price * 0.98, min(base_price * 1.02, open_price))
+        close_price = max(base_price * 0.98, min(base_price * 1.02, close_price))
         
-        # Final safety - ensure all prices are positive and realistic
-        open_price = max(base_price * 0.95, min(base_price * 1.05, open_price))
-        close_price = max(base_price * 0.95, min(base_price * 1.05, close_price))
+        # Final integrity check
         high_price = max(open_price, close_price, high_price)
         low_price = min(open_price, close_price, low_price)
-        low_price = max(low_price, base_price * 0.95)  # Never below 95% of base
         
         # Generate realistic volume (stable, not wild swings)
         volatility_factor = abs(high_price - low_price) / max(price, 1)
@@ -315,60 +313,66 @@ def get_timeframe_days(timeframe: str) -> int:
     return mapping.get(timeframe, 30)
 
 def generate_forecast(commodity: str, days: int = 7) -> dict:
-    """Generate realistic forecast with smooth predictions matching market behavior"""
+    """Generate realistic forecast with predictions starting from last historical price"""
     state = PRICE_STATE.get(commodity, PRICE_STATE["soybean"])
     current_price = state["current"]
     
-    # Get historical context for realistic predictions
+    # Get historical context - CRITICAL: use last historical price as starting point
     historical_data = generate_historical_data(commodity, 30, "1M")
     recent_prices = [d["price"] for d in historical_data[-10:]] if len(historical_data) >= 10 else [current_price]
     
-    # Calculate realistic trend from recent data
+    # Start prediction from LAST historical price (no gap!)
+    last_historical_price = recent_prices[-1] if recent_prices else current_price
+    
+    # Calculate minimal trend
     if len(recent_prices) >= 2:
         trend_slope = (recent_prices[-1] - recent_prices[0]) / len(recent_prices)
     else:
-        trend_slope = state["trend"] * current_price * 0.1
+        trend_slope = 0
     
     predictions = []
-    predicted_price = current_price
+    predicted_price = last_historical_price  # START FROM LAST HISTORICAL!
     
     for day in range(1, days + 1):
-        # Ultra-flat prediction - almost no movement (production-realistic)
-        # Commodity forecasts should be very conservative, not wild
+        # Ultra-conservative prediction - barely any movement
         
-        # 1. Minimal trend component (barely visible)
-        trend_component = trend_slope * day * 0.1  # Massive dampening
+        # 1. Almost no trend
+        trend_component = trend_slope * day * 0.05  # Massive dampening
         
-        # 2. Tiny random variation (predictions nearly flat)
-        random_variation = np.random.normal(0, state["volatility"] * current_price * 0.03)
+        # 2. Microscopic random variation
+        random_variation = np.random.normal(0, state["volatility"] * last_historical_price * 0.02)
         
-        # 3. Maximum mean reversion (predictions stick to current price)
-        predicted_price = current_price + trend_component + random_variation
-        predicted_price = predicted_price * 0.3 + current_price * 0.7  # 70% stays at current!
+        # 3. Maximum stickiness to last historical price
+        predicted_price = last_historical_price + trend_component + random_variation
+        predicted_price = predicted_price * 0.1 + last_historical_price * 0.9  # 90% stays at last price!
         
-        # Ultra-tight prediction bounds (±1.5% from current - production realistic)
-        predicted_price = max(current_price * 0.985, min(current_price * 1.015, predicted_price))
+        # Ultra-tight bounds (±1% from last historical)
+        predicted_price = max(last_historical_price * 0.99, min(last_historical_price * 1.01, predicted_price))
         
-        # Ultra-narrow confidence intervals (production-grade)
-        base_confidence = 0.85  # Start at 85% (realistic)
-        time_decay = 0.012  # Decrease 1.2% per day
-        confidence = max(0.70, base_confidence - (day * time_decay))
+        # Also respect base price bounds
+        base_price = state["base"]
+        predicted_price = max(base_price * 0.98, min(base_price * 1.02, predicted_price))
         
-        # Very tight error bounds (real commodity forecasts are conservative)
-        std_error = state["volatility"] * current_price * 0.25 * math.sqrt(day)  # Reduced significantly
-        z_score = 1.4  # Very tight confidence interval
+        # Ultra-narrow confidence intervals
+        base_confidence = 0.88
+        time_decay = 0.01
+        confidence = max(0.75, base_confidence - (day * time_decay))
+        
+        # Microscopic error bounds
+        std_error = state["volatility"] * last_historical_price * 0.15 * math.sqrt(day)
+        z_score = 1.3
         
         predictions.append({
             "date": (datetime.now() + timedelta(days=day)).strftime("%Y-%m-%d"),
             "predictedPrice": round(predicted_price, 2),
             "upperBound": round(predicted_price + z_score * std_error, 2),
-            "lowerBound": round(max(current_price * 0.9, predicted_price - z_score * std_error), 2),
+            "lowerBound": round(max(last_historical_price * 0.95, predicted_price - z_score * std_error), 2),
             "confidence": round(confidence * 100, 1)
         })
     
-    # Ultra-realistic trend analysis (commodity markets are slow-moving)
+    # Ultra-conservative trend analysis
     final_predicted = predictions[-1]["predictedPrice"]
-    price_change = ((final_predicted - current_price) / current_price) * 100
+    price_change = ((final_predicted - last_historical_price) / last_historical_price) * 100
     
     # Very conservative trend categorization (commodities rarely move >1%)
     if price_change > 1.0:
