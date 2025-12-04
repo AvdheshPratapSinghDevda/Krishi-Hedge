@@ -202,7 +202,7 @@ export default function SignupPage() {
         if (profileError) throw profileError;
       }
 
-      // 3. Store user ID in localStorage for backward compatibility
+      // 3. Store user info for backward compatibility
       localStorage.setItem('kh_user_id', authData.user.id);
       localStorage.setItem('kh_user_type', userType);
 

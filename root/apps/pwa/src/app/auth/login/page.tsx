@@ -35,22 +35,24 @@ export default function LoginPage() {
       if (signInError) throw signInError;
       if (!data.user) throw new Error('Login failed');
 
-      // Fetch user profile to get user_type
-      const { data: profile, error: profileError } = await supabase
+      // Fetch user profile
+      const { data: profile } = await supabase
         .from('profiles')
-        .select('user_type, id')
+        .select('user_type, full_name, business_name')
         .eq('id', data.user.id)
         .single();
 
-      if (profileError) {
-        console.error('Profile fetch error:', profileError);
-        // Continue anyway, profile might be created by trigger
-      }
-
-      // Store user info in localStorage for backward compatibility
+      // Store user info for backward compatibility
       localStorage.setItem('kh_user_id', data.user.id);
       if (profile?.user_type) {
         localStorage.setItem('kh_user_type', profile.user_type);
+        localStorage.setItem('kh_phone', data.user.email || '');
+        
+        // Store name for HomeScreen
+        const userName = profile.user_type === 'farmer' ? profile.full_name : profile.business_name;
+        if (userName) {
+          localStorage.setItem('kh_profile', JSON.stringify({ name: userName }));
+        }
       }
 
       // Redirect to intended page or dashboard
