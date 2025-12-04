@@ -14,23 +14,20 @@ interface AdminContractDetail {
   anchorExplorerUrl?: string;
 }
 
-async function resolveApiBase(): Promise<string> {
-  const candidates = [process.env.NEXT_PUBLIC_PWA_API_BASE, process.env.NEXT_PUBLIC_BASE_URL, "http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "http://localhost:3003"].filter(Boolean);
-  for (const base of candidates) {
-    try {
-      const res = await fetch(`${base}/api/contracts`, { cache: "no-store" });
-      if (res.ok) return base as string;
-    } catch (_) {}
-  }
-  return (process.env.NEXT_PUBLIC_PWA_API_BASE || process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000");
-}
-
 async function fetchContract(id: string): Promise<AdminContractDetail | null> {
-  const base = await resolveApiBase();
-  const res = await fetch(`${base}/api/contracts/${id}`, { cache: "no-store" }).catch(() => null as any);
-  if (!res || !res.ok) return null;
-  const data = (await res.json()) as AdminContractDetail;
-  return data;
+  try {
+    // Fetch from local admin API which connects to Supabase
+    const res = await fetch(`http://localhost:3001/api/contracts`, { cache: "no-store" });
+    if (!res.ok) {
+      console.error('[Admin Contract Detail] Failed to fetch contracts from API');
+      return null;
+    }
+    const contracts = (await res.json()) as AdminContractDetail[];
+    return contracts.find(c => c.id === id) || null;
+  } catch (error) {
+    console.error('[Admin Contract Detail] Error fetching contract:', error);
+    return null;
+  }
 }
 
 interface PageProps {

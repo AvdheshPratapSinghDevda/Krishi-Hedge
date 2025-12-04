@@ -4,10 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_PWA_API_BASE ||
-  process.env.NEXT_PUBLIC_BASE_URL ||
-  "http://localhost:3000";
+const API_BASE = "http://localhost:3000"; // Always use PWA API for creating contracts
 
 const CROPS = ["Maize", "Wheat", "Paddy", "Soybean", "Mustard"];
 const UNITS = ["kg", "quintal", "tonne"];
