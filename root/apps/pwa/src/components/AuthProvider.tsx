@@ -19,12 +19,19 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     // Check active session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      
+      // Store user ID if session exists
+      if (session?.user) {
+        localStorage.setItem('kh_user_id', session.user.id);
+      }
+      
       setLoading(false);
 
-      // Redirect logic
+      // Only redirect to login if no session AND on a protected route
       const isPublicRoute = PUBLIC_ROUTES.some(route => pathname?.startsWith(route));
       
-      if (!session && !isPublicRoute && pathname !== '/') {
+      // Don't redirect if we have a session (logged in)
+      if (!session && !isPublicRoute) {
         router.push(`/auth/login?redirectTo=${encodeURIComponent(pathname || '/')}`);
       }
     });
@@ -32,10 +39,26 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
       
-      if (!session && !PUBLIC_ROUTES.some(route => pathname?.startsWith(route))) {
+      // Store user ID on sign in
+      if (event === 'SIGNED_IN' && session?.user) {
+        localStorage.setItem('kh_user_id', session.user.id);
+      }
+      
+      // Clear data on sign out
+      if (event === 'SIGNED_OUT') {
+        localStorage.removeItem('kh_user_id');
+        localStorage.removeItem('kh_user_type');
+        localStorage.removeItem('kh_profile');
+        localStorage.removeItem('kh_phone');
+        localStorage.removeItem('kh_role');
+      }
+      
+      // Only redirect if no session and not on public routes
+      const isPublicRoute = PUBLIC_ROUTES.some(route => pathname?.startsWith(route));
+      if (!session && !isPublicRoute) {
         router.push('/auth/login');
       }
     });

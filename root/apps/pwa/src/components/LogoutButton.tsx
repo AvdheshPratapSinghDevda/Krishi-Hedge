@@ -20,9 +20,13 @@ export default function LogoutButton({ className = '', variant = 'button' }: Log
       const supabase = createClient();
       await supabase.auth.signOut();
       
-      // Clear localStorage
+      // Clear all localStorage data
       localStorage.removeItem('kh_user_id');
       localStorage.removeItem('kh_user_type');
+      localStorage.removeItem('kh_profile');
+      localStorage.removeItem('kh_phone');
+      localStorage.removeItem('kh_role');
+      localStorage.removeItem('kh_bank');
       
       // Redirect to login
       router.push('/auth/login');

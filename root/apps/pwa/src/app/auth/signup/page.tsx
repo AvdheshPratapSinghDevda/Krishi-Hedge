@@ -158,11 +158,18 @@ export default function SignupPage() {
       if (authError) throw authError;
       if (!authData.user) throw new Error('Failed to create user');
 
-      // 2. Create profile in profiles table
-      if (userType === 'farmer') {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
+      // 2. Check if profile already exists (in case of previous failed attempt)
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', authData.user.id)
+        .single();
+
+      // Only create profile if it doesn't exist
+      if (!existingProfile) {
+        // 3. Create profile in profiles table
+        if (userType === 'farmer') {
+          const profileInsert = {
             id: authData.user.id,
             user_type: 'farmer',
             full_name: farmerData.fullName,
@@ -175,13 +182,17 @@ export default function SignupPage() {
             land_size: parseFloat(farmerData.landSize) || 0,
             primary_crop: farmerData.primaryCrop,
             farming_experience: parseInt(farmerData.farmingExperience) || 0,
-          });
+          };
+          
+          const { data: insertedProfile, error: profileError } = await supabase
+            .from('profiles')
+            .insert(profileInsert)
+            .select()
+            .single();
 
-        if (profileError) throw profileError;
-      } else {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
+          if (profileError) throw profileError;
+        } else {
+          const profileInsert = {
             id: authData.user.id,
             user_type: 'business',
             business_name: businessData.businessName,
@@ -197,16 +208,34 @@ export default function SignupPage() {
             contact_person: businessData.contactPerson,
             designation: businessData.designation,
             trading_volume: parseFloat(businessData.tradingVolume) || 0,
-          });
+          };
 
-        if (profileError) throw profileError;
+          const { data: insertedProfile, error: profileError } = await supabase
+            .from('profiles')
+            .insert(profileInsert)
+            .select()
+            .single();
+
+          if (profileError) throw profileError;
+        }
       }
 
-      // 3. Store user info for backward compatibility
+      // 4. Clear any old session data
+      localStorage.removeItem('kh_phone');
+      localStorage.removeItem('kh_profile');
+      localStorage.removeItem('kh_role');
+      
+      // 5. Store new user data
       localStorage.setItem('kh_user_id', authData.user.id);
       localStorage.setItem('kh_user_type', userType);
+      
+      // Store profile data for immediate use
+      const profileData = userType === 'farmer' 
+        ? { fullName: farmerData.fullName, email: farmerData.email, phone: farmerData.phone, userType: 'farmer' }
+        : { businessName: businessData.businessName, email: businessData.email, phone: businessData.phone, userType: 'business' };
+      localStorage.setItem('kh_profile', JSON.stringify(profileData));
 
-      // 4. Redirect to dashboard
+      // 6. Redirect to dashboard
       router.push('/');
       router.refresh();
     } catch (err: any) {

@@ -35,6 +35,7 @@ export default function LoginPage() {
       if (signInError) throw signInError;
       if (!data.user) throw new Error('Login failed');
 
+<<<<<<< Updated upstream
       // Fetch user profile
       const { data: profile } = await supabase
         .from('profiles')
@@ -53,6 +54,41 @@ export default function LoginPage() {
         if (userName) {
           localStorage.setItem('kh_profile', JSON.stringify({ name: userName }));
         }
+=======
+      // Clear old session data
+      localStorage.removeItem('kh_phone');
+      localStorage.removeItem('kh_profile');
+      localStorage.removeItem('kh_role');
+      
+      // Store new user ID
+      localStorage.setItem('kh_user_id', data.user.id);
+
+      // Fetch user profile to get user_type and other data
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', data.user.id)
+        .single();
+
+      if (profileError) {
+        console.error('Profile fetch error:', profileError);
+        // Continue anyway, profile might be created by trigger
+      } else {
+        // Store user type
+        if (profile?.user_type) {
+          localStorage.setItem('kh_user_type', profile.user_type);
+        }
+        
+        // Store profile data for immediate use
+        const profileData = {
+          fullName: profile.full_name || profile.business_name,
+          businessName: profile.business_name,
+          email: profile.email,
+          phone: profile.phone,
+          userType: profile.user_type
+        };
+        localStorage.setItem('kh_profile', JSON.stringify(profileData));
+>>>>>>> Stashed changes
       }
 
       // Redirect to intended page or dashboard

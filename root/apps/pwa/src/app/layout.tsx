@@ -4,6 +4,7 @@ import "./globals.css";
 import BottomNav from "@/components/BottomNav";
 import InstallPrompt from "@/components/InstallPrompt";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import SetupWarningBanner from "@/components/SetupWarningBanner";
 
 const notoSans = Noto_Sans({
   subsets: ["latin"],
@@ -42,6 +43,7 @@ export default function RootLayout({
       <body
         className={`${notoSans.variable} font-sans antialiased bg-gray-200`}
       >
+        <SetupWarningBanner />
         <div className="flex justify-center min-h-screen">
           <div className="w-full max-w-md bg-gray-50 min-h-screen shadow-2xl relative overflow-hidden flex flex-col">
             <ServiceWorkerRegister />

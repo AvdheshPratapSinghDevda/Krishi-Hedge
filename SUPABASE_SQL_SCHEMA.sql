@@ -74,6 +74,7 @@ DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Users can insert own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON public.profiles;
 DROP POLICY IF EXISTS "Allow authenticated users to insert profiles" ON public.profiles;
+DROP POLICY IF EXISTS "Enable insert for anon users" ON public.profiles;
 
 
 -- 5. CREATE RLS POLICIES
@@ -92,12 +93,12 @@ CREATE POLICY "Users can update own profile"
   USING (auth.uid() = id)
   WITH CHECK (auth.uid() = id);
 
--- Allow any authenticated user to insert a profile (needed for signup)
-CREATE POLICY "Allow authenticated users to insert profiles"
+-- Allow users to insert their own profile during signup
+-- Works for both authenticated and anon roles (signup uses anon initially)
+CREATE POLICY "Users can insert own profile"
   ON public.profiles
   FOR INSERT
-  TO authenticated
-  WITH CHECK (true);
+  WITH CHECK (auth.uid() = id);
 
 
 -- 6. CREATE UPDATE TIMESTAMP FUNCTION
@@ -121,6 +122,32 @@ CREATE TRIGGER set_updated_at
   BEFORE UPDATE ON public.profiles
   FOR EACH ROW
   EXECUTE FUNCTION public.handle_updated_at();
+
+
+-- 8. CREATE FUNCTION TO AUTO-CREATE PROFILE ON SIGNUP (OPTIONAL)
+-- =====================================================
+-- This function automatically creates a profile when a user signs up
+-- Uncomment if you want automatic profile creation
+
+-- CREATE OR REPLACE FUNCTION public.handle_new_user()
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--   INSERT INTO public.profiles (id, email, user_type)
+--   VALUES (
+--     NEW.id,
+--     NEW.email,
+--     COALESCE(NEW.raw_user_meta_data->>'user_type', 'farmer')
+--   );
+--   RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+
+-- CREATE TRIGGER on_auth_user_created
+--   AFTER INSERT ON auth.users
+--   FOR EACH ROW
+--   EXECUTE FUNCTION public.handle_new_user();
 
 
 -- =====================================================

@@ -72,32 +72,100 @@ export default function ProfilePage() {
 
   const loadProfileData = async () => {
     try {
-      // TODO: Replace with Supabase call
-      // const { data } = await supabase.from('profiles').select('*').eq('id', userId).single()
+      const supabase = createClient();
       
-      const stored = localStorage.getItem(PROFILE_STORAGE_KEY);
-      const storedBank = localStorage.getItem(BANK_STORAGE_KEY);
-      const phone = localStorage.getItem(PHONE_STORAGE_KEY);
-
-      if (stored) {
-        const data = JSON.parse(stored);
-        setProfile(data);
-        setEditForm(data);
-      } else {
-        const defaultProfile: ProfileData = {
-          fullName: "User",
-          email: "user@example.com",
-          phone: phone || "",
-          district: "Select District",
-          userType: "farmer",
-          emailVerified: false,
-          phoneVerified: false,
-          kycStatus: "pending",
-        };
-        setProfile(defaultProfile);
-        setEditForm(defaultProfile);
+      // Get current user with retry logic
+      let user = null;
+      let attempts = 0;
+      const maxAttempts = 3;
+      
+      while (!user && attempts < maxAttempts) {
+        const { data: { user: currentUser } } = await supabase.auth.getUser();
+        user = currentUser;
+        
+        if (!user && attempts < maxAttempts - 1) {
+          // Wait a bit and retry
+          await new Promise(resolve => setTimeout(resolve, 500));
+          attempts++;
+        } else if (!user) {
+          break;
+        }
+      }
+      
+      if (!user) {
+        // Only redirect if really no user after retries
+        console.log('No user found after retries');
+        router.push('/auth/login');
+        return;
       }
 
+      // Load profile from Supabase
+      const { data: profileData, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error loading profile:', error);
+        
+        // If profile doesn't exist yet, create a default one
+        if (error.code === 'PGRST116') {
+          console.log('Profile not found, using default');
+          const defaultProfile: ProfileData = {
+            id: user.id,
+            fullName: user.email?.split('@')[0] || 'User',
+            email: user.email || '',
+            phone: '',
+            district: '',
+            userType: 'farmer',
+          };
+          setProfile(defaultProfile);
+          setEditForm(defaultProfile);
+          setLoading(false);
+          return;
+        }
+        
+        // Fallback to localStorage
+        const stored = localStorage.getItem(PROFILE_STORAGE_KEY);
+        if (stored) {
+          const data = JSON.parse(stored);
+          setProfile(data);
+          setEditForm(data);
+        }
+      } else {
+        // Map database fields to component fields
+        const mappedProfile: ProfileData = {
+          id: profileData.id,
+          fullName: profileData.full_name || profileData.business_name || '',
+          businessName: profileData.business_name,
+          email: profileData.email,
+          phone: profileData.phone,
+          userType: profileData.user_type,
+          village: profileData.village,
+          district: profileData.district,
+          state: profileData.state,
+          pincode: profileData.pincode,
+          landSize: profileData.land_size,
+          primaryCrop: profileData.primary_crop,
+          farmingExperience: profileData.farming_experience,
+          gstNumber: profileData.gst_number,
+          businessType: profileData.business_type,
+          emailVerified: profileData.email_verified,
+          phoneVerified: profileData.phone_verified,
+          kycStatus: profileData.kyc_status,
+          createdAt: profileData.created_at,
+          updatedAt: profileData.updated_at,
+        };
+        
+        setProfile(mappedProfile);
+        setEditForm(mappedProfile);
+        
+        // Also update localStorage for backward compatibility
+        localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(mappedProfile));
+      }
+
+      const storedBank = localStorage.getItem(BANK_STORAGE_KEY);
       if (storedBank) setBank(JSON.parse(storedBank));
     } catch (error) {
       console.error("Error loading profile:", error);
@@ -188,7 +256,7 @@ export default function ProfilePage() {
           <div className="flex items-start gap-4">
             <div className="relative">
               <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white text-2xl font-bold">
-                {profile.fullName.charAt(0).toUpperCase()}
+                {(profile.fullName || profile.businessName || 'U').charAt(0).toUpperCase()}
               </div>
               {profile.kycStatus === 'verified' && (
                 <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full p-1">
@@ -197,7 +265,7 @@ export default function ProfilePage() {
               )}
             </div>
             <div className="flex-1">
-              <h2 className="text-2xl font-bold">{profile.fullName}</h2>
+              <h2 className="text-2xl font-bold">{profile.fullName || profile.businessName || 'User'}</h2>
               <p className="text-gray-600 mt-1">
                 {profile.userType === 'farmer' ? '🌾 Farmer' : '🏢 Business'}
               </p>

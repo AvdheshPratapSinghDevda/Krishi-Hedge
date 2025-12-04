@@ -30,7 +30,7 @@ interface MarketStats {
 
 export default function HomeScreen() {
   const router = useRouter();
-  const [name, setName] = useState("Farmer");
+  const [name, setName] = useState("User");
   const [forecast, setForecast] = useState<any>(null);
   const [contracts, setContracts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,11 +43,19 @@ export default function HomeScreen() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const phone = window.localStorage.getItem("kh_phone");
-      if (!phone) {
-        router.replace('/splash');
+      // Load from localStorage first (instant)
+      const storedProfile = window.localStorage.getItem("kh_profile");
+      if (storedProfile) {
+        try {
+          const profile = JSON.parse(storedProfile);
+          const displayName = profile.fullName || profile.businessName || profile.name || 'User';
+          setName(displayName);
+        } catch (e) {
+          console.error('Failed to parse profile:', e);
+        }
       }
       
+<<<<<<< Updated upstream
       const userId = window.localStorage.getItem("kh_user_id");
       if (userId) {
         fetch(`/api/profile?userId=${userId}`)
@@ -76,16 +84,46 @@ export default function HomeScreen() {
       } else {
         const profile = window.localStorage.getItem("kh_profile");
         if (profile) {
+=======
+      // Then load from database for fresh data
+      const userId = window.localStorage.getItem("kh_user_id");
+      if (userId) {
+        const loadProfile = async () => {
+>>>>>>> Stashed changes
           try {
-            const p = JSON.parse(profile);
-            if (p.name) setName(p.name);
-          } catch (e) {}
-        }
+            const { createClient } = await import('@/lib/supabase/client');
+            const supabase = createClient();
+            
+            const { data: profileData, error } = await supabase
+              .from('profiles')
+              .select('full_name, business_name, user_type')
+              .eq('id', userId)
+              .single();
+            
+            if (!error && profileData) {
+              const displayName = profileData.full_name || profileData.business_name || 'User';
+              setName(displayName);
+              
+              // Update localStorage
+              const updatedProfile = {
+                fullName: profileData.full_name,
+                businessName: profileData.business_name,
+                userType: profileData.user_type
+              };
+              window.localStorage.setItem("kh_profile", JSON.stringify(updatedProfile));
+            }
+          } catch (err) {
+            console.error('Failed to load profile:', err);
+          }
+        };
+        
+        loadProfile();
       }
     }
   }, [router]);
 
   useEffect(() => {
+<<<<<<< Updated upstream
     setLoading(true);
     
     Promise.all([
@@ -114,6 +152,28 @@ export default function HomeScreen() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
+=======
+    // Fetch Forecast & Market Price
+    fetch('/api/forecast')
+      .then(res => res.json())
+      .then(data => setForecast(data))
+      .catch(console.error);
+
+    // Fetch Recent Contracts for this farmer
+    if (typeof window !== 'undefined') {
+      const userId = window.localStorage.getItem("kh_user_id");
+      if (userId) {
+        fetch(`/api/contracts?role=farmer&userId=${userId}`)
+          .then(res => res.json())
+          .then(data => {
+            if (Array.isArray(data)) {
+              setContracts(data.slice(0, 2)); // Show top 2
+            }
+          })
+          .catch(console.error);
+      }
+    }
+>>>>>>> Stashed changes
   }, []);
 
   const getTimeGreeting = () => {
