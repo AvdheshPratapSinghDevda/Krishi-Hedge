@@ -55,41 +55,10 @@ export default function HomeScreen() {
         }
       }
       
-<<<<<<< Updated upstream
-      const userId = window.localStorage.getItem("kh_user_id");
-      if (userId) {
-        fetch(`/api/profile?userId=${userId}`)
-          .then(res => res.json())
-          .then(data => {
-            if (data.name) {
-              setName(data.name);
-              const existingProfile = window.localStorage.getItem("kh_profile");
-              if (existingProfile) {
-                const parsed = JSON.parse(existingProfile);
-                const updated = { ...parsed, name: data.name, location: data.location, crops: data.crops };
-                window.localStorage.setItem("kh_profile", JSON.stringify(updated));
-              }
-            }
-          })
-          .catch(err => {
-            console.error('Failed to load profile from DB:', err);
-            const profile = window.localStorage.getItem("kh_profile");
-            if (profile) {
-              try {
-                const p = JSON.parse(profile);
-                if (p.name) setName(p.name);
-              } catch (e) {}
-            }
-          });
-      } else {
-        const profile = window.localStorage.getItem("kh_profile");
-        if (profile) {
-=======
       // Then load from database for fresh data
       const userId = window.localStorage.getItem("kh_user_id");
       if (userId) {
         const loadProfile = async () => {
->>>>>>> Stashed changes
           try {
             const { createClient } = await import('@/lib/supabase/client');
             const supabase = createClient();
@@ -123,36 +92,6 @@ export default function HomeScreen() {
   }, [router]);
 
   useEffect(() => {
-<<<<<<< Updated upstream
-    setLoading(true);
-    
-    Promise.all([
-      fetch('/api/forecast').then(res => res.json()),
-      typeof window !== 'undefined' && window.localStorage.getItem("kh_user_id")
-        ? fetch(`/api/contracts?role=farmer&userId=${window.localStorage.getItem("kh_user_id")}`).then(res => res.json())
-        : Promise.resolve([])
-    ])
-      .then(([forecastData, contractsData]) => {
-        setForecast(forecastData);
-        const allContracts = Array.isArray(contractsData) ? contractsData : [];
-        setContracts(allContracts.slice(0, 3));
-        
-        // Calculate stats
-        const totalValue = allContracts.reduce((sum: number, c: any) => sum + (c.strikePrice * c.quantity || 0), 0);
-        const activeCount = allContracts.filter((c: any) => c.status === 'CREATED' || c.status === 'MATCHED').length;
-        const profitLoss = allContracts.reduce((sum: number, c: any) => sum + (c.profitLoss || 0), 0);
-        const profitLossPercent = totalValue > 0 ? (profitLoss / totalValue) * 100 : 0;
-        
-        setMarketStats({
-          totalValue,
-          activeContracts: activeCount,
-          profitLoss,
-          profitLossPercent
-        });
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-=======
     // Fetch Forecast & Market Price
     fetch('/api/forecast')
       .then(res => res.json())
@@ -173,7 +112,6 @@ export default function HomeScreen() {
           .catch(console.error);
       }
     }
->>>>>>> Stashed changes
   }, []);
 
   const getTimeGreeting = () => {

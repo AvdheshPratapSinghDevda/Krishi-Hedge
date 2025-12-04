@@ -12,13 +12,13 @@ export default function SetupWarningBanner() {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
     
-    const isConfigured = supabaseUrl && 
+    const isConfigured = Boolean(supabaseUrl && 
                         supabaseKey && 
                         !supabaseUrl.includes('demo') && 
                         !supabaseUrl.includes('placeholder') &&
                         !supabaseKey.includes('demo') &&
                         !supabaseKey.includes('placeholder') &&
-                        supabaseUrl.includes('.supabase.co');
+                        supabaseUrl.includes('.supabase.co'));
     
     setIsSupabaseConfigured(isConfigured);
     

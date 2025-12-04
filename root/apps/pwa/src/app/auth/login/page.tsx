@@ -35,35 +35,12 @@ export default function LoginPage() {
       if (signInError) throw signInError;
       if (!data.user) throw new Error('Login failed');
 
-<<<<<<< Updated upstream
-      // Fetch user profile
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('user_type, full_name, business_name')
-        .eq('id', data.user.id)
-        .single();
-
-      // Store user info for backward compatibility
-      localStorage.setItem('kh_user_id', data.user.id);
-      if (profile?.user_type) {
-        localStorage.setItem('kh_user_type', profile.user_type);
-        localStorage.setItem('kh_phone', data.user.email || '');
-        
-        // Store name for HomeScreen
-        const userName = profile.user_type === 'farmer' ? profile.full_name : profile.business_name;
-        if (userName) {
-          localStorage.setItem('kh_profile', JSON.stringify({ name: userName }));
-        }
-=======
       // Clear old session data
       localStorage.removeItem('kh_phone');
       localStorage.removeItem('kh_profile');
       localStorage.removeItem('kh_role');
-      
-      // Store new user ID
-      localStorage.setItem('kh_user_id', data.user.id);
 
-      // Fetch user profile to get user_type and other data
+      // Fetch full profile from Supabase
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('*')
@@ -72,23 +49,29 @@ export default function LoginPage() {
 
       if (profileError) {
         console.error('Profile fetch error:', profileError);
-        // Continue anyway, profile might be created by trigger
-      } else {
-        // Store user type
-        if (profile?.user_type) {
-          localStorage.setItem('kh_user_type', profile.user_type);
-        }
+      }
+
+      // Store user info in localStorage
+      localStorage.setItem('kh_user_id', data.user.id);
+      
+      if (profile) {
+        localStorage.setItem('kh_user_type', profile.user_type || '');
         
-        // Store profile data for immediate use
+        // Store complete profile data
         const profileData = {
-          fullName: profile.full_name || profile.business_name,
-          businessName: profile.business_name,
+          id: profile.id,
           email: profile.email,
-          phone: profile.phone,
+          name: profile.full_name || profile.business_name || '',
+          fullName: profile.full_name,
+          businessName: profile.business_name,
+          phone: profile.phone || '',
           userType: profile.user_type
         };
         localStorage.setItem('kh_profile', JSON.stringify(profileData));
->>>>>>> Stashed changes
+        
+        if (profile.phone) {
+          localStorage.setItem('kh_phone', profile.phone);
+        }
       }
 
       // Redirect to intended page or dashboard
@@ -164,34 +147,31 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full pl-11 pr-11 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+                  className="w-full pl-11 pr-12 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
                   required
                   autoComplete="current-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-2"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 cursor-pointer">
+            <div className="flex items-center justify-between text-sm">
+              <label className="flex items-center cursor-pointer">
                 <input
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
                   className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
                 />
-                <span className="text-sm text-gray-600">Remember me</span>
+                <span className="ml-2 text-gray-600">Remember me</span>
               </label>
-              <Link 
-                href="/auth/forgot-password"
-                className="text-sm font-medium text-green-600 hover:text-green-700 transition-colors"
-              >
+              <Link href="/auth/forgot-password" className="text-green-600 hover:text-green-700 font-medium">
                 Forgot password?
               </Link>
             </div>
@@ -199,40 +179,34 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 hover:from-green-700 hover:to-emerald-700 shadow-lg shadow-green-200 hover:shadow-green-300 transition-all transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none active:scale-95"
+              className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-xl font-semibold hover:from-green-700 hover:to-emerald-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-green-200"
             >
               {isLoading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>Signing in...</span>
+                  Signing in...
                 </>
               ) : (
-                <span>Sign In</span>
+                'Sign In'
               )}
             </button>
           </form>
 
-          <div className="mt-8 text-center border-t border-gray-100 pt-6">
+          <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Don't have an account?{' '}
-              <Link 
-                href="/auth/signup"
-                className="font-semibold text-green-600 hover:text-green-700 transition-colors"
-              >
-                Create Account
+              <Link href="/auth/signup" className="text-green-600 hover:text-green-700 font-semibold">
+                Sign up
               </Link>
             </p>
           </div>
         </div>
 
-        {/* Demo Credentials */}
-        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
-          <p className="text-xs font-medium text-blue-900 mb-2">Demo Credentials:</p>
-          <p className="text-xs text-blue-700">Email: demo@krishihedge.com</p>
-          <p className="text-xs text-blue-700">Password: demo123</p>
+        {/* Additional Info */}
+        <div className="mt-8 text-center text-xs text-gray-500">
+          <p>Protected by industry-standard encryption</p>
         </div>
       </div>
     </div>
   );
 }
-
