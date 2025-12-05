@@ -8,15 +8,29 @@ import dummyContracts from "@/data/dummyContracts";
 async function fetchContracts(): Promise<AdminContract[]> {
   try {
     // Fetch from local admin API which connects to Supabase
-    const res = await fetch(`http://localhost:3001/api/contracts`, { cache: "no-store" });
+    const res = await fetch(`http://localhost:3001/api/contracts`, { 
+      cache: "no-store",
+      headers: {
+        'Accept': 'application/json',
+      }
+    });
+    
     if (!res.ok) {
-      console.error('[Admin Dashboard] Failed to fetch contracts from API');
+      console.error('[Admin Dashboard] Failed to fetch contracts from API, using dummy data');
       return [];
     }
+    
+    // Check if response is JSON
+    const contentType = res.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.warn('[Admin Dashboard] API returned non-JSON response, using dummy data');
+      return [];
+    }
+    
     const data = (await res.json()) as AdminContract[];
     return data;
   } catch (error) {
-    console.error('[Admin Dashboard] Error fetching contracts:', error);
+    console.error('[Admin Dashboard] Error fetching contracts, using dummy data:', error);
     return [];
   }
 }

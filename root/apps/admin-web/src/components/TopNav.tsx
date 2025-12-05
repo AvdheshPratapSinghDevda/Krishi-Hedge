@@ -19,7 +19,7 @@ export default function TopNav() {
   const [authed, setAuthed] = useState<boolean>(() => {
     try {
       if (typeof window === "undefined") return false;
-      return !!window.localStorage?.getItem("kh_user");
+      return !!window.localStorage?.getItem("admin_user");
     } catch (e) {
       return false;
     }
@@ -31,15 +31,14 @@ export default function TopNav() {
 
   useEffect(() => {
     try {
-      const raw = window.localStorage?.getItem('kh_user');
+      const raw = window.localStorage?.getItem('admin_user');
       if (raw) {
         const user = JSON.parse(raw);
-        if (user?.initials) setUserInitials(user.initials);
-        else if (user?.name) {
+        if (user?.name) {
           const parts = user.name.split(' ');
-          setUserInitials((parts[0][0] || 'A') + (parts[1]?.[0] || ''));
+          setUserInitials((parts[0]?.[0] || 'A') + (parts[1]?.[0] || ''));
+          setUserName(user.name);
         }
-        if (user?.name) setUserName(user.name);
       }
     } catch (e) {
       // ignore
@@ -48,7 +47,7 @@ export default function TopNav() {
 
   useEffect(() => {
     try {
-      const raw = window.localStorage?.getItem("kh_user");
+      const raw = window.localStorage?.getItem("admin_user");
       setAuthed(!!raw);
     } catch (e) {
       setAuthed(false);
@@ -59,20 +58,20 @@ export default function TopNav() {
   useEffect(() => {
     function onStorage() {
       try {
-        const raw = window.localStorage?.getItem("kh_user");
+        const raw = window.localStorage?.getItem("admin_user");
         setAuthed(!!raw);
       } catch (e) {
         setAuthed(false);
       }
     }
-    function onKHUserChange() {
+    function onAdminUserChange() {
       onStorage();
     }
     window.addEventListener("storage", onStorage);
-    window.addEventListener("kh_user_change", onKHUserChange);
+    window.addEventListener("admin_user_change", onAdminUserChange);
     return () => {
       window.removeEventListener("storage", onStorage);
-      window.removeEventListener("kh_user_change", onKHUserChange);
+      window.removeEventListener("admin_user_change", onAdminUserChange);
     };
   }, []);
 

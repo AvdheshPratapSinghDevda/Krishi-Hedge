@@ -1,43 +1,64 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import AuthForm from "./AuthForm";
+import { useRouter } from "next/navigation";
 
 export default function AuthGate({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<any>(() => {
-    try {
-      if (typeof window === "undefined") return null;
-      const raw = window.localStorage?.getItem("kh_user");
-      return raw ? JSON.parse(raw) : null;
-    } catch (e) {
-      return null;
-    }
-  });
+  const router = useRouter();
+  const [isChecking, setIsChecking] = useState(true);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    // Sync changes across tabs (storage event) or custom event in same tab.
+    // Check for authenticated user
+    const checkAuth = async () => {
+      try {
+        const raw = window.localStorage?.getItem("admin_user");
+        if (raw) {
+          setUser(JSON.parse(raw));
+        } else {
+          // No user found, redirect to login
+          router.push("/login");
+        }
+      } catch (e) {
+        router.push("/login");
+      } finally {
+        setIsChecking(false);
+      }
+    };
+
+    checkAuth();
+
+    // Sync changes across tabs
     function onStorage() {
       try {
-        const raw = window.localStorage?.getItem("kh_user");
+        const raw = window.localStorage?.getItem("admin_user");
         setUser(raw ? JSON.parse(raw) : null);
+        if (!raw) {
+          router.push("/login");
+        }
       } catch (e) {
         setUser(null);
+        router.push("/login");
       }
     }
+    
     window.addEventListener("storage", onStorage);
-    window.addEventListener("kh_user_change", onStorage);
+    window.addEventListener("admin_user_change", onStorage);
+    
     return () => {
       window.removeEventListener("storage", onStorage);
-      window.removeEventListener("kh_user_change", onStorage);
+      window.removeEventListener("admin_user_change", onStorage);
     };
-  }, []);
+  }, [router]);
 
-  function onAuth(u: any) {
-    setUser(u);
+  // Show nothing while checking to prevent flash
+  if (isChecking) {
+    return null;
   }
 
+  // If no user after check, return null (redirect handles navigation)
   if (!user) {
-    return <AuthForm onAuth={onAuth} />;
+    return null;
   }
 
   return <>{children}</>;
