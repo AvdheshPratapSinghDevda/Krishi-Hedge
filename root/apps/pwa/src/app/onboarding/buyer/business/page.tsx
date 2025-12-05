@@ -1,100 +1,131 @@
 'use client';
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-const PROFILE_STORAGE_KEY = "kh_profile";
-
-interface BuyerProfileSlice {
-  businessType?: 'trader' | 'processor' | 'fpo_aggregator';
-}
+const PROFILE_STORAGE_KEY = "kh_buyer_profile";
 
 export default function BuyerBusinessOnboardingPage() {
   const router = useRouter();
-  const [profile, setProfile] = useState<BuyerProfileSlice>({});
+  const [organizationName, setOrganizationName] = useState("");
+  const [buyerType, setBuyerType] = useState("Institutional");
+  const [district, setDistrict] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const raw = window.localStorage.getItem(PROFILE_STORAGE_KEY);
-    if (!raw) return;
+  async function handleNext() {
+    if (!organizationName.trim()) {
+      alert("Please enter your organization name");
+      return;
+    }
+
+    if (!district.trim()) {
+      alert("Please enter your district");
+      return;
+    }
+
+    setLoading(true);
     try {
-      const parsed = JSON.parse(raw);
-      setProfile({ businessType: parsed.businessType });
-    } catch {
-      // ignore
-    }
-  }, []);
+      const buyerId = window.localStorage.getItem("kh_buyer_id");
+      
+      if (buyerId) {
+        // Update buyer profile in database
+        await fetch('/api/buyer/profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            buyerId,
+            organization_name: organizationName,
+            buyer_type: buyerType,
+            district: district,
+            name: organizationName,
+          }),
+        });
+      }
 
-  function choose(type: BuyerProfileSlice['businessType']) {
-    setProfile({ businessType: type });
-  }
+      // Store in localStorage
+      const profile = {
+        organization_name: organizationName,
+        buyer_type: buyerType,
+        district: district,
+        name: organizationName,
+      };
+      window.localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
 
-  function next() {
-    if (typeof window !== 'undefined') {
-      const raw = window.localStorage.getItem(PROFILE_STORAGE_KEY);
-      const base = raw ? JSON.parse(raw) : {};
-      const merged = { ...base, ...profile };
-      window.localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(merged));
+      // Move to interest selection
+      router.push("/onboarding/buyer/interest");
+    } catch (error) {
+      console.error("Error saving business info:", error);
+      alert("Failed to save. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    router.push('/onboarding/buyer/interest');
   }
 
   return (
-    <main className="flex min-h-screen justify-center bg-zinc-50">
+    <main className="flex min-h-screen justify-center bg-gradient-to-br from-slate-50 to-blue-50">
       <div className="flex min-h-screen w-full max-w-[420px] flex-col bg-white px-4 pb-10 pt-6">
-        <header className="mb-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-emerald-700">Buyer setup</p>
-          <h1 className="text-lg font-semibold text-zinc-900">What best describes you?</h1>
-          <p className="mt-1 text-xs text-zinc-600">This helps us show the right kinds of forwards.</p>
+        <header className="mb-6">
+          <p className="text-xs font-medium uppercase tracking-wide text-blue-700">Buyer Setup - Step 1 of 2</p>
+          <h1 className="text-2xl font-semibold text-slate-900 mt-2">Business Information</h1>
+          <p className="mt-1 text-sm text-slate-600">Tell us about your organization to get started.</p>
         </header>
 
-        <section className="space-y-3 text-sm">
-          <button
-            type="button"
-            onClick={() => choose('trader')}
-            className={`w-full rounded-2xl border px-4 py-3 text-left shadow-sm ${
-              profile.businessType === 'trader'
-                ? 'border-emerald-500 bg-emerald-50 text-emerald-900'
-                : 'border-zinc-200 bg-white text-zinc-900'
-            }`}
-          >
-            <p className="text-xs font-medium uppercase tracking-wide">Individual trader</p>
-            <p className="mt-1 text-xs text-zinc-700">Buying for yourself or a small desk.</p>
-          </button>
+        <section className="space-y-5 flex-1">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Organization Name *
+            </label>
+            <input 
+              type="text"
+              value={organizationName}
+              onChange={(e) => setOrganizationName(e.target.value)}
+              className="w-full p-4 bg-slate-50 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none font-medium text-slate-800 transition" 
+              placeholder="e.g. ITC Limited, BigBasket" 
+            />
+          </div>
 
-          <button
-            type="button"
-            onClick={() => choose('processor')}
-            className={`w-full rounded-2xl border px-4 py-3 text-left shadow-sm ${
-              profile.businessType === 'processor'
-                ? 'border-emerald-500 bg-emerald-50 text-emerald-900'
-                : 'border-zinc-200 bg-white text-zinc-900'
-            }`}
-          >
-            <p className="text-xs font-medium uppercase tracking-wide">Processor / mill</p>
-            <p className="mt-1 text-xs text-zinc-700">Buying for an oil mill / processing unit.</p>
-          </button>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Buyer Type *
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              {['Institutional', 'Retail Chain', 'Mandi Agent', 'Exporter'].map((type) => (
+                <button
+                  key={type}
+                  onClick={() => setBuyerType(type)}
+                  className={`p-4 rounded-xl border-2 text-sm font-bold transition ${
+                    buyerType === type 
+                      ? 'border-blue-600 bg-blue-50 text-blue-800' 
+                      : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                  }`}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
+          </div>
 
-          <button
-            type="button"
-            onClick={() => choose('fpo_aggregator')}
-            className={`w-full rounded-2xl border px-4 py-3 text-left shadow-sm ${
-              profile.businessType === 'fpo_aggregator'
-                ? 'border-emerald-500 bg-emerald-50 text-emerald-900'
-                : 'border-zinc-200 bg-white text-zinc-900'
-            }`}
-          >
-            <p className="text-xs font-medium uppercase tracking-wide">FPO aggregator</p>
-            <p className="mt-1 text-xs text-zinc-700">Buying on behalf of farmers / FPO network.</p>
-          </button>
-
-          <button
-            onClick={next}
-            className="mt-4 w-full rounded-full bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm"
-          >
-            Next
-          </button>
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              District / Location *
+            </label>
+            <input 
+              type="text"
+              value={district}
+              onChange={(e) => setDistrict(e.target.value)}
+              className="w-full p-4 bg-slate-50 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none font-medium text-slate-800 transition" 
+              placeholder="e.g. Mumbai, Bangalore" 
+            />
+          </div>
         </section>
+
+        <button
+          onClick={handleNext}
+          disabled={loading}
+          className="mt-6 w-full rounded-xl bg-blue-600 px-4 py-4 text-base font-bold text-white shadow-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? "Saving..." : "Continue"}
+        </button>
       </div>
     </main>
   );

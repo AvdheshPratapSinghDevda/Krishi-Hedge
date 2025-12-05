@@ -26,18 +26,18 @@ export function BottomNav() {
     return (
       <nav className={baseClasses}>
         <Link href="/buyer/home" className="flex flex-1 flex-col items-center justify-center gap-0.5">
-          <span className="text-xs font-semibold text-emerald-700">Home</span>
+          <span className="text-xs font-semibold text-blue-700">Home</span>
         </Link>
         <Link href="/forecast" className="flex flex-1 flex-col items-center justify-center gap-0.5">
           <span>Forecast</span>
         </Link>
-        <Link href="/contracts" className="flex flex-1 flex-col items-center justify-center gap-0.5">
+        <Link href="/buyer/contracts" className="flex flex-1 flex-col items-center justify-center gap-0.5">
           <span>Contracts</span>
         </Link>
         <Link href="/market" className="flex flex-1 flex-col items-center justify-center gap-0.5">
           <span>Market</span>
         </Link>
-        <Link href="/profile" className="flex flex-1 flex-col items-center justify-center gap-0.5">
+        <Link href="/buyer/profile" className="flex flex-1 flex-col items-center justify-center gap-0.5">
           <span>Profile</span>
         </Link>
       </nav>

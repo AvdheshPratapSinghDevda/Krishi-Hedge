@@ -50,9 +50,12 @@ export default function BuyerHomePage() {
             <h1 className="text-2xl font-bold">Buyer Portal</h1>
             <p className="text-slate-400 text-sm">Sourcing for {buyerName}</p>
           </div>
-          <div className="w-10 h-10 bg-slate-800 border border-slate-700 rounded-full flex items-center justify-center text-blue-400 font-bold shadow-md">
+          <button 
+            onClick={() => router.push('/buyer/profile')}
+            className="w-10 h-10 bg-slate-800 border border-slate-700 rounded-full flex items-center justify-center text-blue-400 font-bold shadow-md hover:bg-slate-700 transition cursor-pointer"
+          >
             {getInitials(buyerName)}
-          </div>
+          </button>
         </div>
         
         <div className="bg-slate-800/50 backdrop-blur-sm p-4 rounded-xl border border-slate-700">

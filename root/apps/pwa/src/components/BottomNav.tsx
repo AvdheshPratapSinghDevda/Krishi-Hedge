@@ -45,8 +45,8 @@ export default function BottomNav() {
         </button>
         
         <button 
-            onClick={() => router.push('/profile')} 
-            className={`${isActive('/profile') ? 'text-blue-400 font-bold' : 'hover:text-slate-200'} flex flex-col items-center text-xs`}
+            onClick={() => router.push('/buyer/profile')} 
+            className={`${isActive('/buyer/profile') ? 'text-blue-400 font-bold' : 'hover:text-slate-200'} flex flex-col items-center text-xs`}
         >
             <i className="fa-solid fa-user-tie text-xl mb-1"></i>Profile
         </button>

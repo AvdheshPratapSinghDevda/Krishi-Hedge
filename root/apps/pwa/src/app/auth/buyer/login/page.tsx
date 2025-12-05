@@ -44,7 +44,7 @@ export default function BuyerLoginPage() {
           alert("OTP sent to your mobile number!");
         }
       }
-      router.push("/auth/buyer-otp");
+      router.push("/auth/buyer/otp");
     } catch (error) {
       console.error("Login error:", error);
       alert("Something went wrong. Please try again.");

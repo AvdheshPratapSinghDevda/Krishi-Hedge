@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const PROFILE_STORAGE_KEY = "kh_profile";
+const PROFILE_STORAGE_KEY = "kh_buyer_profile";
 
 interface BuyerInterestSlice {
   buyerCrops?: string[];
@@ -23,7 +23,7 @@ export default function BuyerInterestOnboardingPage() {
     if (!raw) return;
     try {
       const parsed = JSON.parse(raw);
-      setProfile({ buyerCrops: parsed.buyerCrops || [], volumeBand: parsed.volumeBand || '' });
+      setProfile({ buyerCrops: parsed.buyerCrops || parsed.interested_crops || [], volumeBand: parsed.volumeBand || parsed.volume_band || '' });
     } catch {
       // ignore
     }
@@ -46,21 +46,21 @@ export default function BuyerInterestOnboardingPage() {
     if (typeof window !== 'undefined') {
       const raw = window.localStorage.getItem(PROFILE_STORAGE_KEY);
       const base = raw ? JSON.parse(raw) : {};
-      const merged = { ...base, ...profile, onboardingCompleted: true };
+      const merged = { ...base, interested_crops: profile.buyerCrops, volume_band: profile.volumeBand, onboarded: true };
       window.localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(merged));
       
-      // Save to database
-      const userId = window.localStorage.getItem("kh_user_id");
-      if (userId) {
+      // Save to buyers database
+      const buyerId = window.localStorage.getItem("kh_buyer_id");
+      if (buyerId) {
         try {
-          await fetch('/api/profile', {
+          await fetch('/api/buyer/profile', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              userId,
-              name: base.name || 'Buyer',
-              location: base.location || 'Not specified',
-              crops: profile.buyerCrops || [],
+              buyerId,
+              interested_crops: profile.buyerCrops || [],
+              volume_band: profile.volumeBand || '',
+              onboarded: true,
             }),
           });
         } catch (error) {
