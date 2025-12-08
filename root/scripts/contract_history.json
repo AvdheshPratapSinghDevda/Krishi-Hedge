@@ -1,0 +1,76 @@
+[
+  {
+    "cid": "QmUn98SErzXK2v3tGpNJNXZLN5ZcmdTGksAjzrtNEshy5c",
+    "hash": "54c015f0fa345244bb35d007df8db63ec5a597bc5758b531a5627d6b1daa88df",
+    "contractData": {
+      "farmer": {
+        "name": "Rajesh Kumar",
+        "location": "Indore, Madhya Pradesh",
+        "phone": "+91-98765-43210"
+      },
+      "fpo": {
+        "name": "Indore Farmers Cooperative",
+        "registrationNo": "FPO-MP-2023-12345"
+      },
+      "commodity": {
+        "name": "Soybean",
+        "variety": "JS-335",
+        "grade": "FAQ"
+      },
+      "terms": {
+        "quantity": 50,
+        "strikePrice": 4800,
+        "deliveryDate": "2025-01-15",
+        "totalValue": 240000
+      },
+      "signatures": {
+        "farmer": "DIGITAL_SIGNATURE_PLACEHOLDER",
+        "fpo": "DIGITAL_SIGNATURE_PLACEHOLDER",
+        "witnessedBy": "Block Development Officer"
+      }
+    },
+    "timestamp": "2025-12-08T18:59:15.493Z",
+    "ipfsUrls": [
+      "https://ipfs.io/ipfs/QmUn98SErzXK2v3tGpNJNXZLN5ZcmdTGksAjzrtNEshy5c",
+      "https://gateway.pinata.cloud/ipfs/QmUn98SErzXK2v3tGpNJNXZLN5ZcmdTGksAjzrtNEshy5c"
+    ],
+    "verificationInstructions": "🔍 HOW TO VERIFY THIS CONTRACT:\n1. Go to: https://ipfs.io/ipfs/QmUn98SErzXK2v3tGpNJNXZLN5ZcmdTGksAjzrtNEshy5c\n2. Download the JSON file\n3. Compute SHA-256 hash of the downloaded file\n4. Compare with stored hash: 54c015f0fa345244bb35d007df8db63ec5a597bc5758b531a5627d6b1daa88df\n5. If hashes match = Contract is authentic ✅\n6. If hashes differ = Contract was tampered ❌\n\nOr use our UI: http://localhost:3000/contracts/verify\nEnter CID: QmUn98SErzXK2v3tGpNJNXZLN5ZcmdTGksAjzrtNEshy5c"
+  },
+  {
+    "cid": "QmUn98SErzXK2v3tGpNJNXZLN5ZcmdTGksAjzrtNEshy5c",
+    "hash": "54c015f0fa345244bb35d007df8db63ec5a597bc5758b531a5627d6b1daa88df",
+    "contractData": {
+      "farmer": {
+        "name": "Rajesh Kumar",
+        "location": "Indore, Madhya Pradesh",
+        "phone": "+91-98765-43210"
+      },
+      "fpo": {
+        "name": "Indore Farmers Cooperative",
+        "registrationNo": "FPO-MP-2023-12345"
+      },
+      "commodity": {
+        "name": "Soybean",
+        "variety": "JS-335",
+        "grade": "FAQ"
+      },
+      "terms": {
+        "quantity": 50,
+        "strikePrice": 4800,
+        "deliveryDate": "2025-01-15",
+        "totalValue": 240000
+      },
+      "signatures": {
+        "farmer": "DIGITAL_SIGNATURE_PLACEHOLDER",
+        "fpo": "DIGITAL_SIGNATURE_PLACEHOLDER",
+        "witnessedBy": "Block Development Officer"
+      }
+    },
+    "timestamp": "2025-12-08T18:59:44.320Z",
+    "ipfsUrls": [
+      "https://ipfs.io/ipfs/QmUn98SErzXK2v3tGpNJNXZLN5ZcmdTGksAjzrtNEshy5c",
+      "https://gateway.pinata.cloud/ipfs/QmUn98SErzXK2v3tGpNJNXZLN5ZcmdTGksAjzrtNEshy5c"
+    ],
+    "verificationInstructions": "🔍 HOW TO VERIFY THIS CONTRACT:\n1. Go to: https://ipfs.io/ipfs/QmUn98SErzXK2v3tGpNJNXZLN5ZcmdTGksAjzrtNEshy5c\n2. Download the JSON file\n3. Compute SHA-256 hash of the downloaded file\n4. Compare with stored hash: 54c015f0fa345244bb35d007df8db63ec5a597bc5758b531a5627d6b1daa88df\n5. If hashes match = Contract is authentic ✅\n6. If hashes differ = Contract was tampered ❌\n\nOr use our UI: http://localhost:3000/contracts/verify\nEnter CID: QmUn98SErzXK2v3tGpNJNXZLN5ZcmdTGksAjzrtNEshy5c"
+  }
+]
