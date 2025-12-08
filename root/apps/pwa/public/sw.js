@@ -9,9 +9,26 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  // Simple pass-through for now, or basic caching
-  // For a prototype, we don't want aggressive caching to break updates
-  // But we need a fetch handler for PWA installability criteria
+  // Network-first strategy for API calls, cache-first for static assets
+  if (event.request.url.includes('/api/') || event.request.url.includes('/_next/data/')) {
+    // Always fetch fresh for API and data requests
+    event.respondWith(fetch(event.request));
+  } else if (event.request.destination === 'image' || event.request.destination === 'style' || event.request.destination === 'script') {
+    // Cache-first for static assets
+    event.respondWith(
+      caches.match(event.request).then(cachedResponse => {
+        return cachedResponse || fetch(event.request).then(response => {
+          return caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, response.clone());
+            return response;
+          });
+        });
+      })
+    );
+  } else {
+    // Network-first for everything else
+    event.respondWith(fetch(event.request));
+  }
 });
 
 // Push notification handler

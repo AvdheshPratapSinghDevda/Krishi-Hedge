@@ -285,7 +285,6 @@ export default function ContractsPage() {
   }
 
   return (
-<<<<<<< HEAD
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 pb-20">
       {/* Government-Ready Header */}
       <div className="bg-white border-b shadow-sm sticky top-0 z-20">
@@ -306,7 +305,7 @@ export default function ContractsPage() {
               </div>
             </div>
 
-            {/* Right: Search, Filter, New Contract */}
+            {/* Right: Search, Filter, Verify, New Contract */}
             <div className="flex items-center gap-2">
               {/* Search Button */}
               <button
@@ -327,6 +326,22 @@ export default function ContractsPage() {
                 {(statusFilter !== 'all' || commodityFilter !== 'all') && (
                   <span className="absolute top-1 right-1 w-2 h-2 bg-blue-600 rounded-full"></span>
                 )}
+              </button>
+
+              {/* Verify Contract Button */}
+              <button
+                onClick={() => router.push('/contracts/verify')}
+                className="hidden sm:flex items-center gap-2 px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors shadow-sm"
+              >
+                <CheckCircle size={16} />
+                <span>Verify</span>
+              </button>
+              <button
+                onClick={() => router.push('/contracts/verify')}
+                className="sm:hidden p-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-sm"
+                aria-label="Verify contract"
+              >
+                <CheckCircle size={18} />
               </button>
 
               {/* New Contract Button */}
@@ -457,91 +472,10 @@ export default function ContractsPage() {
               <p className={`text-xl font-bold ${stats.profitLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {stats.profitLoss >= 0 ? '+' : ''}{formatCurrency(stats.profitLoss)}
               </p>
-=======
-    <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Header */}
-      <div className="bg-white border-b sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-            <button onClick={() => router.push('/')} className="text-gray-600 flex-shrink-0">
-              <ChevronRight size={20} className="rotate-180 sm:w-6 sm:h-6" />
-            </button>
-            <div className="min-w-0">
-              <h1 className="text-base sm:text-xl font-bold truncate">{t('contracts.title')}</h1>
-              <p className="text-xs text-gray-500 hidden sm:block truncate">{t('contracts.subtitle')}</p>
-            </div>
-          </div>
-          <button
-            onClick={() => router.push('/contracts/create')}
-            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base flex-shrink-0"
-          >
-            <Plus size={16} className="sm:w-[18px] sm:h-[18px]" />
-            <span className="hidden sm:inline">New Contract</span>
-            <span className="sm:hidden">New</span>
-          </button>
-        </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <div className="bg-white rounded-lg sm:rounded-xl shadow-sm p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="bg-green-100 p-2 sm:p-3 rounded-lg flex-shrink-0">
-                <FileText className="text-green-600" size={20} />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs sm:text-sm text-gray-600 truncate">Active</p>
-                <p className="text-xl sm:text-2xl font-bold text-gray-900">{stats.activeContracts}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg sm:rounded-xl shadow-sm p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="bg-yellow-100 p-2 sm:p-3 rounded-lg flex-shrink-0">
-                <Clock className="text-yellow-600" size={20} />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs sm:text-sm text-gray-600 truncate">Pending</p>
-                <p className="text-xl sm:text-2xl font-bold text-gray-900">{stats.pendingReview}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg sm:rounded-xl shadow-sm p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="bg-blue-100 p-2 sm:p-3 rounded-lg flex-shrink-0">
-                <Wallet className="text-blue-600" size={20} />
-              </div>
-              <div className="min-w-0 overflow-hidden">
-                <p className="text-xs sm:text-sm text-gray-600 truncate">Total Value</p>
-                <p className="text-sm sm:text-lg font-bold text-gray-900 truncate">{formatCurrency(stats.totalValue).replace('₹', '₹')}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg sm:rounded-xl shadow-sm p-3 sm:p-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className={`p-2 sm:p-3 rounded-lg flex-shrink-0 ${stats.profitLoss >= 0 ? 'bg-green-100' : 'bg-red-100'}`}>
-                {stats.profitLoss >= 0 ? (
-                  <TrendingUp className="text-green-600" size={20} />
-                ) : (
-                  <TrendingDown className="text-red-600" size={20} />
-                )}
-              </div>
-              <div className="min-w-0 overflow-hidden">
-                <p className="text-xs sm:text-sm text-gray-600 truncate">P&L</p>
-                <p className={`text-sm sm:text-lg font-bold truncate ${stats.profitLoss >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {formatCurrency(stats.profitLoss)}
-                </p>
-              </div>
->>>>>>> 913fea40bdf5871844d1054272d8935ecc98ae73
             </div>
           </div>
         </div>
 
-<<<<<<< HEAD
         {/* Contracts List - Government Ready Design */}
         <div className="space-y-3">
           {filteredContracts.length === 0 ? (
@@ -551,65 +485,11 @@ export default function ContractsPage() {
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No Contracts Found</h3>
               <p className="text-gray-600 mb-6 max-w-md mx-auto">
-=======
-        {/* Filters */}
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm p-3 sm:p-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {/* Search */}
-            <div className="relative sm:col-span-2 lg:col-span-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-              <input
-                type="text"
-                placeholder="Search contracts..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Status Filter */}
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-3 sm:px-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-            >
-              <option value="all">All Status</option>
-              <option value="active">Active</option>
-              <option value="pending">Pending</option>
-              <option value="completed">Completed</option>
-              <option value="expired">Expired</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-
-            {/* Commodity Filter */}
-            <select
-              value={commodityFilter}
-              onChange={(e) => setCommodityFilter(e.target.value)}
-              className="px-3 sm:px-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-            >
-              <option value="all">All Commodities</option>
-              <option value="Soybean">Soybean</option>
-              <option value="Mustard">Mustard</option>
-              <option value="Groundnut">Groundnut</option>
-              <option value="Sunflower">Sunflower</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Contracts List */}
-        <div className="space-y-3 sm:space-y-4">
-          {filteredContracts.length === 0 ? (
-            <div className="bg-white rounded-lg sm:rounded-xl shadow-sm p-8 sm:p-12 text-center">
-              <FileText className="mx-auto text-gray-400 mb-4" size={40} />
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">No contracts found</h3>
-              <p className="text-sm text-gray-600 mb-6">
->>>>>>> 913fea40bdf5871844d1054272d8935ecc98ae73
                 {searchQuery || statusFilter !== 'all' || commodityFilter !== 'all'
                   ? 'No contracts match your current filters. Try adjusting your search criteria.'
                   : 'You have not created any contracts yet. Create your first contract to begin hedging.'}
               </p>
               <button
-<<<<<<< HEAD
                 onClick={() => router.push('/contracts/new')}
                 className="inline-flex items-center gap-2 px-6 py-3 bg-green-700 text-white font-medium rounded-lg hover:bg-green-800 shadow-sm transition-colors"
               >
@@ -624,75 +504,6 @@ export default function ContractsPage() {
                 <p className="text-sm text-gray-600">
                   Showing <span className="font-semibold">{filteredContracts.length}</span> of <span className="font-semibold">{contracts.length}</span> contracts
                 </p>
-=======
-                onClick={() => router.push('/contracts/create')}
-                className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm sm:text-base"
-              >
-                <Plus size={18} />
-                Create Contract
-              </button>
-            </div>
-          ) : (
-            filteredContracts.map((contract) => (
-              <div key={contract.id} className="bg-white rounded-lg sm:rounded-xl shadow-sm p-4 sm:p-6 hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between mb-3 sm:mb-4 gap-2">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 sm:gap-3 mb-2 flex-wrap">
-                      <h3 className="text-base sm:text-lg font-bold text-gray-900 truncate">{contract.commodity}</h3>
-                      {getStatusBadge(contract.status)}
-                    </div>
-                    <p className="text-xs sm:text-sm text-gray-600 truncate">Contract #{contract.contractNumber}</p>
-                  </div>
-                  <button
-                    onClick={() => router.push(`/contracts/${contract.id}`)}
-                    className="text-gray-400 hover:text-green-600 flex-shrink-0"
-                  >
-                    <ChevronRight size={20} className="sm:w-6 sm:h-6" />
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-3 sm:mb-4">
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Quantity</p>
-                    <p className="text-sm sm:text-base font-semibold text-gray-900 truncate">{contract.quantity} {contract.unit}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Strike Price</p>
-                    <p className="text-sm sm:text-base font-semibold text-gray-900 truncate">{formatCurrency(contract.strikePrice)}/qtl</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">Current Price</p>
-                    <p className="text-sm sm:text-base font-semibold text-gray-900 truncate">{formatCurrency(contract.currentPrice || 0)}/qtl</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 mb-1">P&L</p>
-                    <p className={`text-sm sm:text-base font-semibold truncate ${(contract.profitLoss || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {(contract.profitLoss || 0) >= 0 ? '+' : ''}{formatCurrency(contract.profitLoss || 0)}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 sm:pt-4 border-t">
-                  <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600 overflow-hidden">
-                    <span className="flex items-center gap-1 flex-shrink-0">
-                      <Calendar size={14} className="sm:w-4 sm:h-4" />
-                      <span className="truncate">Expires: {formatDate(contract.expiryDate)}</span>
-                    </span>
-                    {contract.counterparty && (
-                      <span className="hidden lg:inline truncate">• {contract.counterparty}</span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => router.push(`/contracts/${contract.id}`)}
-                      className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-sm text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                    >
-                      <Eye size={14} className="sm:w-4 sm:h-4" />
-                      <span>View Details</span>
-                    </button>
-                  </div>
-                </div>
->>>>>>> 913fea40bdf5871844d1054272d8935ecc98ae73
               </div>
 
               {/* Contract Cards */}

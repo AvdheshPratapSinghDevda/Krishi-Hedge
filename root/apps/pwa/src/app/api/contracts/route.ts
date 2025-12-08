@@ -24,7 +24,13 @@ export async function GET(req: NextRequest) {
     const { data, error } = await query;
 
     if (error) {
+      console.error('[CONTRACTS] Supabase error:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    // Return empty array if no data (not an error)
+    if (!data || data.length === 0) {
+      return NextResponse.json([], { status: 200 });
     }
 
     const mapped = (data || []).map((row: any) => ({

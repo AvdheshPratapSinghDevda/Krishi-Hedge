@@ -13,10 +13,11 @@ export default function NotificationPrompt() {
     if ('Notification' in window) {
       setPermission(Notification.permission);
       
-      // Show prompt if permission not yet granted
-      if (Notification.permission === 'default') {
-        // Delay showing prompt to avoid overwhelming user immediately
-        const timer = setTimeout(() => setShowPrompt(true), 3000);
+      // Only show prompt if user has shown interest (e.g., visited alerts page)
+      // Don't auto-show on every page load
+      const hasInteracted = sessionStorage.getItem('user_interacted');
+      if (Notification.permission === 'default' && hasInteracted) {
+        const timer = setTimeout(() => setShowPrompt(true), 5000);
         return () => clearTimeout(timer);
       }
     }
@@ -56,50 +57,41 @@ export default function NotificationPrompt() {
   if (typeof window !== 'undefined' && sessionStorage.getItem('notif_prompt_dismissed')) return null;
 
   return (
-    <div className="fixed top-20 left-4 right-4 md:left-auto md:right-4 md:max-w-md z-50 animate-slide-down">
-      <div className="bg-white rounded-2xl shadow-2xl border border-green-100 overflow-hidden">
-        <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-4 text-white">
+    <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-[92%] max-w-sm z-50 animate-slide-up">
+      <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-black/5 overflow-hidden">
+        <div className="flex items-center justify-between p-4">
           <div className="flex items-center gap-3">
-            <div className="text-3xl"></div>
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-lg shadow-green-500/25">
+              <span className="text-lg">🔔</span>
+            </div>
             <div>
-              <h3 className="font-bold text-lg">Stay Updated</h3>
-              <p className="text-sm text-green-50">Get instant alerts on your contracts</p>
+              <h3 className="font-semibold text-[15px] text-gray-900 tracking-tight">Notifications</h3>
+              <p className="text-[13px] text-gray-500 font-normal">Get updates on your contracts</p>
             </div>
           </div>
+          <button
+            onClick={handleDismiss}
+            className="w-7 h-7 rounded-full hover:bg-gray-100/80 active:bg-gray-200/80 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-all"
+          >
+            <span className="text-xl leading-none font-light">×</span>
+          </button>
         </div>
 
-        <div className="p-4 space-y-3">
-          <div className="space-y-2">
-            <div className="flex items-start gap-2 text-sm text-gray-700">
-              <span className="text-green-600 font-bold"></span>
-              <span>Contract acceptance notifications</span>
-            </div>
-            <div className="flex items-start gap-2 text-sm text-gray-700">
-              <span className="text-green-600 font-bold"></span>
-              <span>Price change alerts</span>
-            </div>
-            <div className="flex items-start gap-2 text-sm text-gray-700">
-              <span className="text-green-600 font-bold"></span>
-              <span>Delivery reminders</span>
-            </div>
-          </div>
-
-          <div className="flex gap-2">
-            <button
-              onClick={handleDismiss}
-              disabled={isSubscribing}
-              className="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 text-gray-700 rounded-xl font-medium transition-colors"
-            >
-              Not Now
-            </button>
-            <button
-              onClick={handleEnable}
-              disabled={isSubscribing}
-              className="flex-1 px-4 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-400 text-white rounded-xl font-bold transition-all shadow-md"
-            >
-              {isSubscribing ? 'Enabling...' : 'Enable'}
-            </button>
-          </div>
+        <div className="px-4 pb-4 flex gap-2.5">
+          <button
+            onClick={handleDismiss}
+            disabled={isSubscribing}
+            className="flex-1 px-4 py-2.5 bg-gray-100/80 hover:bg-gray-200/80 active:scale-[0.98] disabled:bg-gray-50 text-gray-700 rounded-xl text-[15px] font-medium transition-all"
+          >
+            Not Now
+          </button>
+          <button
+            onClick={handleEnable}
+            disabled={isSubscribing}
+            className="flex-1 px-4 py-2.5 bg-gradient-to-b from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 active:scale-[0.98] disabled:from-gray-300 disabled:to-gray-400 text-white rounded-xl text-[15px] font-semibold transition-all shadow-lg shadow-green-500/25"
+          >
+            {isSubscribing ? 'Enabling...' : 'Allow'}
+          </button>
         </div>
       </div>
     </div>

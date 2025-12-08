@@ -17,12 +17,15 @@ export default function OtpPage() {
   const router = useRouter();
   const [code, setCode] = useState("");
   const [phone, setPhone] = useState("");
+  const [sessionData, setSessionData] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const stored = window.localStorage.getItem(PHONE_STORAGE_KEY) || "";
+    const session = window.localStorage.getItem("kh_otp_session") || "";
     setPhone(stored);
+    setSessionData(session);
   }, []);
 
   async function handleVerify() {
@@ -38,35 +41,43 @@ export default function OtpPage() {
       const response = await fetch("/api/auth/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, otp: code }),
+        body: JSON.stringify({ phone, otp: code, sessionData }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
         alert(data.error || "Invalid OTP");
+        setLoading(false);
         return;
       }
 
-      // Store user session
+      console.log("[OTP] Verification successful:", data);
+
+      // Store user session with correct data
       const profile: LocalProfile = {
         phone: data.user.phone,
-        role: data.user.role,
-        onboardingCompleted: data.user.onboarded
+        role: data.user.userType || "farmer",
+        onboardingCompleted: data.user.isOnboarded
       };
       window.localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
-      window.localStorage.setItem("kh_user_id", data.user.id); // Store user ID for API calls
+      
+      if (data.user.id) {
+        window.localStorage.setItem("kh_user_id", data.user.id);
+      }
+      
+      // Clear OTP session
+      window.localStorage.removeItem("kh_otp_session");
 
       // Route based on onboarding status
-      if (data.user.onboarded) {
-        router.push(data.user.role === "buyer" ? "/buyer/home" : "/");
+      if (data.user.isOnboarded) {
+        router.push(data.user.userType === "buyer" ? "/buyer/home" : "/");
       } else {
-        router.push(data.user.role === "buyer" ? "/onboarding/buyer/business" : "/onboarding/basic");
+        router.push(data.user.userType === "buyer" ? "/onboarding/buyer/business" : "/onboarding/basic");
       }
     } catch (error) {
       console.error("Verification error:", error);
       alert("Something went wrong. Please try again.");
-    } finally {
       setLoading(false);
     }
   }

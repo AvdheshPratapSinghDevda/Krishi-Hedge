@@ -230,19 +230,19 @@ export default function HomeScreen() {
 
       {/* Main Content Area with Proper Spacing */}
       <div className="px-5 mt-6 space-y-4">
-        {/* 4 Navigation Buttons Grid */}
+        {/* 6 Navigation Buttons Grid */}
         <div className="grid grid-cols-2 gap-4">
-          {/* DEMO GAME Button */}
+          {/* HEDGE MARKETPLACE Button */}
           <button 
-            onClick={() => router.push('/sandbox')} 
-            className="bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-700 text-white p-4 rounded-2xl shadow-lg font-bold text-left flex flex-col justify-between h-32 active:scale-95 transition-all group hover:shadow-purple-500/30 border border-purple-400/30"
+            onClick={() => router.push('/hedge')} 
+            className="bg-gradient-to-br from-green-500 via-green-600 to-emerald-700 text-white p-4 rounded-2xl shadow-lg font-bold text-left flex flex-col justify-between h-32 active:scale-95 transition-all group hover:shadow-green-500/30 border border-green-400/30"
           >
             <div className="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-              <i className="fa-solid fa-gamepad text-lg"></i>
+              <i className="fa-solid fa-shield text-lg"></i>
             </div>
             <div>
-              <span className="text-sm font-bold block mb-1 drop-shadow-sm">{t('home.demoGameTitle')}</span>
-              <span className="text-xs text-purple-100 opacity-90">{t('home.demoGameSubtitle')}</span>
+              <span className="text-sm font-bold block mb-1 drop-shadow-sm">Hedge Market</span>
+              <span className="text-xs text-green-100 opacity-90">Price protection</span>
             </div>
           </button>
           
@@ -274,17 +274,102 @@ export default function HomeScreen() {
             </div>
           </button>
           
-          {/* MARKET Button */}
+          {/* BUYER MARKETPLACE Button */}
           <button 
-            onClick={() => router.push('/market')} 
+            onClick={() => router.push('/buyer/marketplace')} 
             className="bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700 text-white p-4 rounded-2xl shadow-lg font-bold text-left flex flex-col justify-between h-32 active:scale-95 transition-all group hover:shadow-blue-500/30 border border-blue-400/30"
           >
             <div className="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-              <Activity className="w-4 h-4" />
+              <i className="fa-solid fa-store text-lg"></i>
             </div>
             <div>
-              <span className="text-sm font-bold block mb-1 drop-shadow-sm">{t('home.marketTitle')}</span>
-              <span className="text-xs text-blue-100 opacity-90">{t('home.marketSubtitle')}</span>
+              <span className="text-sm font-bold block mb-1 drop-shadow-sm">Buyer Market</span>
+              <span className="text-xs text-blue-100 opacity-90">Browse contracts</span>
+            </div>
+          </button>
+          
+          {/* CONTRACTS Button */}
+          <button 
+            onClick={() => router.push('/contracts')} 
+            className="bg-gradient-to-br from-emerald-500 via-green-600 to-teal-700 text-white p-4 rounded-2xl shadow-lg font-bold text-left flex flex-col justify-between h-32 active:scale-95 transition-all group hover:shadow-emerald-500/30 border border-emerald-400/30"
+          >
+            <div className="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+              <FileText className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-sm font-bold block mb-1 drop-shadow-sm">{t('home.contractsTitle')}</span>
+              <span className="text-xs text-emerald-100 opacity-90">{t('home.contractsSubtitle')}</span>
+            </div>
+          </button>
+          
+          {/* FPO DASHBOARD Button */}
+          <button 
+            onClick={() => router.push('/fpo/dashboard')} 
+            className="bg-gradient-to-br from-purple-500 via-purple-600 to-pink-700 text-white p-4 rounded-2xl shadow-lg font-bold text-left flex flex-col justify-between h-32 active:scale-95 transition-all group hover:shadow-purple-500/30 border border-purple-400/30"
+          >
+            <div className="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+              <i className="fa-solid fa-users text-lg"></i>
+            </div>
+            <div>
+              <span className="text-sm font-bold block mb-1 drop-shadow-sm">FPO Dashboard</span>
+              <span className="text-xs text-purple-100 opacity-90">Manage members</span>
+            </div>
+          </button>
+
+
+          {/* ALERTS Button */}
+          <button 
+            onClick={() => router.push('/alerts')} 
+            className="bg-gradient-to-br from-orange-500 via-red-600 to-pink-700 text-white p-4 rounded-2xl shadow-lg font-bold text-left flex flex-col justify-between h-32 active:scale-95 transition-all group hover:shadow-orange-500/30 border border-orange-400/30"
+          >
+            <div className="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+              <i className="fa-solid fa-bell text-lg"></i>
+            </div>
+            <div>
+              <span className="text-sm font-bold block mb-1 drop-shadow-sm">Price Alerts</span>
+              <span className="text-xs text-orange-100 opacity-90">Real-time notifications</span>
+            </div>
+          </button>
+
+          {/* FORECAST Button */}
+          <button 
+            onClick={() => router.push('/forecast')} 
+            className="bg-gradient-to-br from-teal-500 via-cyan-600 to-blue-700 text-white p-4 rounded-2xl shadow-lg font-bold text-left flex flex-col justify-between h-32 active:scale-95 transition-all group hover:shadow-teal-500/30 border border-teal-400/30"
+          >
+            <div className="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-sm font-bold block mb-1 drop-shadow-sm">AI Forecast</span>
+              <span className="text-xs text-teal-100 opacity-90">Price predictions</span>
+            </div>
+          </button>
+
+          {/* VERIFICATION Button */}
+          <button 
+            onClick={() => router.push('/contracts/verify')} 
+            className="bg-gradient-to-br from-purple-500 via-violet-600 to-purple-700 text-white p-4 rounded-2xl shadow-lg font-bold text-left flex flex-col justify-between h-32 active:scale-95 transition-all group hover:shadow-purple-500/30 border border-purple-400/30"
+          >
+            <div className="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+              <CheckCircle2 className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-sm font-bold block mb-1 drop-shadow-sm">🔍 Verify Contract</span>
+              <span className="text-xs text-purple-100 opacity-90">IPFS blockchain proof</span>
+            </div>
+          </button>
+
+          {/* FUTURES TRADING Button */}
+          <button 
+            onClick={() => router.push('/sandbox/futures')} 
+            className="bg-gradient-to-br from-rose-500 via-pink-600 to-red-700 text-white p-4 rounded-2xl shadow-lg font-bold text-left flex flex-col justify-between h-32 active:scale-95 transition-all group hover:shadow-rose-500/30 border border-rose-400/30"
+          >
+            <div className="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+              <Target className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-sm font-bold block mb-1 drop-shadow-sm">📈 Futures Trading</span>
+              <span className="text-xs text-rose-100 opacity-90">Simulate hedge positions</span>
             </div>
           </button>
         </div>

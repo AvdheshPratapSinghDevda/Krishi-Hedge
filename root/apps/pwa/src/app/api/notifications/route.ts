@@ -6,8 +6,8 @@ export async function GET(req: NextRequest) {
     const searchParams = req.nextUrl.searchParams;
     const userId = searchParams.get('userId');
 
-    if (!userId) {
-      return NextResponse.json({ error: "User ID required" }, { status: 400 });
+    if (!userId || userId === 'undefined') {
+      return NextResponse.json([]);
     }
 
     const supabase = supabaseServer();

@@ -38,9 +38,15 @@ export default function FarmerPhoneLoginPage() {
 
       if (typeof window !== "undefined") {
         window.localStorage.setItem(PHONE_STORAGE_KEY, phone);
+        
+        // Store session data for verification
+        if (data.sessionData) {
+          window.localStorage.setItem("kh_otp_session", data.sessionData);
+        }
+        
         // In dev mode, show OTP in console for easy testing
         if (data.otp) {
-          console.log("🔐 Farmer OTP:", data.otp);
+          console.log("🔐 OTP for", phone, ":", data.otp);
           alert(`OTP sent! (Dev mode: ${data.otp})`);
         } else {
           alert("OTP sent to your mobile number!");

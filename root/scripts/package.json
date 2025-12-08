@@ -1,0 +1,14 @@
+{
+  "name": "krishi-hedge-scripts",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "IPFS contract upload scripts for KrishiHedge (Pinata - NO CREDIT CARD!)",
+  "scripts": {
+    "upload": "node upload_contract_pinata.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "form-data": "^4.0.0",
+    "dotenv": "^16.4.1"
+  }
+}

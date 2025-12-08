@@ -151,8 +151,8 @@ export default function SandboxDashboard() {
 
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-purple-100">
           <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4">
-            <h2 className="font-bold text-lg mb-1">Choose Your Role</h2>
-            <p className="text-sm text-purple-100">Practice as farmer or buyer</p>
+            <h2 className="font-bold text-lg mb-1">Practice Modes</h2>
+            <p className="text-sm text-purple-100">Learn different aspects of trading</p>
           </div>
 
           <div className="p-4 space-y-3">
@@ -189,6 +189,24 @@ export default function SandboxDashboard() {
                   </div>
                 </div>
                 <i className="fa-solid fa-arrow-right text-blue-600 group-hover:translate-x-1 transition"></i>
+              </div>
+            </button>
+
+            <button
+              onClick={() => router.push('/sandbox/futures')}
+              className="w-full bg-gradient-to-r from-orange-50 to-red-50 border-2 border-orange-200 rounded-xl p-4 hover:border-orange-400 transition-all group"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-orange-500 text-white rounded-xl flex items-center justify-center group-hover:scale-110 transition">
+                    <i className="fa-solid fa-chart-candlestick text-xl"></i>
+                  </div>
+                  <div className="text-left">
+                    <h3 className="font-bold text-gray-800">Futures Trading</h3>
+                    <p className="text-xs text-gray-600">Practice margin trading & P/L</p>
+                  </div>
+                </div>
+                <i className="fa-solid fa-arrow-right text-orange-600 group-hover:translate-x-1 transition"></i>
               </div>
             </button>
           </div>
