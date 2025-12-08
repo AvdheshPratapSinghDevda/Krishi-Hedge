@@ -2,209 +2,235 @@
 
 import React, { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
-import { Mail, Lock, Eye, EyeOff, Sprout, AlertCircle, Loader2 } from 'lucide-react';
-import Link from 'next/link';
+import { AlertCircle, Loader2 } from 'lucide-react';
+import { authService } from '@/lib/auth/auth-service';
+
+type Role = 'farmer' | 'buyer' | 'fpo' | 'admin';
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirectTo') || '/';
+  const role = (searchParams.get('role') as Role) || 'farmer';
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
+  const [phone, setPhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const getRoleLabel = (r: Role): string => {
+    const labels = {
+      farmer: 'Farmer',
+      buyer: 'Buyer', 
+      fpo: 'FPO Admin',
+      admin: 'Administrator'
+    };
+    return labels[r];
+  };
+
+  const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setError('');
 
+    if (!phone || phone.length < 10) {
+      setError('Please enter a valid 10-digit mobile number.');
+      return;
+    }
+
+    setIsLoading(true);
     try {
-      const supabase = createClient();
-
-      // Sign in with Supabase
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (signInError) throw signInError;
-      if (!data.user) throw new Error('Login failed');
-
-      // Clear old session data
-      localStorage.removeItem('kh_phone');
-      localStorage.removeItem('kh_profile');
-      localStorage.removeItem('kh_role');
-
-      // Fetch full profile from Supabase
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', data.user.id)
-        .single();
-
-      if (profileError) {
-        console.error('Profile fetch error:', profileError);
-      }
-
-      // Store user info in localStorage
-      localStorage.setItem('kh_user_id', data.user.id);
+      const { error, otpSent: sent } = await authService.signInWithPhone(`+91${phone}`);
       
-      if (profile) {
-        localStorage.setItem('kh_user_type', profile.user_type || '');
-        
-        // Store complete profile data
-        const profileData = {
-          id: profile.id,
-          email: profile.email,
-          name: profile.full_name || profile.business_name || '',
-          fullName: profile.full_name,
-          businessName: profile.business_name,
-          phone: profile.phone || '',
-          userType: profile.user_type
-        };
-        localStorage.setItem('kh_profile', JSON.stringify(profileData));
-        
-        if (profile.phone) {
-          localStorage.setItem('kh_phone', profile.phone);
+      if (error) {
+        setError(error);
+      } else if (sent) {
+        setOtpSent(true);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('kh_phone', phone);
+          localStorage.setItem('kh_role', role);
         }
       }
-
-      // Redirect to intended page or dashboard
-      router.push(redirectTo);
-      router.refresh();
     } catch (err: any) {
-      console.error('Login error:', err);
-      if (err.message.includes('Invalid login credentials')) {
-        setError('Invalid email or password. Please try again.');
-      } else {
-        setError(err.message || 'Failed to sign in. Please try again.');
+      console.error('OTP send error:', err);
+      setError(err.message || 'Failed to send OTP. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (otp.length !== 6) {
+      setError('Please enter a valid 6-digit OTP.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { error, user } = await authService.verifyOtp(`+91${phone}`, otp);
+      
+      if (error) {
+        setError(error);
+      } else if (user) {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('kh_user_id', user.id);
+        }
+        
+        const profile = await authService.getProfile(user.id);
+        
+        if (profile?.onboarded) {
+          const paths = {
+            farmer: '/',
+            buyer: '/buyer/dashboard',
+            fpo: '/fpo/dashboard',
+            admin: '/admin'
+          };
+          router.push(paths[profile.user_type] || '/');
+        } else {
+          const onboardingPaths = {
+            farmer: '/onboarding/farmer',
+            buyer: '/onboarding/buyer',
+            fpo: '/fpo/dashboard',
+            admin: '/admin'
+          };
+          router.push(onboardingPaths[role] || '/');
+        }
       }
+    } catch (err: any) {
+      console.error('OTP verify error:', err);
+      setError(err.message || 'Invalid OTP. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center px-4 py-8">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+      <div className="w-full max-w-sm">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <div className="w-14 h-14 bg-green-600 rounded-xl flex items-center justify-center shadow-lg shadow-green-200">
-              <Sprout className="w-8 h-8 text-white" />
-            </div>
-            <div className="text-left">
-              <h1 className="text-2xl font-bold text-gray-900 leading-none">Krishi Hedge</h1>
-              <p className="text-green-600 text-sm font-medium">Oilseed Hedging Platform</p>
-            </div>
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
-          <p className="text-gray-600">Sign in to your account to continue</p>
+        <div className="text-center mb-12">
+          <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+            Krishi Hedge
+          </h1>
+          <p className="text-sm text-gray-500">
+            Login as {getRoleLabel(role)}
+          </p>
         </div>
 
-        {/* Error Alert */}
+        {/* Error */}
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-red-800">{error}</p>
+          <div className="mb-6 p-3 bg-red-50 text-red-800 text-sm flex items-start gap-2 rounded">
+            <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <span>{error}</span>
           </div>
         )}
 
-        {/* Login Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Phone OTP Form */}
+        {!otpSent ? (
+          <form onSubmit={handleSendOtp} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
+                Mobile Number
               </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <div className="flex items-center gap-2">
+                <span className="text-gray-500 text-sm">+91</span>
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                  required
-                  autoComplete="email"
+                  type="tel"
+                  className="flex-1 px-3 py-2 border-b-2 border-gray-200 focus:border-gray-900 outline-none text-gray-900 transition"
+                  placeholder="9876543210"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                  maxLength={10}
+                  autoFocus
                 />
               </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className="w-full pl-11 pr-12 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                  required
-                  autoComplete="current-password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
-                />
-                <span className="ml-2 text-gray-600">Remember me</span>
-              </label>
-              <Link href="/auth/forgot-password" className="text-green-600 hover:text-green-700 font-medium">
-                Forgot password?
-              </Link>
             </div>
 
             <button
               type="submit"
-              disabled={isLoading}
-              className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-xl font-semibold hover:from-green-700 hover:to-emerald-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-green-200"
+              disabled={isLoading || phone.length !== 10}
+              className="w-full bg-gray-900 hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed text-white py-3 text-sm font-medium transition"
             >
               {isLoading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Signing in...
-                </>
+                <span className="flex items-center justify-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Sending...
+                </span>
               ) : (
-                'Sign In'
+                'Send OTP'
               )}
             </button>
           </form>
+        ) : (
+          <form onSubmit={handleVerifyOtp} className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Enter OTP sent to +91{phone}
+              </label>
+              <input
+                type="text"
+                className="w-full px-4 py-3 border-b-2 border-gray-200 focus:border-gray-900 outline-none text-center text-2xl font-semibold tracking-wider transition"
+                placeholder="000000"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                maxLength={6}
+                autoFocus
+              />
+              <button
+                type="button"
+                onClick={() => { setOtpSent(false); setOtp(''); }}
+                className="text-xs text-gray-500 hover:text-gray-900 mt-2"
+              >
+                Change number
+              </button>
+            </div>
 
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
-              <Link href="/auth/signup" className="text-green-600 hover:text-green-700 font-semibold">
-                Sign up
-              </Link>
-            </p>
-          </div>
+            <button
+              type="submit"
+              disabled={isLoading || otp.length !== 6}
+              className="w-full bg-gray-900 hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed text-white py-3 text-sm font-medium transition"
+            >
+              {isLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Verifying...
+                </span>
+              ) : (
+                'Verify & Login'
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleSendOtp}
+              disabled={isLoading}
+              className="w-full text-sm text-gray-500 hover:text-gray-900 py-2"
+            >
+              Resend OTP
+            </button>
+          </form>
+        )}
+
+        {/* Signup Link */}
+        <div className="text-center mt-8">
+          <button
+            onClick={() => router.push(`/auth/signup?role=${role}`)}
+            className="text-sm text-gray-500 hover:text-gray-900"
+          >
+            Don't have an account? <span className="font-medium">Sign up</span>
+          </button>
         </div>
 
-        {/* Additional Info */}
-        <div className="mt-8 text-center text-xs text-gray-500">
-          <p>Protected by industry-standard encryption</p>
+        {/* Back to role selection */}
+        <div className="text-center mt-4">
+          <button
+            onClick={() => router.push('/splash')}
+            className="text-xs text-gray-400 hover:text-gray-600"
+          >
+            ← Choose different role
+          </button>
         </div>
       </div>
     </div>

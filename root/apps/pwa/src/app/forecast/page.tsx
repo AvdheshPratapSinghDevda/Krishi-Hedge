@@ -21,6 +21,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useMemo, useCallback } from "react";
+import { useI18n } from "@/i18n/LanguageProvider";
 import { 
   LineChart, 
   Line, 
@@ -109,6 +110,7 @@ const COMMODITY_MAP: Record<string, string> = {
 
 export default function ForecastPage() {
   const router = useRouter();
+  const { t } = useI18n();
   
   // State Management
   const [selectedCommodity, setSelectedCommodity] = useState<string>('soybean');
@@ -320,8 +322,8 @@ export default function ForecastPage() {
               <ChevronLeft size={24} />
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-white">Market Analysis Dashboard</h1>
-              <p className="text-green-100 text-sm">AI-Powered Price Predictions</p>
+              <h1 className="text-2xl font-bold text-white">{t('forecast.title')}</h1>
+              <p className="text-green-100 text-sm">{t('forecast.subtitle')}</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -357,6 +359,12 @@ export default function ForecastPage() {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Data source & language note */}
+      <div className="mx-4 mt-3 flex flex-wrap items-center justify-between gap-2 text-[11px] text-gray-500">
+        <span>{t('forecast.dataSource')}</span>
+        <span>{t('forecast.languageNote')}</span>
       </div>
 
       {/* Error Banner */}
@@ -685,7 +693,7 @@ export default function ForecastPage() {
           onClick={() => router.push('/contracts/new')} 
           className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-green-900 font-bold py-5 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
         >
-          Create Forward Contract Based on Analysis
+          {t('forecast.ctaCreateContract')}
         </button>
       </div>
     </div>

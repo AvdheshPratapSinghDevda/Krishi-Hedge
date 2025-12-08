@@ -1,1015 +1,497 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
-import { 
-  User, Building2, Mail, Lock, Eye, EyeOff, ArrowRight, Sprout, 
-  Phone, Briefcase, FileText, CheckCircle2, AlertCircle 
-} from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { AlertCircle, Loader2, ChevronLeft } from 'lucide-react';
+import { authService } from '@/lib/auth/auth-service';
 
-interface FarmerData {
+type Role = 'farmer' | 'buyer' | 'fpo' | 'admin';
+
+interface SignupFormData {
   fullName: string;
-  email: string;
   phone: string;
-  password: string;
-  confirmPassword: string;
-  state: string;
-  district: string;
-  village: string;
-  pincode: string;
-  landSize: string;
-  primaryCrop: string;
-  farmingExperience: string;
-  agreeTerms: boolean;
-}
-
-interface BusinessData {
-  businessName: string;
-  email: string;
-  phone: string;
-  password: string;
-  confirmPassword: string;
-  gstNumber: string;
-  businessType: string;
-  companySize: string;
-  address: string;
-  city: string;
-  state: string;
-  pincode: string;
-  contactPerson: string;
-  designation: string;
-  tradingVolume: string;
-  agreeTerms: boolean;
+  state?: string;
+  district?: string;
+  village?: string;
+  pincode?: string;
+  landSize?: string;
+  primaryCrop?: string;
+  organizationName?: string;
+  buyerType?: string;
+  gstNumber?: string;
+  city?: string;
+  fpoName?: string;
+  fpoRegistrationNumber?: string;
+  memberCount?: string;
 }
 
 export default function SignupPage() {
   const router = useRouter();
-  const [userType, setUserType] = useState<'farmer' | 'business'>('farmer');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
+  const searchParams = useSearchParams();
+  const role = (searchParams.get('role') as Role) || 'farmer';
+
+  const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-
-  const [farmerData, setFarmerData] = useState<FarmerData>({
+  const [formData, setFormData] = useState<SignupFormData>({
     fullName: '',
-    email: '',
     phone: '',
-    password: '',
-    confirmPassword: '',
-    state: '',
-    district: '',
-    village: '',
-    pincode: '',
-    landSize: '',
-    primaryCrop: '',
-    farmingExperience: '',
-    agreeTerms: false
   });
 
-  const [businessData, setBusinessData] = useState<BusinessData>({
-    businessName: '',
-    email: '',
-    phone: '',
-    password: '',
-    confirmPassword: '',
-    gstNumber: '',
-    businessType: '',
-    companySize: '',
-    address: '',
-    city: '',
-    state: '',
-    pincode: '',
-    contactPerson: '',
-    designation: '',
-    tradingVolume: '',
-    agreeTerms: false
-  });
-
-  const handleFarmerChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-    const checked = (e.target as HTMLInputElement).checked;
-    setFarmerData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+  const getRoleLabel = (r: Role): string => {
+    const labels = {
+      farmer: 'Farmer',
+      buyer: 'Buyer',
+      fpo: 'FPO Admin',
+      admin: 'Administrator'
+    };
+    return labels[r];
   };
 
-  const handleBusinessChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-    const checked = (e.target as HTMLInputElement).checked;
-    setBusinessData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-  };
-
-  const validateStep1 = () => {
-    const data = userType === 'farmer' ? farmerData : businessData;
-    if (!data.email || !data.phone || !data.password || !data.confirmPassword) {
-      setError('Please fill all required fields');
-      return false;
-    }
-    if (data.password !== data.confirmPassword) {
-      setError('Passwords do not match');
-      return false;
-    }
-    if (data.password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return false;
-    }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
     setError('');
+  };
+
+  const validateStep1 = (): boolean => {
+    if (!formData.fullName.trim()) {
+      setError('Please enter your full name');
+      return false;
+    }
+    if (!formData.phone || formData.phone.length !== 10) {
+      setError('Please enter a valid 10-digit phone number');
+      return false;
+    }
+    return true;
+  };
+
+  const validateStep2 = (): boolean => {
+    if (role === 'farmer') {
+      if (!formData.state || !formData.district || !formData.village) {
+        setError('Please fill all location fields');
+        return false;
+      }
+      if (!formData.pincode || formData.pincode.length !== 6) {
+        setError('Please enter a valid 6-digit pincode');
+        return false;
+      }
+    } else if (role === 'buyer') {
+      if (!formData.organizationName || !formData.buyerType) {
+        setError('Please fill all required fields');
+        return false;
+      }
+    } else if (role === 'fpo') {
+      if (!formData.fpoName || !formData.fpoRegistrationNumber) {
+        setError('Please fill all required fields');
+        return false;
+      }
+    }
     return true;
   };
 
   const handleNext = () => {
-    if (validateStep1() && currentStep < 2) {
-      setCurrentStep(currentStep + 1);
+    if (step === 1 && validateStep1()) {
+      setStep(2);
     }
   };
 
-  const handleBack = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateStep2()) return;
 
-  const handleSubmit = async () => {
     setIsLoading(true);
     setError('');
 
     try {
-      const supabase = createClient();
-      const data = userType === 'farmer' ? farmerData : businessData;
-
-      // 1. Sign up user with Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          data: {
-            user_type: userType,
-            phone: data.phone,
-          },
-        },
+      const result = await authService.signUpWithPhone(`+91${formData.phone}`, {
+        user_type: role,
+        full_name: formData.fullName,
+        ...formData,
       });
 
-      if (authError) throw authError;
-      if (!authData.user) throw new Error('Failed to create user');
-
-      // 2. Check if profile already exists (in case of previous failed attempt)
-      const { data: existingProfile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', authData.user.id)
-        .single();
-
-      // Only create profile if it doesn't exist
-      if (!existingProfile) {
-        // 3. Create profile in profiles table
-        if (userType === 'farmer') {
-          const profileInsert = {
-            id: authData.user.id,
-            user_type: 'farmer',
-            full_name: farmerData.fullName,
-            email: farmerData.email,
-            phone: farmerData.phone,
-            state: farmerData.state,
-            district: farmerData.district,
-            village: farmerData.village,
-            pincode: farmerData.pincode,
-            land_size: parseFloat(farmerData.landSize) || 0,
-            primary_crop: farmerData.primaryCrop,
-            farming_experience: parseInt(farmerData.farmingExperience) || 0,
-          };
-          
-          const { data: insertedProfile, error: profileError } = await supabase
-            .from('profiles')
-            .insert(profileInsert)
-            .select()
-            .single();
-
-          if (profileError) throw profileError;
-        } else {
-          const profileInsert = {
-            id: authData.user.id,
-            user_type: 'business',
-            business_name: businessData.businessName,
-            email: businessData.email,
-            phone: businessData.phone,
-            gst_number: businessData.gstNumber,
-            business_type: businessData.businessType,
-            company_size: businessData.companySize,
-            address: businessData.address,
-            city: businessData.city,
-            state: businessData.state,
-            pincode: businessData.pincode,
-            contact_person: businessData.contactPerson,
-            designation: businessData.designation,
-            trading_volume: parseFloat(businessData.tradingVolume) || 0,
-          };
-
-          const { data: insertedProfile, error: profileError } = await supabase
-            .from('profiles')
-            .insert(profileInsert)
-            .select()
-            .single();
-
-          if (profileError) throw profileError;
+      if (result.error) {
+        setError(result.error);
+      } else {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('kh_phone', formData.phone);
+          localStorage.setItem('kh_role', role);
         }
+        router.push(`/auth/login?role=${role}`);
       }
-
-      // 4. Clear any old session data
-      localStorage.removeItem('kh_phone');
-      localStorage.removeItem('kh_profile');
-      localStorage.removeItem('kh_role');
-      
-      // 5. Store new user data
-      localStorage.setItem('kh_user_id', authData.user.id);
-      localStorage.setItem('kh_user_type', userType);
-      
-      // Store profile data for immediate use
-      const profileData = userType === 'farmer' 
-        ? { fullName: farmerData.fullName, email: farmerData.email, phone: farmerData.phone, userType: 'farmer' }
-        : { businessName: businessData.businessName, email: businessData.email, phone: businessData.phone, userType: 'business' };
-      localStorage.setItem('kh_profile', JSON.stringify(profileData));
-
-      // 6. Redirect to dashboard
-      router.push('/');
-      router.refresh();
     } catch (err: any) {
       console.error('Signup error:', err);
-      setError(err.message || 'Failed to create account. Please try again.');
+      setError(err.message || 'Signup failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const indianStates = [
-    'Andhra Pradesh', 'Bihar', 'Gujarat', 'Haryana', 'Karnataka', 
-    'Madhya Pradesh', 'Maharashtra', 'Punjab', 'Rajasthan', 'Uttar Pradesh'
-  ];
+  const renderStep1 = () => (
+    <div className="space-y-6">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Full Name
+        </label>
+        <input
+          type="text"
+          name="fullName"
+          className="w-full px-3 py-2 border-b-2 border-gray-200 focus:border-gray-900 outline-none transition"
+          placeholder="Enter your full name"
+          value={formData.fullName}
+          onChange={handleInputChange}
+          autoFocus
+        />
+      </div>
 
-  const cropTypes = ['Soybean', 'Mustard', 'Groundnut', 'Sunflower', 'Other'];
-  const businessTypes = ['Oil Mill', 'Trader', 'Processor', 'Exporter', 'Retailer'];
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Mobile Number
+        </label>
+        <div className="flex items-center gap-2">
+          <span className="text-gray-500 text-sm">+91</span>
+          <input
+            type="tel"
+            name="phone"
+            className="flex-1 px-3 py-2 border-b-2 border-gray-200 focus:border-gray-900 outline-none transition"
+            placeholder="9876543210"
+            value={formData.phone}
+            onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+              setFormData(prev => ({ ...prev, phone: value }));
+            }}
+            maxLength={10}
+          />
+        </div>
+      </div>
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 py-4 md:py-8 px-4 font-sans">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-6 md:mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-green-600 rounded-xl flex items-center justify-center shadow-lg shadow-green-200">
-              <Sprout className="w-6 h-6 md:w-7 md:h-7 text-white" />
-            </div>
-            <div className="text-left">
-              <h1 className="text-xl md:text-2xl font-bold text-gray-900 leading-none">Krishi Hedge</h1>
-              <p className="text-green-600 text-xs md:text-sm font-medium">Oilseed Hedging Platform</p>
-            </div>
-          </div>
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Create Your Account</h2>
-          <p className="text-gray-600 text-sm md:text-base">Join thousands of farmers and businesses</p>
+      <button
+        type="button"
+        onClick={handleNext}
+        className="w-full bg-gray-900 hover:bg-gray-800 text-white py-3 text-sm font-medium transition"
+      >
+        Continue
+      </button>
+    </div>
+  );
+
+  const renderStep2Farmer = () => (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">State</label>
+          <select
+            name="state"
+            className="w-full px-3 py-2 border-b-2 border-gray-200 focus:border-gray-900 outline-none bg-white transition"
+            value={formData.state || ''}
+            onChange={handleInputChange}
+          >
+            <option value="">Select</option>
+            <option value="Maharashtra">Maharashtra</option>
+            <option value="Gujarat">Gujarat</option>
+            <option value="Rajasthan">Rajasthan</option>
+            <option value="Karnataka">Karnataka</option>
+          </select>
         </div>
 
-        {/* Error Alert */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">District</label>
+          <input
+            type="text"
+            name="district"
+            className="w-full px-3 py-2 border-b-2 border-gray-200 focus:border-gray-900 outline-none transition"
+            placeholder="District"
+            value={formData.district || ''}
+            onChange={handleInputChange}
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Village</label>
+        <input
+          type="text"
+          name="village"
+          className="w-full px-3 py-2 border-b-2 border-gray-200 focus:border-gray-900 outline-none transition"
+          placeholder="Village name"
+          value={formData.village || ''}
+          onChange={handleInputChange}
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Pincode</label>
+          <input
+            type="text"
+            name="pincode"
+            className="w-full px-3 py-2 border-b-2 border-gray-200 focus:border-gray-900 outline-none transition"
+            placeholder="123456"
+            value={formData.pincode || ''}
+            onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+              setFormData(prev => ({ ...prev, pincode: value }));
+            }}
+            maxLength={6}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Land (acres)</label>
+          <input
+            type="text"
+            name="landSize"
+            className="w-full px-3 py-2 border-b-2 border-gray-200 focus:border-gray-900 outline-none transition"
+            placeholder="10"
+            value={formData.landSize || ''}
+            onChange={handleInputChange}
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Primary Crop</label>
+        <select
+          name="primaryCrop"
+          className="w-full px-3 py-2 border-b-2 border-gray-200 focus:border-gray-900 outline-none bg-white transition"
+          value={formData.primaryCrop || ''}
+          onChange={handleInputChange}
+        >
+          <option value="">Select</option>
+          <option value="Soybean">Soybean</option>
+          <option value="Groundnut">Groundnut</option>
+          <option value="Sunflower">Sunflower</option>
+          <option value="Mustard">Mustard</option>
+        </select>
+      </div>
+    </div>
+  );
+
+  const renderStep2Buyer = () => (
+    <div className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Organization Name</label>
+        <input
+          type="text"
+          name="organizationName"
+          className="w-full px-3 py-2 border-b-2 border-gray-200 focus:border-gray-900 outline-none transition"
+          placeholder="Company name"
+          value={formData.organizationName || ''}
+          onChange={handleInputChange}
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Buyer Type</label>
+        <select
+          name="buyerType"
+          className="w-full px-3 py-2 border-b-2 border-gray-200 focus:border-gray-900 outline-none bg-white transition"
+          value={formData.buyerType || ''}
+          onChange={handleInputChange}
+        >
+          <option value="">Select</option>
+          <option value="wholesaler">Wholesaler</option>
+          <option value="retailer">Retailer</option>
+          <option value="processor">Processor</option>
+          <option value="exporter">Exporter</option>
+        </select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">GST Number</label>
+        <input
+          type="text"
+          name="gstNumber"
+          className="w-full px-3 py-2 border-b-2 border-gray-200 focus:border-gray-900 outline-none transition"
+          placeholder="22AAAAA0000A1Z5"
+          value={formData.gstNumber || ''}
+          onChange={handleInputChange}
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
+          <input
+            type="text"
+            name="city"
+            className="w-full px-3 py-2 border-b-2 border-gray-200 focus:border-gray-900 outline-none transition"
+            placeholder="City"
+            value={formData.city || ''}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">State</label>
+          <select
+            name="state"
+            className="w-full px-3 py-2 border-b-2 border-gray-200 focus:border-gray-900 outline-none bg-white transition"
+            value={formData.state || ''}
+            onChange={handleInputChange}
+          >
+            <option value="">Select</option>
+            <option value="Maharashtra">Maharashtra</option>
+            <option value="Gujarat">Gujarat</option>
+            <option value="Karnataka">Karnataka</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderStep2Fpo = () => (
+    <div className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">FPO Name</label>
+        <input
+          type="text"
+          name="fpoName"
+          className="w-full px-3 py-2 border-b-2 border-gray-200 focus:border-gray-900 outline-none transition"
+          placeholder="FPO name"
+          value={formData.fpoName || ''}
+          onChange={handleInputChange}
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Registration Number</label>
+        <input
+          type="text"
+          name="fpoRegistrationNumber"
+          className="w-full px-3 py-2 border-b-2 border-gray-200 focus:border-gray-900 outline-none transition"
+          placeholder="Registration number"
+          value={formData.fpoRegistrationNumber || ''}
+          onChange={handleInputChange}
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">District</label>
+          <input
+            type="text"
+            name="district"
+            className="w-full px-3 py-2 border-b-2 border-gray-200 focus:border-gray-900 outline-none transition"
+            placeholder="District"
+            value={formData.district || ''}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">State</label>
+          <select
+            name="state"
+            className="w-full px-3 py-2 border-b-2 border-gray-200 focus:border-gray-900 outline-none bg-white transition"
+            value={formData.state || ''}
+            onChange={handleInputChange}
+          >
+            <option value="">Select</option>
+            <option value="Maharashtra">Maharashtra</option>
+            <option value="Gujarat">Gujarat</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Members</label>
+        <input
+          type="number"
+          name="memberCount"
+          className="w-full px-3 py-2 border-b-2 border-gray-200 focus:border-gray-900 outline-none transition"
+          placeholder="100"
+          value={formData.memberCount || ''}
+          onChange={handleInputChange}
+        />
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+            Create Account
+          </h1>
+          <p className="text-sm text-gray-500">
+            Sign up as {getRoleLabel(role)}
+          </p>
+        </div>
+
+        {/* Progress */}
+        <div className="mb-8 flex gap-2">
+          <div className={`h-1 flex-1 ${step >= 1 ? 'bg-gray-900' : 'bg-gray-200'}`} />
+          <div className={`h-1 flex-1 ${step >= 2 ? 'bg-gray-900' : 'bg-gray-200'}`} />
+        </div>
+
+        {/* Error */}
         {error && (
-          <div className="max-w-4xl mx-auto mb-6">
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-red-800">{error}</p>
-            </div>
+          <div className="mb-6 p-3 bg-red-50 text-red-800 text-sm flex items-start gap-2 rounded">
+            <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <span>{error}</span>
           </div>
         )}
 
-        {/* User Type Toggle */}
-        <div className="max-w-md mx-auto mb-6 md:mb-8">
-          <label className="text-xs md:text-sm font-medium text-gray-700 mb-3 block text-center uppercase tracking-wide">
-            I am a
-          </label>
-          <div className="grid grid-cols-2 gap-3 p-1 bg-white rounded-2xl shadow-sm border border-gray-100">
-            <button
-              type="button"
-              onClick={() => {
-                setUserType('farmer');
-                setCurrentStep(1);
-                setError('');
-              }}
-              className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl transition-all duration-200 ${
-                userType === 'farmer'
-                  ? 'bg-green-600 text-white shadow-md'
-                  : 'text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              <User className="w-4 h-4 md:w-5 md:h-5" />
-              <span className="font-medium text-sm md:text-base">Farmer</span>
-            </button>
-            
-            <button
-              type="button"
-              onClick={() => {
-                setUserType('business');
-                setCurrentStep(1);
-                setError('');
-              }}
-              className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl transition-all duration-200 ${
-                userType === 'business'
-                  ? 'bg-green-600 text-white shadow-md'
-                  : 'text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              <Building2 className="w-4 h-4 md:w-5 md:h-5" />
-              <span className="font-medium text-sm md:text-base">Business</span>
-            </button>
-          </div>
-        </div>
+        {/* Form */}
+        <form onSubmit={handleSubmit}>
+          {step === 1 && renderStep1()}
+          
+          {step === 2 && (
+            <div className="space-y-6">
+              {role === 'farmer' && renderStep2Farmer()}
+              {role === 'buyer' && renderStep2Buyer()}
+              {role === 'fpo' && renderStep2Fpo()}
 
-        {/* Progress Bar */}
-        <div className="max-w-xl mx-auto mb-8 px-4">
-          <div className="relative flex items-center justify-between">
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-gray-200 -z-10 rounded-full"></div>
-            <div 
-              className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-green-600 -z-10 rounded-full transition-all duration-300"
-              style={{ width: currentStep === 2 ? '100%' : '0%' }}
-            ></div>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  className="px-6 py-3 border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-50 transition"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
 
-            <div className="flex flex-col items-center gap-2">
-              <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center font-bold text-sm md:text-base transition-all duration-300 border-4 ${
-                currentStep >= 1 
-                  ? 'bg-green-600 text-white border-green-50 shadow-green-200 shadow-lg scale-110' 
-                  : 'bg-white text-gray-400 border-gray-100'
-              }`}>
-                1
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="flex-1 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed text-white py-3 text-sm font-medium transition"
+                >
+                  {isLoading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Creating...
+                    </span>
+                  ) : (
+                    'Create Account'
+                  )}
+                </button>
               </div>
-              <span className={`text-[10px] md:text-xs font-semibold uppercase tracking-wider ${currentStep >= 1 ? 'text-green-700' : 'text-gray-400'}`}>
-                Basic Info
-              </span>
-            </div>
-
-            <div className="flex flex-col items-center gap-2">
-              <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center font-bold text-sm md:text-base transition-all duration-300 border-4 ${
-                currentStep >= 2 
-                  ? 'bg-green-600 text-white border-green-50 shadow-green-200 shadow-lg scale-110' 
-                  : 'bg-white text-gray-400 border-gray-100'
-              }`}>
-                2
-              </div>
-              <span className={`text-[10px] md:text-xs font-semibold uppercase tracking-wider ${currentStep >= 2 ? 'text-green-700' : 'text-gray-400'}`}>
-                Details
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Forms Container */}
-        <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-5 md:p-8">
-          {userType === 'farmer' ? (
-            <div>
-              {/* FARMER STEP 1 */}
-              {currentStep === 1 && (
-                <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-300">
-                  <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-6 flex items-center gap-2 border-b pb-4">
-                    <User className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
-                    Personal Information
-                  </h3>
-
-                  <div className="grid md:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Full Name *
-                      </label>
-                      <input
-                        type="text"
-                        name="fullName"
-                        value={farmerData.fullName}
-                        onChange={handleFarmerChange}
-                        placeholder="Enter your full name"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Email Address *
-                      </label>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <input
-                          type="email"
-                          name="email"
-                          value={farmerData.email}
-                          onChange={handleFarmerChange}
-                          placeholder="farmer@example.com"
-                          className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Phone Number *
-                      </label>
-                      <div className="relative">
-                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <input
-                          type="tel"
-                          name="phone"
-                          value={farmerData.phone}
-                          onChange={handleFarmerChange}
-                          placeholder="+91 98765 43210"
-                          className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        State *
-                      </label>
-                      <select
-                        name="state"
-                        value={farmerData.state}
-                        onChange={handleFarmerChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none bg-white transition-all"
-                        required
-                      >
-                        <option value="">Select State</option>
-                        {indianStates.map(state => (
-                          <option key={state} value={state}>{state}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Password *
-                      </label>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <input
-                          type={showPassword ? 'text' : 'password'}
-                          name="password"
-                          value={farmerData.password}
-                          onChange={handleFarmerChange}
-                          placeholder="Create password"
-                          className="w-full pl-11 pr-11 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                          required
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-2"
-                        >
-                          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                        </button>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Confirm Password *
-                      </label>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <input
-                          type={showConfirmPassword ? 'text' : 'password'}
-                          name="confirmPassword"
-                          value={farmerData.confirmPassword}
-                          onChange={handleFarmerChange}
-                          placeholder="Confirm password"
-                          className="w-full pl-11 pr-11 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                          required
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-2"
-                        >
-                          {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={handleNext}
-                    className="w-full mt-6 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 hover:from-green-700 hover:to-emerald-700 shadow-lg shadow-green-200 hover:shadow-green-300 transition-all transform hover:-translate-y-0.5 active:scale-95"
-                  >
-                    <span>Continue to Details</span>
-                    <ArrowRight className="w-5 h-5" />
-                  </button>
-                </div>
-              )}
-
-              {/* FARMER STEP 2 */}
-              {currentStep === 2 && (
-                <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-300">
-                  <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-6 flex items-center gap-2 border-b pb-4">
-                    <Sprout className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
-                    Farming Details
-                  </h3>
-
-                  <div className="grid md:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        District *
-                      </label>
-                      <input
-                        type="text"
-                        name="district"
-                        value={farmerData.district}
-                        onChange={handleFarmerChange}
-                        placeholder="Enter district"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Village/Town *
-                      </label>
-                      <input
-                        type="text"
-                        name="village"
-                        value={farmerData.village}
-                        onChange={handleFarmerChange}
-                        placeholder="Enter village/town"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Pincode *
-                      </label>
-                      <input
-                        type="text"
-                        name="pincode"
-                        value={farmerData.pincode}
-                        onChange={handleFarmerChange}
-                        placeholder="Enter pincode"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Land Size (in acres) *
-                      </label>
-                      <input
-                        type="number"
-                        name="landSize"
-                        value={farmerData.landSize}
-                        onChange={handleFarmerChange}
-                        placeholder="e.g., 5"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Primary Crop *
-                      </label>
-                      <select
-                        name="primaryCrop"
-                        value={farmerData.primaryCrop}
-                        onChange={handleFarmerChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none bg-white transition-all"
-                        required
-                      >
-                        <option value="">Select Crop</option>
-                        {cropTypes.map(crop => (
-                          <option key={crop} value={crop}>{crop}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Farming Experience (years) *
-                      </label>
-                      <input
-                        type="number"
-                        name="farmingExperience"
-                        value={farmerData.farmingExperience}
-                        onChange={handleFarmerChange}
-                        placeholder="e.g., 10"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="mt-8 pt-6 border-t border-gray-100">
-                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 mb-6">
-                      <label className="flex items-start gap-3 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          name="agreeTerms"
-                          checked={farmerData.agreeTerms}
-                          onChange={handleFarmerChange}
-                          className="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500 mt-0.5 flex-shrink-0"
-                        />
-                        <span className="text-xs md:text-sm text-gray-600 leading-relaxed">
-                          I agree to the <span className="text-green-600 font-medium hover:underline cursor-pointer">Terms of Service</span> and <span className="text-green-600 font-medium hover:underline cursor-pointer">Privacy Policy</span>.
-                        </span>
-                      </label>
-                    </div>
-
-                    <div className="flex gap-3">
-                      <button
-                        onClick={handleBack}
-                        className="flex-1 border-2 border-gray-300 text-gray-700 py-3.5 rounded-xl font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all"
-                      >
-                        Back
-                      </button>
-                      <button
-                        onClick={handleSubmit}
-                        disabled={isLoading || !farmerData.agreeTerms}
-                        className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 hover:from-green-700 hover:to-emerald-700 shadow-lg shadow-green-200 hover:shadow-green-300 transition-all transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none active:scale-95"
-                      >
-                        {isLoading ? (
-                          <>
-                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                            <span>Creating...</span>
-                          </>
-                        ) : (
-                          <>
-                            <span>Create Account</span>
-                            <CheckCircle2 className="w-5 h-5" />
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div>
-              {/* BUSINESS STEP 1 - Similar structure, continuing in next part... */}
-              {currentStep === 1 && (
-                <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-300">
-                  <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-6 flex items-center gap-2 border-b pb-4">
-                    <Building2 className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
-                    Business Information
-                  </h3>
-
-                  <div className="grid md:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Business Name *
-                      </label>
-                      <input
-                        type="text"
-                        name="businessName"
-                        value={businessData.businessName}
-                        onChange={handleBusinessChange}
-                        placeholder="Enter business name"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Business Email *
-                      </label>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <input
-                          type="email"
-                          name="email"
-                          value={businessData.email}
-                          onChange={handleBusinessChange}
-                          placeholder="business@example.com"
-                          className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Phone Number *
-                      </label>
-                      <div className="relative">
-                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <input
-                          type="tel"
-                          name="phone"
-                          value={businessData.phone}
-                          onChange={handleBusinessChange}
-                          placeholder="+91 98765 43210"
-                          className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        GST Number *
-                      </label>
-                      <div className="relative">
-                        <FileText className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <input
-                          type="text"
-                          name="gstNumber"
-                          value={businessData.gstNumber}
-                          onChange={handleBusinessChange}
-                          placeholder="22AAAAA0000A1Z5"
-                          className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Password *
-                      </label>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <input
-                          type={showPassword ? 'text' : 'password'}
-                          name="password"
-                          value={businessData.password}
-                          onChange={handleBusinessChange}
-                          placeholder="Create password"
-                          className="w-full pl-11 pr-11 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                          required
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-2"
-                        >
-                          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                        </button>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Confirm Password *
-                      </label>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <input
-                          type={showConfirmPassword ? 'text' : 'password'}
-                          name="confirmPassword"
-                          value={businessData.confirmPassword}
-                          onChange={handleBusinessChange}
-                          placeholder="Confirm password"
-                          className="w-full pl-11 pr-11 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                          required
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-2"
-                        >
-                          {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={handleNext}
-                    className="w-full mt-6 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 hover:from-green-700 hover:to-emerald-700 shadow-lg shadow-green-200 hover:shadow-green-300 transition-all transform hover:-translate-y-0.5 active:scale-95"
-                  >
-                    <span>Continue to Details</span>
-                    <ArrowRight className="w-5 h-5" />
-                  </button>
-                </div>
-              )}
-
-              {/* BUSINESS STEP 2 */}
-              {currentStep === 2 && (
-                <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-300">
-                  <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-6 flex items-center gap-2 border-b pb-4">
-                    <Briefcase className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
-                    Additional Details
-                  </h3>
-
-                  <div className="grid md:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Business Type *
-                      </label>
-                      <select
-                        name="businessType"
-                        value={businessData.businessType}
-                        onChange={handleBusinessChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none bg-white transition-all"
-                        required
-                      >
-                        <option value="">Select Type</option>
-                        {businessTypes.map(type => (
-                          <option key={type} value={type}>{type}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Company Size *
-                      </label>
-                      <select
-                        name="companySize"
-                        value={businessData.companySize}
-                        onChange={handleBusinessChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none bg-white transition-all"
-                        required
-                      >
-                        <option value="">Select Size</option>
-                        <option value="1-10">1-10 employees</option>
-                        <option value="11-50">11-50 employees</option>
-                        <option value="51-200">51-200 employees</option>
-                        <option value="201+">201+ employees</option>
-                      </select>
-                    </div>
-
-                    <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Business Address *
-                      </label>
-                      <input
-                        type="text"
-                        name="address"
-                        value={businessData.address}
-                        onChange={handleBusinessChange}
-                        placeholder="Enter complete address"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        City *
-                      </label>
-                      <input
-                        type="text"
-                        name="city"
-                        value={businessData.city}
-                        onChange={handleBusinessChange}
-                        placeholder="Enter city"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        State *
-                      </label>
-                      <select
-                        name="state"
-                        value={businessData.state}
-                        onChange={handleBusinessChange}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none bg-white transition-all"
-                        required
-                      >
-                        <option value="">Select State</option>
-                        {indianStates.map(state => (
-                          <option key={state} value={state}>{state}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Pincode *
-                      </label>
-                      <input
-                        type="text"
-                        name="pincode"
-                        value={businessData.pincode}
-                        onChange={handleBusinessChange}
-                        placeholder="Enter pincode"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Contact Person Name *
-                      </label>
-                      <div className="relative">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <input
-                          type="text"
-                          name="contactPerson"
-                          value={businessData.contactPerson}
-                          onChange={handleBusinessChange}
-                          placeholder="Enter contact person"
-                          className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Designation *
-                      </label>
-                      <input
-                        type="text"
-                        name="designation"
-                        value={businessData.designation}
-                        onChange={handleBusinessChange}
-                        placeholder="e.g., Manager, Director"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                        required
-                      />
-                    </div>
-
-                    <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Expected Monthly Trading Volume (Quintals) *
-                      </label>
-                      <input
-                        type="number"
-                        name="tradingVolume"
-                        value={businessData.tradingVolume}
-                        onChange={handleBusinessChange}
-                        placeholder="e.g., 10000"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="mt-8 pt-6 border-t border-gray-100">
-                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 mb-6">
-                      <label className="flex items-start gap-3 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          name="agreeTerms"
-                          checked={businessData.agreeTerms}
-                          onChange={handleBusinessChange}
-                          className="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500 mt-0.5 flex-shrink-0"
-                        />
-                        <span className="text-xs md:text-sm text-gray-600 leading-relaxed">
-                          I agree to the <span className="text-green-600 font-medium hover:underline cursor-pointer">Terms of Service</span> and <span className="text-green-600 font-medium hover:underline cursor-pointer">Privacy Policy</span>. I confirm that all information provided is accurate.
-                        </span>
-                      </label>
-                    </div>
-
-                    <div className="flex gap-3">
-                      <button
-                        onClick={handleBack}
-                        className="flex-1 border-2 border-gray-300 text-gray-700 py-3.5 rounded-xl font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all"
-                      >
-                        Back
-                      </button>
-                      <button
-                        onClick={handleSubmit}
-                        disabled={isLoading || !businessData.agreeTerms}
-                        className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 hover:from-green-700 hover:to-emerald-700 shadow-lg shadow-green-200 hover:shadow-green-300 transition-all transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none active:scale-95"
-                      >
-                        {isLoading ? (
-                          <>
-                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                            <span>Creating...</span>
-                          </>
-                        ) : (
-                          <>
-                            <span>Create Account</span>
-                            <CheckCircle2 className="w-5 h-5" />
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           )}
+        </form>
 
-          {/* Already have account */}
-          <div className="mt-8 text-center border-t border-gray-100 pt-6">
-            <p className="text-sm text-gray-600">
-              Already have an account?{' '}
-              <button 
-                onClick={() => router.push('/auth/login')}
-                className="font-semibold text-green-600 hover:text-green-700 transition-colors"
-              >
-                Sign In
-              </button>
-            </p>
-          </div>
+        {/* Login Link */}
+        <div className="text-center mt-8">
+          <button
+            onClick={() => router.push(`/auth/login?role=${role}`)}
+            className="text-sm text-gray-500 hover:text-gray-900"
+          >
+            Already have an account? <span className="font-medium">Login</span>
+          </button>
+        </div>
+
+        {/* Back */}
+        <div className="text-center mt-4">
+          <button
+            onClick={() => router.push('/splash')}
+            className="text-xs text-gray-400 hover:text-gray-600"
+          >
+            ← Choose different role
+          </button>
         </div>
       </div>
     </div>

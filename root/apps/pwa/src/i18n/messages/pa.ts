@@ -1,0 +1,73 @@
+export const pa = {
+  common: {
+    appName: 'ਕ੍ਰਿਸ਼ੀ ਹੇਜ',
+    languageLabel: 'ਭਾਸ਼ਾ',
+    back: 'ਵਾਪਸ',
+  },
+  nav: {
+    home: 'ਹੋਮ',
+    forecast: 'ਦਾਮ ਅਨੁਮਾਨ',
+    contracts: 'ਕਾਂਟ੍ਰੈਕਟ',
+    profile: 'ਪ੍ਰੋਫ਼ਾਈਲ',
+    dashboard: 'ਡੈਸ਼ਬੋਰਡ',
+    market: 'ਮਾਰਕਿਟ',
+    portfolio: 'ਪੋਰਟਫੋਲਿਓ',
+  },
+  splash: {
+    tagline: 'ਸਮਾਰਟ ਕੀਮਤ ਸੁਰੱਖਿਆ',
+    continueFarmer: 'ਕਿਸਾਨ ਵਜੋਂ ਅੱਗੇ ਵਧੋ',
+    continueBuyer: 'ਖਰੀਦਦਾਰ ਵਜੋਂ ਅੱਗੇ ਵਧੋ',
+    badge: 'SIH 2025 ਪ੍ਰੋਟੋਟਾਈਪ',
+  },
+  contracts: {
+    title: 'ਕਾਂਟ੍ਰੈਕਟ',
+    subtitle: 'ਆਪਣੇ ਹੇਜਿੰਗ ਕੰਟ੍ਰੈਕਟ ਇੱਥੇ ਦੇਖੋ ਅਤੇ ਸੰਭਾਲੋ',
+    noneCta: 'ਸ਼ੁਰੂ ਕਰਨ ਲਈ ਆਪਣਾ ਪਹਿਲਾ ਹੇਜਿੰਗ ਕੰਟ੍ਰੈਕਟ ਬਣਾਓ',
+  },
+  forecast: {
+    title: 'ਮਾਰਕਿਟ ਵਿਸ਼ਲੇਸ਼ਣ ਡੈਸ਼ਬੋਰਡ',
+    subtitle: 'AI ਆਧਾਰਿਤ ਕੀਮਤ ਅਨੁਮਾਨ',
+    dataSource: 'ਡਾਟਾ ਸਰੋਤ: AGMARKNET (data.gov.in) ਤੋਂ ਅਸਲੀ ਮੰਡੀ ਰੇਟ, ML ਪਾਈਪਲਾਈਨ ਰਾਹੀਂ',
+    languageNote: 'ਭਾਸ਼ਾ: ਇਸ ਵੇਲੇ ਮੁੱਖ ਤੌਰ ਤੇ ਅੰਗਰੇਜ਼ੀ, ਪਰ ਸਮੱਗਰੀ ਕਿਸਾਨ ਕੇਂਦਰਿਤ ਹੈ',
+    ctaCreateContract: 'ਇਸ ਵਿਸ਼ਲੇਸ਼ਣ ਦੇ ਆਧਾਰ \'ਤੇ ਫਾਰਵਰਡ ਕੰਟ੍ਰੈਕਟ ਬਣਾਓ',
+  },
+  education: {
+    title: 'ਸ਼ਿਖਿਆ ਕੇਂਦਰ',
+    subtitle: 'ਸਧੀ ਪੰਜਾਬੀ, ਹਿੰਦੀ ਅਤੇ ਅੰਗਰੇਜ਼ੀ ਵਿੱਚ ਛੋਟੇ ਪਾਠ',
+    cardHedgingTitle: 'Hedging ਕੀ ਹੁੰਦਾ ਹੈ?',
+    cardHedgingSubtitle: 'ਫਾਰਵਰਡ ਕੰਟ੍ਰੈਕਟ ਤੁਹਾਡੀ ਕੀਮਤ ਕਿਵੇਂ ਬਚਾਉਂਦਾ ਹੈ',
+    cardForecastTitle: 'ਸਾਡੇ ਦਾਮ ਅਨੁਮਾਨ ਨੂੰ ਕਿਵੇਂ ਪੜ੍ਹਨਾ ਹੈ',
+    cardForecastSubtitle: 'ਕੀਮਤ ਦੀ ਰੇਂਜ਼ ਅਤੇ ਅਨਿਸ਼ਚਿਤਤਾ ਨੂੰ ਸਮਝੋ',
+  },
+  language: {
+    title: 'ਆਪਣੀ ਮਨਪਸੰਦ ਭਾਸ਼ਾ ਚੁਣੋ',
+    subtitle: 'ਅਸੀਂ ਕੀਮਤਾਂ, ਅਲਰਟ ਅਤੇ ਸਿੱਖਣ ਵਾਲੀ ਸਮੱਗਰੀ ਤੁਹਾਡੀ ਭਾਸ਼ਾ ਵਿੱਚ ਦਿਖਾਵਾਂਗੇ। ਬਾਅਦ ਵਿੱਚ ਵੀ ਬਦਲ ਸਕਦੇ ਹੋ।',
+    footer: 'ਇਹ ਚੋਣ ਵੱਖ-ਵੱਖ ਰਾਜਾਂ ਦੇ ਕਿਸਾਨਾਂ ਅਤੇ ਖਰੀਦਦਾਰਾਂ ਲਈ ਐਪ ਨੂੰ ਆਸਾਨ ਬਣਾਉਂਦੀ ਹੈ।',
+    changeLink: 'ਭਾਸ਼ਾ ਬਦਲੋ',
+  },
+  auth: {
+    login: {
+      heading: 'ਵਾਪਸ ਸਵਾਗਤ ਹੈ',
+      subheading: 'ਅੱਗੇ ਵਧਣ ਲਈ ਆਪਣੇ ਖਾਤੇ ਵਿੱਚ ਸਾਈਨ ਇਨ ਕਰੋ',
+      emailLabel: 'ਈਮੇਲ ਐਡਰੈਸ',
+      emailPlaceholder: 'ਆਪਣਾ ਈਮੇਲ ਦਾਖਲ ਕਰੋ',
+      passwordLabel: 'ਪਾਸਵਰਡ',
+      passwordPlaceholder: 'ਆਪਣਾ ਪਾਸਵਰਡ ਦਾਖਲ ਕਰੋ',
+      rememberMe: 'ਮੈਨੂੰ ਯਾਦ ਰੱਖੋ',
+      forgotPassword: 'ਪਾਸਵਰਡ ਭੁੱਲ ਗਏ?',
+      signIn: 'ਲਾਗਇਨ',
+      signingIn: 'ਲਾਗਇਨ ਹੋ ਰਿਹਾ ਹੈ...',
+      noAccount: 'ਖਾਤਾ ਨਹੀਂ?',
+      signUp: 'ਰਜਿਸਟਰ ਕਰੋ',
+    },
+    buyerLogin: {
+      heading: 'ਖਰੀਦਦਾਰ ਲਾਗਇਨ',
+      subheading: 'ਮਾਰਕਿਟਪਲੇਸ ਅਤੇ ਕੰਟ੍ਰੈਕਟਾਂ ਤੱਕ ਪਹੁੰਚ',
+      description: 'ਖਰੀਦਦਾਰ ਵਜੋਂ ਅੱਗੇ ਵਧਣ ਲਈ ਆਪਣਾ ਮੋਬਾਇਲ ਨੰਬਰ ਭਰੋ।',
+      mobileLabel: 'ਮੋਬਾਇਲ ਨੰਬਰ',
+      sendOtp: 'OTP ਭੇਜੋ',
+      sendingOtp: 'ਭੇਜਿਆ ਜਾ ਰਿਹਾ ਹੈ...',
+    },
+  },
+};
+

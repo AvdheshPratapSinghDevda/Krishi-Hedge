@@ -7,6 +7,7 @@ import {
   Calendar, Package, DollarSign, CheckCircle, Clock, XCircle,
   Eye, Edit3, ChevronRight, AlertCircle, BarChart3, Wallet
 } from 'lucide-react';
+import { useI18n } from "@/i18n/LanguageProvider";
 
 // Contract interface - Supabase ready
 interface Contract {
@@ -37,6 +38,7 @@ interface Stats {
 
 export default function ContractsPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const [loading, setLoading] = useState(true);
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [filteredContracts, setFilteredContracts] = useState<Contract[]>([]);
@@ -60,16 +62,82 @@ export default function ContractsPage() {
 
   const loadContracts = async () => {
     try {
-      // TODO: Replace with Supabase call
-      // const { data } = await supabase.from('contracts').select('*').eq('user_id', userId)
-      
-      const stored = localStorage.getItem('kh_contracts');
+      // Prefer real contracts from API (Supabase via /api/contracts)
+      const userId = typeof window !== 'undefined' ? window.localStorage.getItem('kh_user_id') : null;
+
+      if (userId) {
+        const res = await fetch(`/api/contracts?role=farmer&userId=${encodeURIComponent(userId)}`);
+
+        if (res.ok) {
+          const apiData: any[] = await res.json();
+
+          const mapped: Contract[] = apiData.map((row) => {
+            // Map backend status to UI status buckets
+            const rawStatus = (row.status || '').toString().toUpperCase();
+            const statusMap: Record<string, Contract['status']> = {
+              CREATED: 'pending',
+              MATCHED_WITH_BUYER_DEMO: 'active',
+              SETTLED: 'completed',
+              CANCELLED: 'cancelled',
+              EXPIRED: 'expired',
+            };
+            const uiStatus = statusMap[rawStatus] || 'pending';
+
+            const createdAt: string = row.createdAt || row.created_at || new Date().toISOString();
+
+            // Rough expiry: createdAt + 30 days or fallback to createdAt
+            let expiryDate = createdAt;
+            try {
+              const base = new Date(createdAt);
+              const deliveryWindow: string | undefined = row.deliveryWindow || row.deliverywindow;
+              let days = 30;
+              if (deliveryWindow) {
+                const match = deliveryWindow.match(/(\d+)\s*Day/i);
+                if (match) days = parseInt(match[1], 10);
+              }
+              base.setDate(base.getDate() + days);
+              expiryDate = base.toISOString();
+            } catch {
+              // ignore, keep default expiryDate
+            }
+
+            return {
+              id: row.id,
+              contractNumber: row.id?.slice(0, 8) || undefined,
+              commodity: row.crop || 'Oilseed',
+              quantity: Number(row.quantity) || 0,
+              unit: row.unit || 'quintals',
+              strikePrice: Number(row.strikePrice ?? row.strike_price ?? 0),
+              currentPrice: undefined, // could be wired to live price later
+              contractType: 'hedge',
+              status: uiStatus,
+              startDate: createdAt,
+              expiryDate,
+              premium: undefined,
+              counterparty: undefined,
+              profitLoss: undefined,
+              createdAt,
+              updatedAt: row.updatedAt || row.updated_at || undefined,
+            };
+          });
+
+          setContracts(mapped);
+          calculateStats(mapped);
+          setLoading(false);
+          return;
+        } else {
+          console.error('Failed to fetch contracts from API:', await res.text());
+        }
+      }
+
+      // Fallback: use local demo data if API or userId not available
+      const stored = typeof window !== 'undefined' ? window.localStorage.getItem('kh_contracts') : null;
       if (stored) {
-        const data = JSON.parse(stored);
+        const data: Contract[] = JSON.parse(stored);
         setContracts(data);
         calculateStats(data);
       } else {
-        // Demo data
+        // Demo data (used only as last resort)
         const demoContracts: Contract[] = [
           {
             id: '1',
@@ -125,7 +193,9 @@ export default function ContractsPage() {
         ];
         setContracts(demoContracts);
         calculateStats(demoContracts);
-        localStorage.setItem('kh_contracts', JSON.stringify(demoContracts));
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem('kh_contracts', JSON.stringify(demoContracts));
+        }
       }
     } catch (error) {
       console.error('Error loading contracts:', error);
@@ -223,8 +293,8 @@ export default function ContractsPage() {
               <ChevronRight size={24} className="rotate-180" />
             </button>
             <div>
-              <h1 className="text-xl font-bold">Contracts</h1>
-              <p className="text-xs text-gray-500">Manage your hedging contracts</p>
+              <h1 className="text-xl font-bold">{t('contracts.title')}</h1>
+              <p className="text-xs text-gray-500">{t('contracts.subtitle')}</p>
             </div>
           </div>
           <button
@@ -348,7 +418,7 @@ export default function ContractsPage() {
               <p className="text-gray-600 mb-6">
                 {searchQuery || statusFilter !== 'all' || commodityFilter !== 'all'
                   ? 'Try adjusting your filters'
-                  : 'Create your first hedging contract to get started'}
+                  : t('contracts.noneCta')}
               </p>
               <button
                 onClick={() => router.push('/contracts/create')}

@@ -5,7 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase-server';
+import { supabaseServer } from '@/lib/supabaseServer';
 
 export async function GET(req: NextRequest) {
   try {
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
     const crop = searchParams.get('crop');
     const verified = searchParams.get('verified');
 
-    const supabase = createClient();
+    const supabase = supabaseServer();
 
     // Get single FPO by ID
     if (fpoId) {
@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const supabase = createClient();
+    const supabase = supabaseServer();
 
     const insertData = {
       fpo_name,
@@ -148,7 +148,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'FPO ID is required' }, { status: 400 });
     }
 
-    const supabase = createClient();
+    const supabase = supabaseServer();
 
     // Don't allow updating certain protected fields via this endpoint
     const {
