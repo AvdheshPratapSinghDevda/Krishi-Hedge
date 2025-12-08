@@ -39,8 +39,8 @@ export default function BuyerProfilePage() {
       const phone = window.localStorage.getItem(PHONE_STORAGE_KEY);
       
       if (!buyerId && !phone) {
-        // No buyer session, redirect to login
-        router.push('/auth/buyer-login');
+        // No buyer session, redirect to unified OTP login for buyer
+        router.push('/auth/login?role=buyer');
         return;
       }
 

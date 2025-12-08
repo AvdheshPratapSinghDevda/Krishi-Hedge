@@ -36,7 +36,7 @@ export default function BuyerContractsPage() {
           });
       } else {
         setLoading(false);
-        router.push('/auth/buyer/login');
+        router.push('/auth/login?role=buyer');
       }
     }
   }, []);

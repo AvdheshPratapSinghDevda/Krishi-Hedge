@@ -1,21 +1,48 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
+import { createHash } from "crypto";
 
-// Stub endpoint: in a real backend, compute SHA-256 of the contract, push to IPFS,
-// then anchor the IPFS CID / hash on Polygon testnet via ethers.js.
-// For SIH demo, we return a fixed sample IPFS CID and testnet tx hash and persist them.
+// Compute a real SHA-256 hash of the contract data and derive a deterministic
+// demo transaction hash + Polygon Amoy explorer URL. In production, this is
+// where you would call a signing service to submit an on-chain transaction.
 
 export async function POST(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
 
-  // Sample data - replace with real values later
-  const ipfsCid = "bafybeigdyrztwexamplecid1234567890";
-  const ipfsGatewayUrl = `https://ipfs.io/ipfs/${ipfsCid}`;
+  const supabase = supabaseServer();
+  const { data, error } = await supabase
+    .from("contracts")
+    .select("*")
+    .eq("id", id)
+    .single();
 
-  const txHash = "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcd";
+  if (error || !data) {
+    return NextResponse.json({ error: error?.message || "Contract not found" }, { status: 404 });
+  }
+
+  const payload = {
+    id: data.id,
+    crop: data.crop,
+    quantity: data.quantity,
+    unit: data.unit,
+    strike_price: data.strike_price,
+    deliverywindow: data.deliverywindow,
+    status: data.status,
+    farmer_id: data.farmer_id,
+    buyer_id: data.buyer_id,
+    // fpo_id is optional; only present if you extend the schema
+    fpo_id: (data as any).fpo_id ?? null,
+    created_at: data.created_at,
+  };
+
+  const documentHash = createHash("sha256")
+    .update(JSON.stringify(payload))
+    .digest("hex");
+
+  // Derive a deterministic tx-like hash from the document hash
+  const txHash = "0x" + documentHash.slice(0, 64);
   const explorerUrl = `https://amoy.polygonscan.com/tx/${txHash}`;
 
-  const supabase = supabaseServer();
   await supabase
     .from("contracts")
     .update({ anchor_tx_hash: txHash, anchor_explorer_url: explorerUrl })
@@ -24,8 +51,7 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ id: s
   return NextResponse.json(
     {
       id,
-      ipfsCid,
-      ipfsGatewayUrl,
+      documentHash,
       txHash,
       explorerUrl,
     },
