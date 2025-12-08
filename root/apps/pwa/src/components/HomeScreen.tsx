@@ -20,6 +20,7 @@ import {
   Clock,
   AlertCircle
 } from "lucide-react";
+import { useI18n } from "@/i18n/LanguageProvider";
 
 interface MarketStats {
   totalValue: number;
@@ -30,6 +31,7 @@ interface MarketStats {
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { t } = useI18n();
   const [name, setName] = useState("User");
   const [forecast, setForecast] = useState<any>(null);
   const [contracts, setContracts] = useState<any[]>([]);
@@ -149,9 +151,9 @@ export default function HomeScreen() {
 
   const getTimeGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return "Good Morning";
-    if (hour < 17) return "Good Afternoon";
-    return "Good Evening";
+    if (hour < 12) return t('home.greetingMorning');
+    if (hour < 17) return t('home.greetingAfternoon');
+    return t('home.greetingEvening');
   };
 
   return (
@@ -171,8 +173,8 @@ export default function HomeScreen() {
                 <i className="fa-solid fa-wheat-awn text-2xl text-emerald-900"></i>
               </div>
               <div>
-                <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-white to-amber-100 bg-clip-text text-transparent">Krishi Hedge</span>
-                <p className="text-xs text-emerald-100">Agricultural Risk Management</p>
+                <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-white to-amber-100 bg-clip-text text-transparent">{t('common.appName')}</span>
+                <p className="text-xs text-emerald-100">{t('home.appTagline')}</p>
               </div>
             </div>
             <NotificationBell />
@@ -239,8 +241,8 @@ export default function HomeScreen() {
               <i className="fa-solid fa-gamepad text-lg"></i>
             </div>
             <div>
-              <span className="text-sm font-bold block mb-1 drop-shadow-sm">DEMO GAME</span>
-              <span className="text-xs text-purple-100 opacity-90">Practice risk-free trading</span>
+              <span className="text-sm font-bold block mb-1 drop-shadow-sm">{t('home.demoGameTitle')}</span>
+              <span className="text-xs text-purple-100 opacity-90">{t('home.demoGameSubtitle')}</span>
             </div>
           </button>
           
@@ -253,8 +255,8 @@ export default function HomeScreen() {
               <BarChart3 className="w-4 h-4 text-gray-900" />
             </div>
             <div>
-              <span className="text-sm font-bold block mb-1 drop-shadow-sm">PORTFOLIO</span>
-              <span className="text-xs text-gray-800 opacity-90">View your holdings</span>
+              <span className="text-sm font-bold block mb-1 drop-shadow-sm">{t('home.portfolioTitle')}</span>
+              <span className="text-xs text-gray-800 opacity-90">{t('home.portfolioSubtitle')}</span>
             </div>
           </button>
           
@@ -267,8 +269,8 @@ export default function HomeScreen() {
               <FileText className="w-4 h-4" />
             </div>
             <div>
-              <span className="text-sm font-bold block mb-1 drop-shadow-sm">CONTRACTS</span>
-              <span className="text-xs text-emerald-100 opacity-90">Manage agreements</span>
+              <span className="text-sm font-bold block mb-1 drop-shadow-sm">{t('home.contractsTitle')}</span>
+              <span className="text-xs text-emerald-100 opacity-90">{t('home.contractsSubtitle')}</span>
             </div>
           </button>
           
@@ -281,8 +283,8 @@ export default function HomeScreen() {
               <Activity className="w-4 h-4" />
             </div>
             <div>
-              <span className="text-sm font-bold block mb-1 drop-shadow-sm">MARKET</span>
-              <span className="text-xs text-blue-100 opacity-90">Oilseed forecasting</span>
+              <span className="text-sm font-bold block mb-1 drop-shadow-sm">{t('home.marketTitle')}</span>
+              <span className="text-xs text-blue-100 opacity-90">{t('home.marketSubtitle')}</span>
             </div>
           </button>
         </div>
@@ -292,7 +294,7 @@ export default function HomeScreen() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-gray-600 flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
-              Portfolio Overview
+              {t('home.portfolioOverview')}
             </h3>
             <button onClick={() => router.push('/portfolio')} className="text-xs font-medium text-green-600 hover:text-green-700 flex items-center gap-1">
               View All
@@ -302,20 +304,20 @@ export default function HomeScreen() {
           
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
-              <p className="text-xs text-gray-500 font-medium">Total Portfolio Value</p>
+              <p className="text-xs text-gray-500 font-medium">{t('home.totalPortfolioValue')}</p>
               <p className="text-2xl font-bold text-gray-900">
                 ₹{marketStats.totalValue.toLocaleString('en-IN')}
               </p>
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-gray-500 font-medium">Active Contracts</p>
+              <p className="text-xs text-gray-500 font-medium">{t('home.activeContracts')}</p>
               <p className="text-2xl font-bold text-gray-900">{marketStats.activeContracts}</p>
             </div>
           </div>
           
           <div className="mt-4 pt-4 border-t border-gray-100">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-600 font-medium">Net P&L</span>
+              <span className="text-xs text-gray-600 font-medium">{t('home.netPnL')}</span>
               <div className="flex items-center gap-2">
                 {marketStats.profitLoss >= 0 ? (
                   <TrendingUp className="w-4 h-4 text-green-600" />

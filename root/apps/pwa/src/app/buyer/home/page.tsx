@@ -16,8 +16,8 @@ export default function BuyerHomePage() {
       const p = JSON.parse(stored);
       if (p.name) setBuyerName(p.name);
     } else {
-      // If no buyer profile, redirect to login
-      router.replace('/auth/buyer-login');
+      // If no buyer profile, redirect to unified OTP login for buyer
+      router.replace('/auth/login?role=buyer');
     }
 
     fetch('/api/contracts?role=buyer')

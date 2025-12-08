@@ -50,6 +50,8 @@ export default function BuyerOtpPage() {
         onboarded: data.buyer.onboarded
       };
       window.localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
+      // Treat buyer ID as a logged-in "user" for AuthProvider checks
+      window.localStorage.setItem("kh_user_id", data.buyer.id);
       window.localStorage.setItem("kh_buyer_id", data.buyer.id);
       window.localStorage.setItem("kh_role", "buyer");
 

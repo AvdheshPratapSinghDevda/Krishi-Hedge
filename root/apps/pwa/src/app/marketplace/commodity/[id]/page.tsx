@@ -72,8 +72,10 @@ export default function CommodityDetailPage() {
   };
 
   const handleCreateContract = () => {
-    // Navigate to contract creation with pre-filled data
-    router.push(`/contracts/create?commodity=${listing?.commodity_name}&fpo_id=${listing?.fpo.id}`);
+    // Navigate to existing new contract screen (query params can be used later to prefill)
+    if (!listing) return;
+    const params = new URLSearchParams({ commodity: listing.commodity_name, fpo_id: listing.fpo.id });
+    router.push(`/contracts/new?${params.toString()}`);
   };
 
   if (loading) {

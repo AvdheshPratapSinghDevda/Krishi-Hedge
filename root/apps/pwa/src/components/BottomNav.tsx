@@ -57,7 +57,7 @@ export default function BottomNav() {
   }
 
   return (
-    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-200 flex justify-around py-3 pb-5 z-50">
+    <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white border-t border-gray-200 flex justify-evenly py-3 pb-5 z-50">
         <button 
             onClick={() => router.push('/')} 
             className={`${isActive('/') ? 'text-green-700 font-bold' : 'text-gray-400'} flex flex-col items-center text-xs`}
@@ -72,7 +72,12 @@ export default function BottomNav() {
             <i className="fa-solid fa-chart-line text-xl mb-1"></i>{t('nav.forecast')}
         </button>
         
-        <div className="w-12"></div> 
+        <button 
+            onClick={() => router.push('/education')} 
+            className={`${isActive('/education') ? 'text-green-700 font-bold' : 'text-gray-400'} flex flex-col items-center text-xs`}
+        >
+            <i className="fa-solid fa-book-open text-xl mb-1"></i>{t('nav.education')}
+        </button>
         
         <button 
             onClick={() => router.push('/contracts')} 
@@ -86,13 +91,6 @@ export default function BottomNav() {
             className={`${isActive('/profile') ? 'text-green-700 font-bold' : 'text-gray-400'} flex flex-col items-center text-xs`}
         >
             <i className="fa-solid fa-user text-xl mb-1"></i>{t('nav.profile')}
-        </button>
-        
-        <button 
-            onClick={() => router.push('/contracts/new')} 
-            className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-white w-14 h-14 rounded-full shadow-lg border-4 border-gray-100 flex items-center justify-center"
-        >
-            <i className="fa-solid fa-plus text-xl"></i>
         </button>
     </nav>
   );

@@ -13,14 +13,14 @@ const PUBLIC_ROUTES = [
   '/auth/signup',
   '/auth/forgot-password',
   '/auth/reset-password',
-  // Buyer phone-OTP flow (both new nested route and legacy flat route)
-  '/auth/buyer/login',
-  '/auth/buyer-otp',
-  '/auth/buyer-login',
-  '/auth/buyer/otp',
-  // Legacy generic OTP route (if still used)
+  // OTP flows (unified login + legacy buyer routes still accessible if needed)
   '/auth/otp',
-  '/auth/phone-login',
+  '/auth/buyer/otp',
+  '/auth/buyer/login',
+  '/auth/buyer-login',
+  // FPO admin login & dashboard are handled via localStorage fpo_id
+  '/auth/fpo',
+  '/fpo',
 ];
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {

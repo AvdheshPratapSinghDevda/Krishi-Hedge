@@ -6,7 +6,8 @@ import { supabaseServer } from "@/lib/supabaseServer";
 
 export async function POST(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
-  const pdfUrl = "/sample-contract.pdf";
+  // Point pdf_url to a printable HTML contract view; browser can print/save as PDF
+  const pdfUrl = `/contracts/${id}/print`;
 
   const supabase = supabaseServer();
   await supabase
