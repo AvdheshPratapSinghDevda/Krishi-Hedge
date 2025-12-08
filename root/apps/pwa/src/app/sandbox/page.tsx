@@ -1,73 +1,215 @@
 'use client';
 
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { sandboxStorage } from '@/lib/sandbox/storage';
+import { SandboxPlayer } from '@/lib/sandbox/types';
+import { progressionManager, LEVELS } from '@/lib/sandbox/progression';
+import { marketEngine } from '@/lib/sandbox/market-engine';
 
-export default function SandboxPage() {
+export default function SandboxDashboard() {
   const router = useRouter();
-  const [balance, setBalance] = useState(1000000);
-  const [level, setLevel] = useState("Lvl 1 Rookie");
-  const [trades, setTrades] = useState<any[]>([]);
+  const [player, setPlayer] = useState<SandboxPlayer | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedBalance = localStorage.getItem("sandbox_balance");
-    if (storedBalance) setBalance(parseInt(storedBalance));
+    marketEngine.startAutoUpdate();
     
-    const t = JSON.parse(localStorage.getItem("sandbox_trades") || "[]");
-    setTrades(t);
-    if (t.length > 5) setLevel("Lvl 2 Trader");
+    let p = sandboxStorage.getPlayer();
+    if (!p) {
+      const profileStr = typeof window !== 'undefined' ? localStorage.getItem('kh_profile') : null;
+      const name = profileStr ? JSON.parse(profileStr).fullName || 'Player' : 'Player';
+      p = sandboxStorage.createNewPlayer(name);
+    }
+    
+    // Ensure stats object exists with all properties
+    if (!p.stats) {
+      p.stats = {
+        totalTrades: 0,
+        winRate: 0,
+        totalProfit: 0,
+        currentStreak: 0,
+        bestStreak: 0
+      };
+      sandboxStorage.savePlayer(p);
+    }
+    
+    setPlayer(p);
+    setLoading(false);
+
+    return () => {
+      marketEngine.stopAutoUpdate();
+    };
   }, []);
 
+  if (loading || !player || !player.stats) {
+    return <div className="min-h-screen bg-purple-50 flex items-center justify-center pb-20">
+      <div className="animate-spin w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full"></div>
+    </div>;
+  }
+
+  const levelInfo = progressionManager.getLevelInfo(player.level);
+  const nextLevel = LEVELS.find(l => l.level === player.level + 1);
+  const progressToNext = nextLevel 
+    ? ((player.xp - levelInfo.xpRequired) / (nextLevel.xpRequired - levelInfo.xpRequired)) * 100
+    : 100;
+
   return (
-    <div className="min-h-screen bg-purple-50 pb-20">
-      <header className="bg-purple-800 text-white p-5 rounded-b-3xl shadow-lg">
-        <div className="flex items-center gap-3 mb-4">
-          <button onClick={() => router.push('/')} className="text-purple-200"><i className="fa-solid fa-arrow-left"></i></button>
-          <h1 className="text-xl font-bold">Sandbox Mode</h1>
-        </div>
-        <div className="flex justify-between items-end">
-          <div>
-            <p className="text-purple-200 text-xs">Virtual Balance</p>
-            <h2 className="text-3xl font-bold">₹{balance.toLocaleString('en-IN')}</h2>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 pb-24">
+      <header className="bg-gradient-to-br from-purple-700 via-purple-600 to-pink-600 text-white px-6 pt-6 pb-16 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32" />
+        
+        <div className="relative z-10">
+          <div className="flex items-center justify-between mb-6">
+            <button 
+              onClick={() => router.push('/')}
+              className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-white/30 transition"
+            >
+              <i className="fa-solid fa-arrow-left"></i>
+            </button>
+            <div className="flex items-center gap-2">
+              <i className="fa-solid fa-gamepad text-yellow-300"></i>
+              <span className="text-sm font-bold text-yellow-300">PRACTICE MODE</span>
+            </div>
           </div>
-          <div className="text-right">
-            <span className="bg-purple-600 px-2 py-1 rounded text-xs font-bold">{level}</span>
+
+          <h1 className="text-2xl font-bold mb-1">Sandbox Trading</h1>
+          <p className="text-purple-200 text-sm mb-6">Learn risk-free before real trading</p>
+
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <p className="text-xs text-purple-200 mb-1">Virtual Balance</p>
+                <p className="text-3xl font-bold">₹{(player.balance / 100000).toFixed(1)}L</p>
+              </div>
+              <div className={`px-3 py-1.5 ${levelInfo.badge.color} rounded-lg`}>
+                <p className="text-xs font-bold text-white">
+                  <i className={`fa-solid ${levelInfo.badge.icon} mr-1`}></i>
+                  Lvl {player.level}
+                </p>
+                <p className="text-xs text-white/90">{levelInfo.title}</p>
+              </div>
+            </div>
+
+            {nextLevel && (
+              <div>
+                <div className="flex items-center justify-between text-xs mb-1">
+                  <span className="text-purple-200">XP Progress</span>
+                  <span className="text-white font-bold">{player.xp} / {nextLevel.xpRequired}</span>
+                </div>
+                <div className="w-full bg-white/20 h-2 rounded-full overflow-hidden">
+                  <div 
+                    className="bg-gradient-to-r from-yellow-400 to-orange-500 h-full transition-all duration-500"
+                    style={{ width: `${Math.min(progressToNext, 100)}%` }}
+                  ></div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </header>
 
-      <div className="p-5 space-y-4">
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-purple-100 text-center">
-          <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-2">
-            <i className="fa-solid fa-graduation-cap text-xl"></i>
+      <div className="px-6 -mt-8 relative z-10 space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-10 h-10 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center">
+                <i className="fa-solid fa-chart-line text-lg"></i>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 mb-1">Total Trades</p>
+            <p className="text-2xl font-bold text-gray-800">{player.stats.totalTrades}</p>
           </div>
-          <h3 className="font-bold text-gray-800">Learn Risk-Free</h3>
-          <p className="text-xs text-gray-500 mt-1">Practice trading without losing real money. Try creating a contract now.</p>
+          <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-10 h-10 bg-green-100 text-green-600 rounded-lg flex items-center justify-center">
+                <i className="fa-solid fa-bullseye text-lg"></i>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 mb-1">Win Rate</p>
+            <p className="text-2xl font-bold text-gray-800">{player.stats.winRate}%</p>
+          </div>
+          <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-10 h-10 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center">
+                <i className="fa-solid fa-wallet text-lg"></i>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 mb-1">Total Profit</p>
+            <p className="text-2xl font-bold text-gray-800">₹{(player.stats.totalProfit / 1000).toFixed(0)}K</p>
+          </div>
+          <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
+                <i className="fa-solid fa-fire text-lg"></i>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 mb-1">Current Streak</p>
+            <p className="text-2xl font-bold text-gray-800">{player.stats.currentStreak}</p>
+          </div>
         </div>
 
-        <h3 className="font-bold text-gray-700 text-sm">Practice History</h3>
-        {trades.length === 0 ? (
-          <div className="text-center py-8 opacity-50">
-            <i className="fa-solid fa-box-open text-4xl text-gray-300 mb-2"></i>
-            <p className="text-sm text-gray-400">No practice trades yet</p>
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-purple-100">
+          <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4">
+            <h2 className="font-bold text-lg mb-1">Choose Your Role</h2>
+            <p className="text-sm text-purple-100">Practice as farmer or buyer</p>
           </div>
-        ) : (
-          <div className="space-y-3">
-            {trades.map((t: any) => (
-              <div key={t.id} className="bg-white p-3 rounded-lg shadow-sm border border-purple-100 flex justify-between items-center">
-                <div>
-                  <p className="font-bold text-gray-800">{t.crop}</p>
-                  <p className="text-xs text-gray-500">{t.quantity} Qtl @ ₹{t.price}</p>
-                </div>
-                <span className="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded">VIRTUAL</span>
-              </div>
-            ))}
-          </div>
-        )}
 
-        <button onClick={() => router.push('/contracts/new?mode=sandbox')} className="w-full bg-purple-600 text-white font-bold py-3 rounded-lg shadow-md">
-          Start New Practice Trade
-        </button>
+          <div className="p-4 space-y-3">
+            <button
+              onClick={() => router.push('/sandbox/farmer')}
+              className="w-full bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-4 hover:border-green-400 transition-all group"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-green-500 text-white rounded-xl flex items-center justify-center group-hover:scale-110 transition">
+                    <i className="fa-solid fa-user-tie text-xl"></i>
+                  </div>
+                  <div className="text-left">
+                    <h3 className="font-bold text-gray-800">Play as Seller</h3>
+                    <p className="text-xs text-gray-600">Create contracts, get AI feedback</p>
+                  </div>
+                </div>
+                <i className="fa-solid fa-arrow-right text-green-600 group-hover:translate-x-1 transition"></i>
+              </div>
+            </button>
+
+            <button
+              onClick={() => router.push('/sandbox/buyer')}
+              className="w-full bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4 hover:border-blue-400 transition-all group"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-blue-500 text-white rounded-xl flex items-center justify-center group-hover:scale-110 transition">
+                    <i className="fa-solid fa-shopping-cart text-xl"></i>
+                  </div>
+                  <div className="text-left">
+                    <h3 className="font-bold text-gray-800">Play as Buyer</h3>
+                    <p className="text-xs text-gray-600">Browse AI contracts, find deals</p>
+                  </div>
+                </div>
+                <i className="fa-solid fa-arrow-right text-blue-600 group-hover:translate-x-1 transition"></i>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-r from-yellow-50 to-amber-50 border-l-4 border-yellow-400 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <i className="fa-solid fa-lightbulb text-yellow-600 text-xl"></i>
+            <div>
+              <h4 className="font-bold text-gray-800 text-sm mb-1">Quick Tip</h4>
+              <p className="text-xs text-gray-700">
+                {player.stats.totalTrades === 0 
+                  ? "Start with Seller mode to learn pricing. AI will give you instant feedback!"
+                  : player.stats.winRate < 50
+                  ? "Try to match market prices closely. Check the live prices before setting your price."
+                  : "Great job! Try Buyer mode to practice identifying profitable deals from the other side."
+                }
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
