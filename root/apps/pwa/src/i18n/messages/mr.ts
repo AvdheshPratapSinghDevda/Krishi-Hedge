@@ -1,0 +1,73 @@
+export const mr = {
+  common: {
+    appName: 'कृषि हेज',
+    languageLabel: 'भाषा',
+    back: 'मागे',
+  },
+  nav: {
+    home: 'होम',
+    forecast: 'भाव अंदाज',
+    contracts: 'करार',
+    profile: 'प्रोफाइल',
+    dashboard: 'डॅशबोर्ड',
+    market: 'बाजार',
+    portfolio: 'पोर्टफोलिओ',
+  },
+  splash: {
+    tagline: 'स्मार्ट किंमत संरक्षण',
+    continueFarmer: 'शेतकरी म्हणून पुढे जा',
+    continueBuyer: 'खरेदीदार म्हणून पुढे जा',
+    badge: 'SIH 2025 प्रोटोटाइप',
+  },
+  contracts: {
+    title: 'करार',
+    subtitle: 'तुमचे हेजिंग करार येथे पहा आणि व्यवस्थापित करा',
+    noneCta: 'सुरुवात करण्यासाठी तुमचा पहिला हेजिंग करार तयार करा',
+  },
+  forecast: {
+    title: 'बाजार विश्लेषण डॅशबोर्ड',
+    subtitle: 'AI आधारित भाव अंदाज',
+    dataSource: 'डेटा स्रोत: AGMARKNET (data.gov.in) मधील खरे मंडी भाव, ML पाइपलाइन द्वारे',
+    languageNote: 'भाषा: सध्या मुख्यतः इंग्रजी, पण मजकूर शेतकऱ्यांसाठी तयार केलेला आहे',
+    ctaCreateContract: 'या विश्लेषणावर आधारित फॉरवर्ड करार तयार करा',
+  },
+  education: {
+    title: 'शिक्षण केंद्र',
+    subtitle: 'सरळ मराठी, हिंदी आणि इंग्रजीत छोटे छोटे धडे',
+    cardHedgingTitle: 'Hedging म्हणजे काय?',
+    cardHedgingSubtitle: 'फॉरवर्ड करार तुमचा भाव कसा सुरक्षित करतो',
+    cardForecastTitle: 'आपला भाव अंदाज कसा वाचायचा',
+    cardForecastSubtitle: 'भावाचा पट्टा आणि अनिश्चितता समजून घ्या',
+  },
+  language: {
+    title: 'आपली आवडती भाषा निवडा',
+    subtitle: 'भाव, सूचना आणि शिकवणीची माहिती आम्ही तुमच्या भाषेत दाखवू. नंतरही बदल करू शकता.',
+    footer: 'हा पर्याय वेगवेगळ्या राज्यातील शेतकरी आणि खरेदीदारांसाठी अॅप वापरणे सोपे करतो.',
+    changeLink: 'भाषा बदला',
+  },
+  auth: {
+    login: {
+      heading: 'परत स्वागत आहे',
+      subheading: 'पुढे जाण्यासाठी तुमच्या खात्यात लॉगिन करा',
+      emailLabel: 'ईमेल पत्ता',
+      emailPlaceholder: 'तुमचा ईमेल टाका',
+      passwordLabel: 'पासवर्ड',
+      passwordPlaceholder: 'तुमचा पासवर्ड टाका',
+      rememberMe: 'मला लक्षात ठेवा',
+      forgotPassword: 'पासवर्ड विसरलात?',
+      signIn: 'लॉगिन',
+      signingIn: 'लॉगिन होत आहे...',
+      noAccount: 'खाते नाही?',
+      signUp: 'नोंदणी करा',
+    },
+    buyerLogin: {
+      heading: 'खरेदीदार लॉगिन',
+      subheading: 'मार्केटप्लेस आणि करारांना प्रवेश',
+      description: 'खरेदीदार म्हणून पुढे जाण्यासाठी तुमचा मोबाइल नंबर भरा.',
+      mobileLabel: 'मोबाइल नंबर',
+      sendOtp: 'OTP पाठवा',
+      sendingOtp: 'पाठवित आहे...',
+    },
+  },
+};
+

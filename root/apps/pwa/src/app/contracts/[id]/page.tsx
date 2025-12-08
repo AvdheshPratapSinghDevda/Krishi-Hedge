@@ -10,18 +10,28 @@ export default function ContractDetailPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!params.id) return;
-    fetch('/api/contracts')
-      .then(res => res.json())
-      .then((data: any[]) => {
-        const found = data.find(c => c.id === params.id);
-        setContract(found);
+    const id = params.id as string | undefined;
+    if (!id) return;
+
+    async function load() {
+      try {
+        const res = await fetch(`/api/contracts/${id}`);
+        if (!res.ok) {
+          console.error('Failed to load contract detail', await res.text());
+          setContract(null);
+        } else {
+          const data = await res.json();
+          setContract(data);
+        }
+      } catch (err) {
+        console.error('Error loading contract detail', err);
+        setContract(null);
+      } finally {
         setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
+      }
+    }
+
+    load();
   }, [params.id]);
 
   if (loading) return <div className="min-h-screen bg-gray-50 flex items-center justify-center text-gray-500">Loading...</div>;
@@ -42,6 +52,10 @@ export default function ContractDetailPage() {
       alert("Error deleting");
     }
   }
+
+  const txHash: string | undefined = contract.anchorTxHash || contract.anchor_tx_hash;
+  const explorerUrl: string | undefined = contract.anchorExplorerUrl || contract.anchor_explorer_url;
+  const pdfUrl: string | undefined = contract.pdfUrl || contract.pdf_url;
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -85,10 +99,17 @@ export default function ContractDetailPage() {
           </div>
 
           <div className="border-t border-dashed border-gray-300 pt-3 flex items-center justify-between">
-            <button className="text-red-500 text-xs font-bold flex items-center gap-1">
-              <i className="fa-solid fa-file-pdf"></i> Download PDF
+            <button
+              className="text-red-500 text-xs font-bold flex items-center gap-1 disabled:text-gray-400 disabled:cursor-not-allowed"
+              disabled={!pdfUrl}
+              onClick={() => {
+                if (pdfUrl) window.open(pdfUrl, '_blank');
+              }}
+            >
+              <i className="fa-solid fa-file-pdf"></i>
+              {pdfUrl ? 'Download PDF' : 'PDF not generated yet'}
             </button>
-            <span className="text-xs text-gray-400 italic">Digitally Signed</span>
+            <span className="text-xs text-gray-400 italic">Digitally Signed (demo)</span>
           </div>
         </div>
 
@@ -96,11 +117,17 @@ export default function ContractDetailPage() {
           <div className="flex items-center gap-2 mb-2 text-purple-400 font-bold uppercase tracking-wider">
             <i className="fa-solid fa-link"></i> Blockchain Proof
           </div>
-          <div className="mb-1 text-gray-500">Transaction Hash (Polygon):</div>
+          <div className="mb-1 text-gray-500">Transaction Hash (Polygon demo):</div>
           <div className="break-all text-white bg-gray-800 p-2 rounded mb-3">
-            {contract.anchorTxHash || '0x71C9...8a2B9d4e1'}
+            {txHash || '0x71C9...8a2B9d4e1'}
           </div>
-          <button className="w-full border border-gray-600 text-gray-300 py-2 rounded hover:bg-gray-800">
+          <button
+            className="w-full border border-gray-600 text-gray-300 py-2 rounded hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!explorerUrl}
+            onClick={() => {
+              if (explorerUrl) window.open(explorerUrl, '_blank');
+            }}
+          >
             View on Explorer <i className="fa-solid fa-external-link-alt ml-1"></i>
           </button>
         </div>

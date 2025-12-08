@@ -103,7 +103,7 @@ export default function LessonPage({ params }: PageProps) {
     <div className="min-h-screen bg-gray-50 pb-20">
       <div className="bg-white p-4 shadow-sm mb-4 flex items-center gap-3">
         <button onClick={() => router.back()} className="text-gray-600"><i className="fa-solid fa-arrow-left"></i></button>
-        <h1 className="text-xl font-bold text-green-800">Lesson</h1>
+        <h1 className="text-xl font-bold text-green-800">Lesson / पाठ</h1>
       </div>
 
       <div className="p-4 space-y-6">
@@ -113,6 +113,16 @@ export default function LessonPage({ params }: PageProps) {
             {lesson.body.map((p, i) => (
               <p key={i}>{p}</p>
             ))}
+            {lessonKey === 'hedging' && (
+              <p className="text-xs text-gray-500 mt-2">
+                हिन्दी सारांश: Hedging का मतलब है अभी से दाम तय कर लेना ताकि बाद में भाव गिरने पर नुकसान कम हो।
+              </p>
+            )}
+            {lessonKey === 'forecast' && (
+              <p className="text-xs text-gray-500 mt-2">
+                हिन्दी सारांश: यह केवल दाम का अनुमान और दायरा दिखाता है, पक्का दाम नहीं।
+              </p>
+            )}
           </div>
         </div>
 

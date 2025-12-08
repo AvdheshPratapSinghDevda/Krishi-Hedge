@@ -60,9 +60,23 @@ function CreateContractContent() {
       if (res.ok) {
         const data = await res.json();
         console.log('[CONTRACT CREATE] Success:', data);
+
+        // Fire-and-forget: generate PDF and anchor on blockchain (demo stubs)
+        const contractId = data.id;
+        try {
+          await fetch(`/api/contracts/${contractId}/pdf`, { method: 'POST' });
+        } catch (err) {
+          console.warn('[CONTRACT CREATE] PDF generation failed (demo stub):', err);
+        }
+        try {
+          await fetch(`/api/contracts/${contractId}/anchor`, { method: 'POST' });
+        } catch (err) {
+          console.warn('[CONTRACT CREATE] Anchor failed (demo stub):', err);
+        }
+
         // Wait a bit to show the loading animation
         setTimeout(() => {
-           router.push(`/contracts/${data.id}`);
+           router.push(`/contracts/${contractId}`);
         }, 2000);
       } else {
         const errorData = await res.json();

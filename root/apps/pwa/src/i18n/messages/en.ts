@@ -1,0 +1,73 @@
+export const en = {
+  common: {
+    appName: 'Krishi Hedge',
+    languageLabel: 'Language',
+    back: 'Back',
+  },
+  nav: {
+    home: 'Home',
+    forecast: 'Forecast',
+    contracts: 'Contracts',
+    profile: 'Profile',
+    dashboard: 'Dashboard',
+    market: 'Market',
+    portfolio: 'Portfolio',
+  },
+  splash: {
+    tagline: 'Smart Price Protection',
+    continueFarmer: 'Continue as Farmer',
+    continueBuyer: 'Continue as Buyer',
+    badge: 'SIH 2025 Prototype',
+  },
+  contracts: {
+    title: 'Contracts',
+    subtitle: 'Manage your hedging contracts',
+    noneCta: 'Create your first hedging contract to get started',
+  },
+  forecast: {
+    title: 'Market Analysis Dashboard',
+    subtitle: 'AI-Powered Price Predictions',
+    dataSource: 'Data source: Real mandi prices from AGMARKNET (data.gov.in) via ML pipeline',
+    languageNote: 'Language: currently mostly English, but content is farmer-focused',
+    ctaCreateContract: 'Create Forward Contract Based on Analysis',
+  },
+  education: {
+    title: 'Education Center',
+    subtitle: 'Short lessons in simple Hindi & English',
+    cardHedgingTitle: 'What is hedging?',
+    cardHedgingSubtitle: 'How a forward contract protects your price',
+    cardForecastTitle: 'How to read our forecast',
+    cardForecastSubtitle: 'Understanding bands and uncertainty',
+  },
+  language: {
+    title: 'Choose your language',
+    subtitle: 'We will show prices, alerts and learning content in your preferred language. You can change this later.',
+    footer: 'This choice helps make the app easier to use for farmers and buyers from different states.',
+    changeLink: 'Change language',
+  },
+  auth: {
+    login: {
+      heading: 'Welcome Back',
+      subheading: 'Sign in to your account to continue',
+      emailLabel: 'Email Address',
+      emailPlaceholder: 'Enter your email',
+      passwordLabel: 'Password',
+      passwordPlaceholder: 'Enter your password',
+      rememberMe: 'Remember me',
+      forgotPassword: 'Forgot password?',
+      signIn: 'Sign In',
+      signingIn: 'Signing in...',
+      noAccount: "Don't have an account?",
+      signUp: 'Sign up',
+    },
+    buyerLogin: {
+      heading: 'Buyer Login',
+      subheading: 'Access marketplace & contracts',
+      description: 'Enter your mobile number to continue as a buyer.',
+      mobileLabel: 'Mobile Number',
+      sendOtp: 'Send OTP',
+      sendingOtp: 'Sending...',
+    },
+  },
+};
+

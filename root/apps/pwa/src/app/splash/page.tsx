@@ -1,47 +1,84 @@
 'use client';
 
 import { useRouter } from "next/navigation";
+import { useI18n } from "@/i18n/LanguageProvider";
+import { ArrowRight, Globe } from "lucide-react";
 
 export default function SplashPage() {
   const router = useRouter();
+  const { t } = useI18n();
+
+  const roles = [
+    { 
+      id: 'farmer', 
+      label: t('splash.continueFarmer'),
+      desc: 'Sell your produce'
+    },
+    { 
+      id: 'buyer', 
+      label: t('splash.continueBuyer'),
+      desc: 'Purchase oilseeds'
+    },
+    { 
+      id: 'fpo', 
+      label: 'FPO Admin',
+      desc: 'Manage your organization'
+    }
+  ];
 
   return (
-    <div className="h-screen bg-green-900 text-white flex flex-col items-center justify-center p-6 relative">
-      <div 
-        className="absolute top-0 left-0 w-full h-full opacity-10" 
-        style={{ backgroundImage: "radial-gradient(#EAB308 1px, transparent 1px)", backgroundSize: "20px 20px" }}
-      ></div>
-      
-      <div className="z-10 text-center space-y-6">
-        <div className="w-32 h-32 mx-auto mb-4 relative">
-          <img 
-            src="/splash-logo.png" 
-            alt="Krishi Hedge Logo" 
-            className="w-full h-full object-contain drop-shadow-xl"
-          />
-        </div>
-        <div>
-          <h1 className="text-4xl font-bold mb-1">Krishi Hedge</h1>
-          <p className="text-green-300">Smart Price Protection</p>
-        </div>
-        
-        <div className="space-y-3 w-full pt-10">
-          <button 
-            onClick={() => router.push('/auth/login')} 
-            className="w-full bg-yellow-500 hover:bg-yellow-400 text-green-900 font-bold py-4 rounded-xl shadow-lg transition transform active:scale-95"
-          >
-            Continue as Farmer
-          </button>
-          <button 
-            onClick={() => router.push('/auth/buyer/login')} 
-            className="w-full bg-transparent border border-green-500 text-green-100 font-semibold py-4 rounded-xl hover:bg-green-800 transition"
-          >
-            Continue as Buyer
-          </button>
-        </div>
-        
-        <div className="pt-8">
-          <span className="text-xs bg-green-800 px-3 py-1 rounded-full text-green-300 border border-green-700">SIH 2025 Prototype</span>
+    <div className="min-h-screen bg-white flex flex-col">
+      {/* Top Bar */}
+      <div className="p-4 flex justify-end border-b border-gray-100">
+        <button
+          onClick={() => router.push('/language')}
+          className="flex items-center gap-2 px-3 py-1.5 text-xs text-gray-600 hover:text-gray-900 transition"
+        >
+          <Globe className="w-3.5 h-3.5" />
+          <span>{t('language.changeLink')}</span>
+        </button>
+      </div>
+
+      {/* Main */}
+      <div className="flex-1 flex items-center justify-center p-6">
+        <div className="w-full max-w-sm">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <h1 className="text-3xl font-semibold text-gray-900 mb-2">
+              {t('common.appName')}
+            </h1>
+            <p className="text-gray-500 text-sm">
+              {t('splash.tagline')}
+            </p>
+          </div>
+
+          {/* Roles */}
+          <div className="space-y-3">
+            <p className="text-xs font-medium text-gray-500 mb-4 uppercase tracking-wide">
+              Continue as
+            </p>
+            
+            {roles.map((role) => (
+              <button
+                key={role.id}
+                onClick={() => router.push(`/auth/login?role=${role.id}`)}
+                className="w-full flex items-center justify-between p-4 border border-gray-200 hover:border-gray-900 hover:bg-gray-50 transition group"
+              >
+                <div className="text-left">
+                  <div className="font-medium text-gray-900">{role.label}</div>
+                  <div className="text-xs text-gray-500">{role.desc}</div>
+                </div>
+                <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-gray-900 transition" />
+              </button>
+            ))}
+          </div>
+
+          {/* Badge */}
+          <div className="mt-8 text-center">
+            <span className="inline-block px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium">
+              {t('splash.badge')}
+            </span>
+          </div>
         </div>
       </div>
     </div>

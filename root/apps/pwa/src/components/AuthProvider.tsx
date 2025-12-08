@@ -5,7 +5,23 @@ import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
 
-const PUBLIC_ROUTES = ['/auth/login', '/auth/signup', '/auth/forgot-password', '/auth/reset-password', '/splash'];
+const PUBLIC_ROUTES = [
+  '/', // allow root to decide between language screen, splash, and home
+  '/language',
+  '/splash',
+  '/auth/login',
+  '/auth/signup',
+  '/auth/forgot-password',
+  '/auth/reset-password',
+  // Buyer phone-OTP flow (both new nested route and legacy flat route)
+  '/auth/buyer/login',
+  '/auth/buyer-otp',
+  '/auth/buyer-login',
+  '/auth/buyer/otp',
+  // Legacy generic OTP route (if still used)
+  '/auth/otp',
+  '/auth/phone-login',
+];
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -29,9 +45,10 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
       // Only redirect to login if no session AND on a protected route
       const isPublicRoute = PUBLIC_ROUTES.some(route => pathname?.startsWith(route));
+      const hasLocalUser = typeof window !== 'undefined' && !!localStorage.getItem('kh_user_id');
       
-      // Don't redirect if we have a session (logged in)
-      if (!session && !isPublicRoute) {
+      // Don't redirect if we have a Supabase session OR an OTP/localStorage session
+      if (!session && !hasLocalUser && !isPublicRoute) {
         router.push(`/auth/login?redirectTo=${encodeURIComponent(pathname || '/')}`);
       }
     });
@@ -56,9 +73,10 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         localStorage.removeItem('kh_role');
       }
       
-      // Only redirect if no session and not on public routes
+      // Only redirect if no session/local user and not on public routes
       const isPublicRoute = PUBLIC_ROUTES.some(route => pathname?.startsWith(route));
-      if (!session && !isPublicRoute) {
+      const hasLocalUser = typeof window !== 'undefined' && !!localStorage.getItem('kh_user_id');
+      if (!session && !hasLocalUser && !isPublicRoute) {
         router.push('/auth/login');
       }
     });
