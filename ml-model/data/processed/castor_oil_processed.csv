@@ -1,0 +1,3 @@
+commodity,variety,market,district,state,date,modal_price,min_price,max_price,arrivals,volume_lakhs,adtv,unit
+Castor Oil,Commercial,Ahmedabad,Ahmedabad,Gujarat,2025-05-01,129166.67,120125.0,138208.34,6.0,7.75,0.37,Quintal
+Castor Oil,Commercial,Ahmedabad,Ahmedabad,Gujarat,2025-06-01,133500.0,124155.0,142845.0,2.0,2.67,0.13,Quintal

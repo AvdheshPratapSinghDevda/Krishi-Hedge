@@ -7,7 +7,7 @@ import LogoutButton from '@/components/LogoutButton';
 import { 
   User, Mail, Phone, MapPin, Building2, 
   Edit3, Save, X, CheckCircle2, AlertCircle,
-  ChevronRight, Landmark, Package, LogOut, Settings
+  ChevronRight, Landmark, Package, LogOut, Settings, Store
 } from 'lucide-react';
 
 // Storage keys
@@ -509,6 +509,20 @@ export default function ProfilePage() {
 
         {/* Actions */}
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <button 
+            onClick={() => router.push('/marketplace')}
+            className="w-full px-6 py-4 flex items-center justify-between hover:bg-emerald-50 border-b"
+          >
+            <div className="flex items-center gap-3">
+              <Store size={20} className="text-emerald-600" />
+              <div className="text-left">
+                <p className="font-medium">FPO Marketplace</p>
+                <p className="text-xs text-gray-500">Buy commodities & join FPOs</p>
+              </div>
+            </div>
+            <ChevronRight size={20} className="text-gray-400" />
+          </button>
+
           <button 
             onClick={() => router.push('/settings')}
             className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 border-b"

@@ -1,0 +1,32 @@
+[
+  {
+    "commodity":"Castor Oil",
+    "variety":"Commercial",
+    "market":"Ahmedabad",
+    "district":"Ahmedabad",
+    "state":"Gujarat",
+    "date":"2025-05-01T00:00:00.000",
+    "modal_price":129166.67,
+    "min_price":120125.0,
+    "max_price":138208.34,
+    "arrivals":6.0,
+    "volume_lakhs":7.75,
+    "adtv":0.37,
+    "unit":"Quintal"
+  },
+  {
+    "commodity":"Castor Oil",
+    "variety":"Commercial",
+    "market":"Ahmedabad",
+    "district":"Ahmedabad",
+    "state":"Gujarat",
+    "date":"2025-06-01T00:00:00.000",
+    "modal_price":133500.0,
+    "min_price":124155.0,
+    "max_price":142845.0,
+    "arrivals":2.0,
+    "volume_lakhs":2.67,
+    "adtv":0.13,
+    "unit":"Quintal"
+  }
+]

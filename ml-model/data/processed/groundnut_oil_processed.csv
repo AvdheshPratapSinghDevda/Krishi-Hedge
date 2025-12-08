@@ -1,0 +1,25 @@
+commodity,variety,market,district,state,date,modal_price,min_price,max_price,arrivals,volume_lakhs,adtv,unit
+Groundnut Oil,Filtered,Rajkot,Rajkot,Gujarat,2020-06-01,76312.61,71733.85,80891.37,595,454.06,38.25,Quintal
+Groundnut Oil,Filtered,Rajkot,Rajkot,Gujarat,2020-07-01,75225.81,70712.26,79739.36,93,69.96,3.92,Quintal
+Groundnut Oil,Filtered,Rajkot,Rajkot,Gujarat,2020-08-01,92428.57,86882.86,97974.28,7,6.47,0.25,Quintal
+Groundnut Oil,Filtered,Rajkot,Rajkot,Gujarat,2020-12-01,29555.56,27782.23,31328.89,9,2.66,0.25,Quintal
+Groundnut Oil,Filtered,Rajkot,Rajkot,Gujarat,2021-01-01,89900.0,84506.0,95294.0,10,8.99,0.48,Quintal
+Groundnut Oil,Filtered,Rajkot,Rajkot,Gujarat,2021-06-01,78442.88,73736.31,83149.45,709,556.16,38.46,Quintal
+Groundnut Oil,Filtered,Rajkot,Rajkot,Gujarat,2021-07-01,107771.43,101305.14,114237.72,70,75.44,3.36,Quintal
+Groundnut Oil,Filtered,Rajkot,Rajkot,Gujarat,2022-06-01,66804.14,62795.89,70812.39,725,484.33,46.56,Quintal
+Groundnut Oil,Filtered,Rajkot,Rajkot,Gujarat,2022-07-01,80894.74,76041.06,85748.42,114,92.22,3.37,Quintal
+Groundnut Oil,Filtered,Rajkot,Rajkot,Gujarat,2022-11-01,103142.86,96954.29,109331.43,7,7.22,0.35,Quintal
+Groundnut Oil,Filtered,Rajkot,Rajkot,Gujarat,2023-01-01,47222.22,44388.89,50055.55,9,4.25,0.24,Quintal
+Groundnut Oil,Filtered,Rajkot,Rajkot,Gujarat,2023-06-01,76331.5,71751.61,80911.39,727,554.93,48.95,Quintal
+Groundnut Oil,Filtered,Rajkot,Rajkot,Gujarat,2023-07-01,51492.31,48402.77,54581.85,130,66.94,2.33,Quintal
+Groundnut Oil,Filtered,Rajkot,Rajkot,Gujarat,2023-12-01,31875.0,29962.5,33787.5,8,2.55,0.24,Quintal
+Groundnut Oil,Filtered,Rajkot,Rajkot,Gujarat,2024-06-01,52384.97,49241.87,55528.07,652,341.55,58.75,Quintal
+Groundnut Oil,Filtered,Rajkot,Rajkot,Gujarat,2024-07-01,64153.15,60303.96,68002.34,111,71.21,2.31,Quintal
+Groundnut Oil,Filtered,Rajkot,Rajkot,Gujarat,2024-08-01,78333.33,73633.33,83033.33,6,4.7,0.26,Quintal
+Groundnut Oil,Filtered,Rajkot,Rajkot,Gujarat,2024-09-01,87666.67,82406.67,92926.67,3,2.63,0.14,Quintal
+Groundnut Oil,Filtered,Rajkot,Rajkot,Gujarat,2024-11-01,48571.43,45657.14,51485.72,7,3.4,0.18,Quintal
+Groundnut Oil,Filtered,Rajkot,Rajkot,Gujarat,2025-02-01,93777.78,88151.11,99404.45,9,8.44,0.21,Quintal
+Groundnut Oil,Filtered,Rajkot,Rajkot,Gujarat,2025-06-01,87983.4,82704.4,93262.4,723,636.12,75.06,Quintal
+Groundnut Oil,Filtered,Rajkot,Rajkot,Gujarat,2025-07-01,80943.18,76086.59,85799.77,88,71.23,5.43,Quintal
+Groundnut Oil,Filtered,Rajkot,Rajkot,Gujarat,2025-09-01,51000.0,47940.0,54060.0,5,2.55,0.21,Quintal
+Groundnut Oil,Filtered,Rajkot,Rajkot,Gujarat,2025-12-01,48500.0,45590.0,51410.0,6,2.91,0.42,Quintal

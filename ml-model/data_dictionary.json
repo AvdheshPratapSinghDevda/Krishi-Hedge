@@ -1,0 +1,289 @@
+{
+  "dataset_name": "Oilseed Market Dataset for ML Training",
+  "version": "1.0.0",
+  "created": "2024-12",
+  "description": "Comprehensive Indian oilseed commodity market data in AGMARK format for machine learning price forecasting",
+  
+  "data_dictionary": {
+    "core_fields": {
+      "commodity": {
+        "type": "string",
+        "description": "Name of the oilseed commodity",
+        "values": ["Groundnut", "Groundnut Oil", "Sunflower Oil", "Castor Oil", "Soybean", "Mustard", "Sesame"],
+        "required": true,
+        "example": "Groundnut"
+      },
+      "variety": {
+        "type": "string",
+        "description": "Commodity variety or grade",
+        "values": ["Bold", "Filtered", "Refined", "Commercial", "Yellow", "Black", "White"],
+        "required": true,
+        "example": "Bold"
+      },
+      "market": {
+        "type": "string",
+        "description": "Market or trading center name",
+        "values": ["Rajkot", "Mumbai", "Ahmedabad", "Indore", "Bhopal", "Jaipur", "Bharatpur", "Alwar", "Hyderabad", "Bangalore"],
+        "required": true,
+        "example": "Rajkot"
+      },
+      "district": {
+        "type": "string",
+        "description": "District where market is located",
+        "required": true,
+        "example": "Rajkot"
+      },
+      "state": {
+        "type": "string",
+        "description": "State where market is located",
+        "values": ["Gujarat", "Maharashtra", "Madhya Pradesh", "Rajasthan", "Telangana", "Karnataka"],
+        "required": true,
+        "example": "Gujarat"
+      },
+      "date": {
+        "type": "date",
+        "format": "YYYY-MM-DD",
+        "description": "Trading date",
+        "required": true,
+        "example": "2024-01-15"
+      },
+      "modal_price": {
+        "type": "float",
+        "unit": "₹/Quintal",
+        "description": "Most frequently traded price (modal price)",
+        "required": true,
+        "min": 0,
+        "example": 5500.00
+      },
+      "min_price": {
+        "type": "float",
+        "unit": "₹/Quintal",
+        "description": "Minimum price traded on the day",
+        "required": true,
+        "min": 0,
+        "constraint": "min_price <= modal_price",
+        "example": 5200.00
+      },
+      "max_price": {
+        "type": "float",
+        "unit": "₹/Quintal",
+        "description": "Maximum price traded on the day",
+        "required": true,
+        "min": 0,
+        "constraint": "max_price >= modal_price",
+        "example": 5800.00
+      },
+      "arrivals": {
+        "type": "float",
+        "unit": "Quintals",
+        "description": "Quantity of commodity arrived at market",
+        "required": true,
+        "min": 0,
+        "example": 150.00
+      },
+      "unit": {
+        "type": "string",
+        "description": "Unit of measurement",
+        "values": ["Quintal"],
+        "required": true,
+        "example": "Quintal"
+      }
+    },
+    
+    "optional_fields": {
+      "volume_lakhs": {
+        "type": "float",
+        "unit": "₹ in Lakhs",
+        "description": "Total trading volume in rupees (lakhs)",
+        "source": "NCDEX data",
+        "example": 425.13
+      },
+      "adtv": {
+        "type": "float",
+        "unit": "₹ in Lakhs",
+        "description": "Average Daily Trading Volume",
+        "source": "NCDEX data",
+        "example": 53.14
+      }
+    },
+    
+    "engineered_features": {
+      "temporal": {
+        "year": {"type": "int", "description": "Year extracted from date", "example": 2024},
+        "month": {"type": "int", "range": [1, 12], "description": "Month number", "example": 6},
+        "day": {"type": "int", "range": [1, 31], "description": "Day of month", "example": 15},
+        "day_of_week": {"type": "int", "range": [0, 6], "description": "0=Monday, 6=Sunday", "example": 3},
+        "day_of_year": {"type": "int", "range": [1, 366], "description": "Day number in year", "example": 167},
+        "week_of_year": {"type": "int", "range": [1, 53], "description": "ISO week number", "example": 24},
+        "quarter": {"type": "int", "range": [1, 4], "description": "Financial quarter", "example": 2},
+        "is_weekend": {"type": "int", "values": [0, 1], "description": "1 if Saturday/Sunday", "example": 0},
+        "month_name": {"type": "string", "description": "Month name", "example": "June"}
+      },
+      
+      "seasonal": {
+        "season": {"type": "string", "values": ["Winter", "Summer", "Monsoon", "Post-Monsoon"], "description": "Indian agricultural season"},
+        "is_soybean_harvest": {"type": "int", "values": [0, 1], "description": "1 if Oct-Dec"},
+        "is_mustard_harvest": {"type": "int", "values": [0, 1], "description": "1 if Feb-Apr"},
+        "is_groundnut_harvest": {"type": "int", "values": [0, 1], "description": "1 if Sep-Nov"}
+      },
+      
+      "festivals": {
+        "is_diwali_season": {"type": "int", "values": [0, 1], "description": "1 if Oct-Nov"},
+        "is_holi_season": {"type": "int", "values": [0, 1], "description": "1 if March"},
+        "is_pongal_season": {"type": "int", "values": [0, 1], "description": "1 if January"}
+      },
+      
+      "price_features": {
+        "price_spread": {"type": "float", "unit": "₹", "description": "max_price - min_price"},
+        "price_spread_pct": {"type": "float", "unit": "%", "description": "Price spread as % of modal price"},
+        "is_high_volatility": {"type": "int", "values": [0, 1], "description": "1 if price_spread_pct > 10%"}
+      },
+      
+      "lag_features": {
+        "price_lag_1d": {"type": "float", "description": "Price 1 day ago", "grouped_by": ["commodity", "market"]},
+        "price_lag_7d": {"type": "float", "description": "Price 7 days ago"},
+        "price_lag_30d": {"type": "float", "description": "Price 30 days ago"},
+        "arrivals_lag_1d": {"type": "float", "description": "Arrivals 1 day ago"},
+        "arrivals_lag_7d": {"type": "float", "description": "Arrivals 7 days ago"},
+        "arrivals_lag_30d": {"type": "float", "description": "Arrivals 30 days ago"}
+      },
+      
+      "rolling_features": {
+        "price_ma_7d": {"type": "float", "description": "7-day moving average of price"},
+        "price_ma_14d": {"type": "float", "description": "14-day moving average"},
+        "price_ma_30d": {"type": "float", "description": "30-day moving average"},
+        "price_std_7d": {"type": "float", "description": "7-day price volatility (std dev)"},
+        "price_std_14d": {"type": "float", "description": "14-day volatility"},
+        "price_std_30d": {"type": "float", "description": "30-day volatility"},
+        "price_min_7d": {"type": "float", "description": "Minimum price in last 7 days"},
+        "price_max_7d": {"type": "float", "description": "Maximum price in last 7 days"},
+        "arrivals_ma_7d": {"type": "float", "description": "7-day moving average of arrivals"}
+      },
+      
+      "change_features": {
+        "price_change_1d": {"type": "float", "description": "Price change from yesterday"},
+        "price_change_pct_1d": {"type": "float", "unit": "%", "description": "% change from yesterday"},
+        "price_change_7d": {"type": "float", "description": "Price change from 7 days ago"},
+        "price_change_pct_7d": {"type": "float", "unit": "%", "description": "% change from 7 days ago"},
+        "price_change_30d": {"type": "float", "description": "Price change from 30 days ago"},
+        "price_change_pct_30d": {"type": "float", "unit": "%", "description": "% change from 30 days ago"},
+        "arrivals_change_1d": {"type": "float", "description": "Arrivals change from yesterday"},
+        "arrivals_change_7d": {"type": "float", "description": "Arrivals change from 7 days ago"}
+      },
+      
+      "trend_features": {
+        "is_uptrend": {"type": "int", "values": [0, 1], "description": "1 if 7-day MA > 30-day MA"},
+        "is_downtrend": {"type": "int", "values": [0, 1], "description": "1 if 7-day MA < 30-day MA"},
+        "price_momentum": {"type": "float", "description": "Current price - 30-day MA"}
+      },
+      
+      "yoy_features": {
+        "price_yoy": {"type": "float", "description": "Price change from 365 days ago"},
+        "price_yoy_pct": {"type": "float", "unit": "%", "description": "% change year-over-year"}
+      },
+      
+      "arrival_price_features": {
+        "arrivals_normalized": {"type": "float", "description": "Z-score normalized arrivals"},
+        "is_high_arrivals": {"type": "int", "values": [0, 1], "description": "1 if arrivals > mean"}
+      }
+    }
+  },
+  
+  "file_formats": {
+    "csv": {
+      "encoding": "utf-8",
+      "delimiter": ",",
+      "header": true,
+      "null_values": ["", "NA", "NaN", "null"],
+      "date_format": "YYYY-MM-DD"
+    },
+    "json": {
+      "encoding": "utf-8",
+      "orientation": "records",
+      "date_format": "iso",
+      "indent": 2
+    }
+  },
+  
+  "data_splits": {
+    "train": {
+      "percentage": 70,
+      "description": "Earliest 70% of data by date",
+      "file": "train_data.csv"
+    },
+    "validation": {
+      "percentage": 10,
+      "description": "Middle 10% of data by date",
+      "file": "validation_data.csv"
+    },
+    "test": {
+      "percentage": 20,
+      "description": "Most recent 20% of data by date",
+      "file": "test_data.csv"
+    }
+  },
+  
+  "quality_standards": {
+    "completeness": {
+      "critical_fields_null_threshold": 0,
+      "description": "commodity, market, date, modal_price, arrivals must not be null"
+    },
+    "consistency": {
+      "price_order": "min_price <= modal_price <= max_price",
+      "date_continuity": "No gaps > 30 days expected"
+    },
+    "validity": {
+      "price_range": "All prices > 0",
+      "arrivals_range": "arrivals >= 0",
+      "date_range": "2020-01-01 to 2024-12-31"
+    }
+  },
+  
+  "usage_notes": {
+    "missing_values": "Lag and rolling features have nulls at the start of time series (expected)",
+    "zero_values": "Zero arrivals indicate non-trading days (weekends/holidays)",
+    "outliers": "Price outliers are real market events, keep for training",
+    "grouping": "All time-based features are grouped by [commodity, market]",
+    "scaling": "Normalize prices per commodity due to different price ranges"
+  },
+  
+  "commodity_metadata": {
+    "Groundnut": {
+      "category": "Oilseed",
+      "harvest_season": "Sep-Nov",
+      "major_markets": ["Rajkot", "Junagadh"],
+      "typical_price_range": "₹5,000-7,000/Quintal"
+    },
+    "Soybean": {
+      "category": "Oilseed",
+      "harvest_season": "Oct-Dec",
+      "major_markets": ["Indore", "Bhopal"],
+      "typical_price_range": "₹4,000-5,500/Quintal"
+    },
+    "Mustard": {
+      "category": "Oilseed",
+      "harvest_season": "Feb-Apr",
+      "major_markets": ["Jaipur", "Bharatpur"],
+      "typical_price_range": "₹5,200-7,000/Quintal"
+    },
+    "Sesame": {
+      "category": "Oilseed",
+      "harvest_season": "Oct-Nov",
+      "major_markets": ["Hyderabad", "Bangalore"],
+      "typical_price_range": "₹10,000-14,000/Quintal"
+    }
+  },
+  
+  "scripts": {
+    "data_processor.py": "Cleans and standardizes raw CSV files to AGMARK format",
+    "generate_synthetic_data.py": "Generates realistic synthetic data for Soybean, Mustard, Sesame",
+    "feature_engineering.py": "Creates ML-ready features from base data",
+    "data_validator.py": "Runs quality checks and generates validation reports"
+  },
+  
+  "references": {
+    "agmark": "https://agmarknet.gov.in/",
+    "ncdex": "https://www.ncdex.com/",
+    "units": "1 Quintal = 100 kg"
+  }
+}

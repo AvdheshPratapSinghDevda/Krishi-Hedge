@@ -1,0 +1,6 @@
+commodity,variety,market,district,state,date,modal_price,min_price,max_price,arrivals,volume_lakhs,adtv,unit
+Groundnut,Bold,Rajkot,Rajkot,Gujarat,2023-06-01,70269.42,64647.87,75890.97,605.0,425.13,53.14,Quintal
+Groundnut,Bold,Rajkot,Rajkot,Gujarat,2023-07-01,70129.41,64519.06,75739.76,85.0,59.61,2.84,Quintal
+Groundnut,Bold,Rajkot,Rajkot,Gujarat,2023-09-01,68800.0,63296.0,74304.0,5.0,3.44,0.17,Quintal
+Groundnut,Bold,Rajkot,Rajkot,Gujarat,2023-11-01,65600.0,60352.0,70848.0,5.0,3.28,0.16,Quintal
+Groundnut,Bold,Rajkot,Rajkot,Gujarat,2024-01-01,64000.0,58880.0,69120.0,5.0,3.2,0.15,Quintal

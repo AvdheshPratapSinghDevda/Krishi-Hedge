@@ -1,0 +1,58 @@
+{
+  "processed_on": "2025-12-08 14:16:36",
+  "total_records": 32340,
+  "total_features": 52,
+  "date_range": {
+    "start": "2014-01-01",
+    "end": "2024-11-25"
+  },
+  "commodities": [
+    "Groundnut",
+    "Mustard",
+    "Sesame",
+    "Soybean"
+  ],
+  "features": {
+    "time_features": [
+      "year",
+      "month",
+      "quarter",
+      "season",
+      "is_harvest_season"
+    ],
+    "price_features": [
+      "modal_price",
+      "min_price",
+      "max_price",
+      "price_change",
+      "price_change_pct",
+      "ma_7",
+      "ma_30",
+      "ma_90",
+      "ema_30",
+      "price_lag_1",
+      "price_lag_7",
+      "price_lag_14",
+      "price_lag_30",
+      "arrivals_ma_7",
+      "arrivals_ma_30",
+      "target_price_1d",
+      "target_price_7d",
+      "target_price_30d"
+    ],
+    "arrival_features": [
+      "arrivals",
+      "arrivals_ma_7",
+      "arrivals_ma_30",
+      "arrivals_change"
+    ],
+    "target_variables": [
+      "target_price_1d",
+      "target_change_1d",
+      "target_price_7d",
+      "target_change_7d",
+      "target_price_30d",
+      "target_change_30d"
+    ]
+  }
+}

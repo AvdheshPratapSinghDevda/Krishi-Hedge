@@ -1,0 +1,72 @@
+{
+  "total_records": 281,
+  "date_range": {
+    "start": "2020-06-01",
+    "end": "2025-12-01",
+    "days": 2009
+  },
+  "commodities": {
+    "Sunflower Oil": 250,
+    "Groundnut Oil": 24,
+    "Groundnut": 5,
+    "Castor Oil": 2
+  },
+  "markets": {
+    "NCDEX": 250,
+    "Rajkot": 29,
+    "Ahmedabad": 2
+  },
+  "states": {
+    "Maharashtra": 250,
+    "Gujarat": 31
+  },
+  "price_statistics": {
+    "Castor Oil": {
+      "mean": 131333.34,
+      "median": 131333.34,
+      "min": 129166.67,
+      "max": 133500.0,
+      "std": 3064.13
+    },
+    "Groundnut": {
+      "mean": 67759.77,
+      "median": 68800.0,
+      "min": 64000.0,
+      "max": 70269.42,
+      "std": 2819.4
+    },
+    "Groundnut Oil": {
+      "mean": 70863.06,
+      "median": 76322.05,
+      "min": 29555.56,
+      "max": 107771.43,
+      "std": 21550.12
+    },
+    "Sunflower Oil": {
+      "mean": 94915.65,
+      "median": 89817.0,
+      "min": 81053.85,
+      "max": 135200.0,
+      "std": 14619.43
+    }
+  },
+  "data_quality": {
+    "missing_values": {
+      "commodity": 0,
+      "variety": 0,
+      "market": 0,
+      "district": 0,
+      "state": 0,
+      "date": 0,
+      "modal_price": 0,
+      "min_price": 0,
+      "max_price": 0,
+      "arrivals": 0,
+      "volume_lakhs": 0,
+      "adtv": 0,
+      "unit": 0
+    },
+    "zero_prices": 0,
+    "zero_arrivals": 0
+  }
+}

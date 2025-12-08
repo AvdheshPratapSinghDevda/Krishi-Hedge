@@ -1,0 +1,262 @@
+{
+  "timestamp": "2025-12-08 10:47:58",
+  "checks": {
+    "missing_values": {},
+    "date_gaps": {
+      "total_gaps": 31,
+      "gaps": [
+        {
+          "commodity": "Castor Oil",
+          "market": "Ahmedabad",
+          "gap_start": "2025-05-01",
+          "gap_end": "2025-06-01",
+          "gap_days": 31
+        },
+        {
+          "commodity": "Groundnut",
+          "market": "Rajkot",
+          "gap_start": "2023-06-01",
+          "gap_end": "2023-07-01",
+          "gap_days": 30
+        },
+        {
+          "commodity": "Groundnut",
+          "market": "Rajkot",
+          "gap_start": "2023-07-01",
+          "gap_end": "2023-09-01",
+          "gap_days": 62
+        },
+        {
+          "commodity": "Groundnut",
+          "market": "Rajkot",
+          "gap_start": "2023-09-01",
+          "gap_end": "2023-11-01",
+          "gap_days": 61
+        },
+        {
+          "commodity": "Groundnut",
+          "market": "Rajkot",
+          "gap_start": "2023-11-01",
+          "gap_end": "2024-01-01",
+          "gap_days": 61
+        },
+        {
+          "commodity": "Groundnut Oil",
+          "market": "Rajkot",
+          "gap_start": "2020-06-01",
+          "gap_end": "2020-07-01",
+          "gap_days": 30
+        },
+        {
+          "commodity": "Groundnut Oil",
+          "market": "Rajkot",
+          "gap_start": "2020-07-01",
+          "gap_end": "2020-08-01",
+          "gap_days": 31
+        },
+        {
+          "commodity": "Groundnut Oil",
+          "market": "Rajkot",
+          "gap_start": "2020-08-01",
+          "gap_end": "2020-12-01",
+          "gap_days": 122
+        },
+        {
+          "commodity": "Groundnut Oil",
+          "market": "Rajkot",
+          "gap_start": "2020-12-01",
+          "gap_end": "2021-01-01",
+          "gap_days": 31
+        },
+        {
+          "commodity": "Groundnut Oil",
+          "market": "Rajkot",
+          "gap_start": "2021-01-01",
+          "gap_end": "2021-06-01",
+          "gap_days": 151
+        }
+      ]
+    },
+    "price_anomalies": {
+      "commodities_with_anomalies": 1,
+      "details": [
+        {
+          "commodity": "Sunflower Oil",
+          "outlier_count": 36,
+          "expected_range": [
+            61761.68,
+            117762.78
+          ],
+          "outlier_prices": [
+            118637.5,
+            118011.76,
+            119909.09,
+            119500.0,
+            120000.0
+          ]
+        }
+      ]
+    },
+    "zero_values": {
+      "zero_prices": {
+        "count": 0,
+        "percentage": 0.0
+      },
+      "zero_arrivals": {
+        "count": 0,
+        "percentage": 0.0
+      }
+    },
+    "price_consistency": {
+      "inconsistent_rows": 0,
+      "percentage": 0.0
+    },
+    "data_coverage": {
+      "total_records": 281,
+      "commodities": {
+        "Castor Oil": {
+          "records": 2,
+          "markets": 1,
+          "date_range": {
+            "start": "2025-05-01",
+            "end": "2025-06-01"
+          }
+        },
+        "Groundnut": {
+          "records": 5,
+          "markets": 1,
+          "date_range": {
+            "start": "2023-06-01",
+            "end": "2024-01-01"
+          }
+        },
+        "Groundnut Oil": {
+          "records": 24,
+          "markets": 1,
+          "date_range": {
+            "start": "2020-06-01",
+            "end": "2025-12-01"
+          }
+        },
+        "Sunflower Oil": {
+          "records": 250,
+          "markets": 1,
+          "date_range": {
+            "start": "2023-11-12",
+            "end": "2025-01-21"
+          }
+        }
+      },
+      "markets": {
+        "Ahmedabad": {
+          "records": 2,
+          "commodities": 1,
+          "date_range": {
+            "start": "2025-05-01",
+            "end": "2025-06-01"
+          }
+        },
+        "NCDEX": {
+          "records": 250,
+          "commodities": 1,
+          "date_range": {
+            "start": "2023-11-12",
+            "end": "2025-01-21"
+          }
+        },
+        "Rajkot": {
+          "records": 29,
+          "commodities": 2,
+          "date_range": {
+            "start": "2020-06-01",
+            "end": "2025-12-01"
+          }
+        }
+      },
+      "date_range": {
+        "start": "2020-06-01",
+        "end": "2025-12-01",
+        "total_days": 2009
+      }
+    },
+    "statistical_sanity": {
+      "Castor Oil": {
+        "price_mean": 131333.34,
+        "price_std": 3064.13,
+        "coefficient_of_variation": 2.33,
+        "price_range": [
+          129166.67,
+          133500.0
+        ],
+        "avg_arrivals": 4.0
+      },
+      "Groundnut": {
+        "price_mean": 67759.77,
+        "price_std": 2819.4,
+        "coefficient_of_variation": 4.16,
+        "price_range": [
+          64000.0,
+          70269.42
+        ],
+        "avg_arrivals": 141.0
+      },
+      "Groundnut Oil": {
+        "price_mean": 70863.06,
+        "price_std": 21550.12,
+        "coefficient_of_variation": 30.41,
+        "price_range": [
+          29555.56,
+          107771.43
+        ],
+        "avg_arrivals": 200.96
+      },
+      "Sunflower Oil": {
+        "price_mean": 94915.65,
+        "price_std": 14619.43,
+        "coefficient_of_variation": 15.4,
+        "price_range": [
+          81053.85,
+          135200.0
+        ],
+        "avg_arrivals": 255.3
+      }
+    },
+    "duplicates": {
+      "duplicate_rows": 0,
+      "percentage": 0.0
+    }
+  },
+  "warnings": [
+    "Sunflower Oil: 36 price outliers detected"
+  ],
+  "errors": [
+    "Large date gap (31 days) in Castor Oil - Ahmedabad",
+    "Large date gap (62 days) in Groundnut - Rajkot",
+    "Large date gap (61 days) in Groundnut - Rajkot",
+    "Large date gap (61 days) in Groundnut - Rajkot",
+    "Large date gap (31 days) in Groundnut Oil - Rajkot",
+    "Large date gap (122 days) in Groundnut Oil - Rajkot",
+    "Large date gap (31 days) in Groundnut Oil - Rajkot",
+    "Large date gap (151 days) in Groundnut Oil - Rajkot",
+    "Large date gap (335 days) in Groundnut Oil - Rajkot",
+    "Large date gap (123 days) in Groundnut Oil - Rajkot",
+    "Large date gap (61 days) in Groundnut Oil - Rajkot",
+    "Large date gap (151 days) in Groundnut Oil - Rajkot",
+    "Large date gap (153 days) in Groundnut Oil - Rajkot",
+    "Large date gap (183 days) in Groundnut Oil - Rajkot",
+    "Large date gap (31 days) in Groundnut Oil - Rajkot",
+    "Large date gap (31 days) in Groundnut Oil - Rajkot",
+    "Large date gap (61 days) in Groundnut Oil - Rajkot",
+    "Large date gap (92 days) in Groundnut Oil - Rajkot",
+    "Large date gap (120 days) in Groundnut Oil - Rajkot",
+    "Large date gap (62 days) in Groundnut Oil - Rajkot",
+    "Large date gap (91 days) in Groundnut Oil - Rajkot",
+    "Large date gap (32 days) in Sunflower Oil - NCDEX"
+  ],
+  "summary": {
+    "total_checks": 8,
+    "total_errors": 22,
+    "total_warnings": 1,
+    "overall_status": "FAIL"
+  }
+}
