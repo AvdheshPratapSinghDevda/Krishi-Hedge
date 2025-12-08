@@ -134,7 +134,7 @@ export default function MarketplacePage() {
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            🌾 Buy Commodities ({listings.length})
+            Buy Commodities ({listings.length})
           </button>
           <button
             onClick={() => setActiveTab('fpos')}
@@ -144,7 +144,7 @@ export default function MarketplacePage() {
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            🏢 Join FPO ({fpos.length})
+            Join FPO ({fpos.length})
           </button>
         </div>
       </div>

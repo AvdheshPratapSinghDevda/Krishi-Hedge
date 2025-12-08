@@ -44,10 +44,10 @@ export default function NotificationsPage() {
   function getIcon(type: Notification['type']) {
     switch (type) {
       case 'contract': return '📝';
-      case 'success': return '✅';
-      case 'warning': return '⚠️';
-      case 'price_alert': return '📈';
-      default: return '🔔';
+      case 'success': return '';
+      case 'warning': return '';
+      case 'price_alert': return '';
+      default: return '';
     }
   }
 
@@ -65,7 +65,7 @@ export default function NotificationsPage() {
           <div className="text-center py-10 text-gray-400">Loading...</div>
         ) : notifications.length === 0 ? (
           <div className="text-center py-10 text-gray-400">
-            <div className="text-4xl mb-2">🔔</div>
+            <div className="text-4xl mb-2"></div>
             <p>No notifications yet</p>
           </div>
         ) : (

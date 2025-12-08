@@ -73,8 +73,8 @@ export default function BottomNav() {
         </button>
         
         <button 
-            onClick={() => router.push('/education')} 
-            className={`${isActive('/education') ? 'text-green-700 font-bold' : 'text-gray-400'} flex flex-col items-center text-xs`}
+            onClick={() => router.push('/learn-hedging')} 
+            className={`${isActive('/learn-hedging') ? 'text-green-700 font-bold' : 'text-gray-400'} flex flex-col items-center text-xs`}
         >
             <i className="fa-solid fa-book-open text-xl mb-1"></i>{t('nav.education')}
         </button>

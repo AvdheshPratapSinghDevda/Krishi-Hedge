@@ -218,9 +218,9 @@ export default function CreateFarmerContract() {
               </div>
               <div className="flex-1">
                 <h3 className="font-bold text-gray-800 mb-1">
-                  {aiEvaluation.decision === 'accepted' ? '✅ Accepted!' :
+                  {aiEvaluation.decision === 'accepted' ? 'Accepted!' :
                    aiEvaluation.decision === 'counter_offer' ? '💬 Counter Offer' :
-                   '❌ Rejected'}
+                   'Rejected'}
                 </h3>
                 <p className="text-sm text-gray-700 mb-2">{aiEvaluation.reasoning}</p>
                 <p className="text-xs text-gray-500">AI Buyer: {aiEvaluation.botName}</p>

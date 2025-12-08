@@ -203,7 +203,7 @@ export default function CommodityDetailPage() {
                   key={idx}
                   className="bg-emerald-50 text-emerald-700 px-3 py-2 rounded-lg text-sm font-medium"
                 >
-                  ✓ {cert}
+                  {cert}
                 </span>
               ))}
             </div>

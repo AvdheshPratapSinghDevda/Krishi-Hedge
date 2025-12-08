@@ -48,7 +48,7 @@ export default function SetupWarningBanner() {
             </span>
             <div className="ml-3 flex-1">
               <p className="text-sm font-medium sm:text-base">
-                <span className="font-bold">⚠️ Setup Required:</span> Supabase is not configured. 
+                <span className="font-bold">Setup Required:</span> Supabase is not configured. 
                 <span className="hidden sm:inline"> Authentication and database features won't work until you set up Supabase.</span>
               </p>
               <p className="text-xs mt-1 opacity-90">

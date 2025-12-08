@@ -220,7 +220,7 @@ export default function FPODetailPage() {
                 key={idx}
                 className="bg-emerald-50 text-emerald-700 px-3 py-2 rounded-lg font-medium text-sm"
               >
-                🌾 {crop}
+                {crop}
               </span>
             ))}
           </div>
@@ -239,7 +239,7 @@ export default function FPODetailPage() {
                   key={idx}
                   className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium"
                 >
-                  ✓ {cert}
+                  {cert}
                 </span>
               ))}
             </div>

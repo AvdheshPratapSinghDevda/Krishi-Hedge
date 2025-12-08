@@ -267,14 +267,14 @@ export default function ProfilePage() {
             <div className="flex-1">
               <h2 className="text-2xl font-bold">{profile.fullName || profile.businessName || 'User'}</h2>
               <p className="text-gray-600 mt-1">
-                {profile.userType === 'farmer' ? '🌾 Farmer' : '🏢 Business'}
+                {profile.userType === 'farmer' ? 'Farmer' : 'Business'}
               </p>
               <span className={`inline-block text-xs px-3 py-1 rounded-full mt-3 ${
                 profile.kycStatus === 'verified' ? 'bg-green-100 text-green-700' : 
                 profile.kycStatus === 'rejected' ? 'bg-red-100 text-red-700' : 
                 'bg-yellow-100 text-yellow-700'
               }`}>
-                {profile.kycStatus === 'verified' ? '✓ Verified' : 
+                {profile.kycStatus === 'verified' ? 'Verified' : 
                  profile.kycStatus === 'rejected' ? '✗ Rejected' : 
                  '⏳ Pending'}
               </span>

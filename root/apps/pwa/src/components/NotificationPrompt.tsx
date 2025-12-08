@@ -60,7 +60,7 @@ export default function NotificationPrompt() {
       <div className="bg-white rounded-2xl shadow-2xl border border-green-100 overflow-hidden">
         <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-4 text-white">
           <div className="flex items-center gap-3">
-            <div className="text-3xl">🔔</div>
+            <div className="text-3xl"></div>
             <div>
               <h3 className="font-bold text-lg">Stay Updated</h3>
               <p className="text-sm text-green-50">Get instant alerts on your contracts</p>
@@ -71,15 +71,15 @@ export default function NotificationPrompt() {
         <div className="p-4 space-y-3">
           <div className="space-y-2">
             <div className="flex items-start gap-2 text-sm text-gray-700">
-              <span className="text-green-600 font-bold">✓</span>
+              <span className="text-green-600 font-bold"></span>
               <span>Contract acceptance notifications</span>
             </div>
             <div className="flex items-start gap-2 text-sm text-gray-700">
-              <span className="text-green-600 font-bold">✓</span>
+              <span className="text-green-600 font-bold"></span>
               <span>Price change alerts</span>
             </div>
             <div className="flex items-start gap-2 text-sm text-gray-700">
-              <span className="text-green-600 font-bold">✓</span>
+              <span className="text-green-600 font-bold"></span>
               <span>Delivery reminders</span>
             </div>
           </div>
