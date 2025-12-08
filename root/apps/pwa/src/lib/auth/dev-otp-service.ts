@@ -68,8 +68,8 @@ class DevOtpService {
    * Create temporary session (mock Supabase user)
    */
   createTempSession(phone: string, role: string, userData?: any): TempSession {
-    // Generate fake user ID
-    const userId = `dev_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    // Generate valid UUID v4 for compatibility with Supabase
+    const userId = this.generateUUID();
     
     const session: TempSession = {
       userId,
@@ -87,6 +87,18 @@ class DevOtpService {
 
     console.log('✅ Created temp session:', session);
     return session;
+  }
+
+  /**
+   * Generate valid UUID v4
+   */
+  private generateUUID(): string {
+    // RFC4122 version 4 UUID
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
   }
 
   /**

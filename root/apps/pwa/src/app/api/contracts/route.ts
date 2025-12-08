@@ -62,6 +62,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    // Validate UUID format - farmer_id must be valid UUID or null
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const isValidUUID = userId && uuidRegex.test(userId);
+    
+    if (userId && !isValidUUID) {
+      console.warn('[CONTRACTS] Invalid UUID format for userId, setting to null:', userId);
+    }
+
     const supabase = supabaseServer();
     const insertRow = {
       crop,
@@ -70,7 +78,7 @@ export async function POST(req: NextRequest) {
       strike_price: Number(targetPrice),
       deliverywindow: deliveryWindow,
       status: "CREATED",
-      farmer_id: userId || null,
+      farmer_id: isValidUUID ? userId : null,
     };
 
     console.log('[CONTRACTS] Inserting:', insertRow);
