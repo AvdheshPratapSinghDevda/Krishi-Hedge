@@ -6,6 +6,10 @@ export async function GET(req: NextRequest) {
     const searchParams = req.nextUrl.searchParams;
     const role = searchParams.get('role'); // 'farmer' or 'buyer'
     const userId = searchParams.get('userId');
+    const farmerId = searchParams.get('farmerId');
+    const buyerId = searchParams.get('buyerId');
+    const contractType = searchParams.get('type'); // 'FARMER_OFFER' or 'BUYER_DEMAND'
+    const status = searchParams.get('status'); // 'CREATED', 'ACCEPTED', etc.
 
     const supabase = supabaseServer();
     let query = supabase
@@ -13,12 +17,28 @@ export async function GET(req: NextRequest) {
       .select("*")
       .order("created_at", { ascending: false });
 
+    // Filter by contract type
+    if (contractType) {
+      query = query.eq('contract_type', contractType);
+    }
+
+    // Filter by status
+    if (status) {
+      query = query.eq('status', status);
+    }
+
     // Filter by role
-    if (role === 'farmer' && userId) {
-      query = query.eq('farmer_id', userId);
-    } else if (role === 'buyer') {
-      // Buyers see all available contracts OR contracts they've accepted
-      query = query.or(`status.eq.CREATED,buyer_id.eq.${userId}`);
+    if (role === 'farmer' || farmerId) {
+      const id = farmerId || userId;
+      if (id) {
+        query = query.eq('farmer_id', id);
+      }
+    } else if (role === 'buyer' || buyerId) {
+      const id = buyerId || userId;
+      if (id) {
+        // Buyers see contracts they've accepted
+        query = query.eq('buyer_id', id);
+      }
     }
 
     const { data, error } = await query;
@@ -72,9 +92,10 @@ export async function POST(req: NextRequest) {
       userId,
       hedgeType,
       premiumPerQtl,
+      contractType, // 'FARMER_OFFER' or undefined for legacy
     } = body || {};
 
-    console.log('[CONTRACTS] POST request:', { crop, quantity, unit, targetPrice, deliveryWindow, userId });
+    console.log('[CONTRACTS] POST request:', { crop, quantity, unit, targetPrice, deliveryWindow, userId, contractType });
 
     if (!crop || !quantity || !unit || !targetPrice || !deliveryWindow) {
       console.error('[CONTRACTS] Missing required fields:', { crop, quantity, unit, targetPrice, deliveryWindow });
@@ -98,6 +119,7 @@ export async function POST(req: NextRequest) {
       deliverywindow: deliveryWindow,
       status: "CREATED",
       farmer_id: isValidUUID ? userId : null,
+      contract_type: contractType || 'FARMER_OFFER', // Default to FARMER_OFFER
     };
 
     // Optional F&O-style hedge fields (columns must exist in Supabase contracts table)

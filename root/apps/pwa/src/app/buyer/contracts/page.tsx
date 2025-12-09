@@ -12,6 +12,10 @@ interface Contract {
   deliverywindow: string;
   status: string;
   created_at: string;
+  ipfsCid?: string;
+  ipfs_cid?: string;
+  pdfUrl?: string;
+  pdf_url?: string;
 }
 
 export default function BuyerContractsPage() {
@@ -27,11 +31,13 @@ export default function BuyerContractsPage() {
         fetch(`/api/contracts?role=buyer&buyerId=${buyerId}`)
           .then(res => res.json())
           .then(data => {
-            setContracts(data);
+            // Ensure data is an array
+            setContracts(Array.isArray(data) ? data : []);
             setLoading(false);
           })
           .catch(err => {
             console.error(err);
+            setContracts([]);
             setLoading(false);
           });
       } else {
@@ -39,7 +45,7 @@ export default function BuyerContractsPage() {
         router.push('/auth/login?role=buyer');
       }
     }
-  }, []);
+  }, [router]);
 
   const filteredContracts = contracts.filter(c => {
     if (filter === 'all') return true;
@@ -141,7 +147,7 @@ export default function BuyerContractsPage() {
           filteredContracts.map((contract) => (
             <div
               key={contract.id}
-              onClick={() => router.push(`/buyer/contracts/${contract.id}`)}
+              onClick={() => router.push(`/contracts/${contract.id}`)}
               className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition cursor-pointer"
             >
               <div className="flex justify-between items-start mb-3">
@@ -161,8 +167,21 @@ export default function BuyerContractsPage() {
                   <i className="fa-solid fa-calendar text-slate-400"></i>
                   <span>{contract.deliverywindow || 'No delivery window'}</span>
                 </div>
-                <div className="text-slate-400">
-                  {new Date(contract.created_at).toLocaleDateString()}
+                <div className="flex items-center gap-3">
+                  {(contract.ipfsCid || contract.ipfs_cid) ? (
+                    <div className="flex items-center gap-1 text-green-600">
+                      <i className="fa-solid fa-file-pdf"></i>
+                      <span className="text-xs font-medium">PDF Available</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1 text-amber-600">
+                      <i className="fa-solid fa-clock"></i>
+                      <span className="text-xs font-medium">PDF Pending</span>
+                    </div>
+                  )}
+                  <div className="text-slate-400 text-xs">
+                    {new Date(contract.created_at).toLocaleDateString()}
+                  </div>
                 </div>
               </div>
             </div>

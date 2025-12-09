@@ -80,8 +80,8 @@ export default function BottomNav() {
         </button>
         
         <button 
-            onClick={() => router.push('/contracts')} 
-            className={`${isActive('/contracts') ? 'text-green-700 font-bold' : 'text-gray-400'} flex flex-col items-center text-xs`}
+            onClick={() => router.push('/farmer/contracts')} 
+            className={`${isActive('/farmer/contracts') ? 'text-green-700 font-bold' : 'text-gray-400'} flex flex-col items-center text-xs`}
         >
             <i className="fa-solid fa-file-contract text-xl mb-1"></i>{t('nav.contracts')}
         </button>

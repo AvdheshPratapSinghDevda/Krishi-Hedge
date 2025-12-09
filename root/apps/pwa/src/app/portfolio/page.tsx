@@ -36,10 +36,31 @@ interface ContractBreakdown {
   profitLoss: number;
 }
 
+interface Contract {
+  id: string;
+  crop: string;
+  quantity: number;
+  unit: string;
+  strikePrice?: number;
+  strike_price?: number;
+  deliveryWindow?: string;
+  deliverywindow?: string;
+  status: string;
+  contractType?: string;
+  contract_type?: string;
+  createdAt?: string;
+  created_at?: string;
+  acceptedAt?: string;
+  accepted_at?: string;
+  ipfsCid?: string;
+  ipfs_cid?: string;
+}
+
 export default function PortfolioPage() {
   const router = useRouter();
   const { t } = useI18n();
   const [loading, setLoading] = useState(true);
+  const [contracts, setContracts] = useState<Contract[]>([]);
   const [stats, setStats] = useState<PortfolioStats>({
     totalInvestment: 0,
     currentValue: 0,
@@ -61,12 +82,25 @@ export default function PortfolioPage() {
           setLoading(false);
           return;
         }
-        const res = await fetch(`/api/contracts?role=farmer&userId=${encodeURIComponent(userId)}`);
-        if (!res.ok) {
-          setLoading(false);
-          return;
-        }
-        const data: any[] = await res.json();
+        
+        // Fetch both farmer offers and accepted buyer demands
+        const [farmerRes, demandsRes] = await Promise.all([
+          fetch(`/api/contracts?role=farmer&farmerId=${encodeURIComponent(userId)}`),
+          fetch(`/api/buyer-demands?farmerId=${encodeURIComponent(userId)}`)
+        ]);
+        
+        const farmerContracts = farmerRes.ok ? await farmerRes.json() : [];
+        const acceptedDemands = demandsRes.ok ? await demandsRes.json() : [];
+        
+        // Combine both types of contracts
+        const data = [
+          ...(Array.isArray(farmerContracts) ? farmerContracts : []),
+          ...(Array.isArray(acceptedDemands) ? acceptedDemands : [])
+        ];
+        
+        // Store all contracts for display
+        setContracts(data.filter(c => c.status === 'ACCEPTED'));
+        
         if (!data || data.length === 0) {
           setLoading(false);
           return;
@@ -341,6 +375,98 @@ export default function PortfolioPage() {
               <span>{stats.completedContracts} completed contracts show strong execution track record</span>
             </li>
           </ul>
+        </div>
+
+        {/* My Contracts List */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <CheckCircle2 className="w-4 h-4 text-white" />
+              </div>
+              <h3 className="text-base font-bold text-gray-900">My Contracts</h3>
+            </div>
+            <span className="text-xs text-gray-500">{contracts.length} active</span>
+          </div>
+
+          {contracts.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i className="fa-solid fa-file-contract text-gray-400 text-2xl"></i>
+              </div>
+              <p className="text-sm text-gray-500">No active contracts yet</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {contracts.map((contract) => {
+                const contractType = contract.contractType || contract.contract_type;
+                const ipfsCid = contract.ipfsCid || contract.ipfs_cid;
+                const strikePrice = contract.strikePrice || contract.strike_price;
+                const deliveryWindow = contract.deliveryWindow || contract.deliverywindow;
+                const acceptedAt = contract.acceptedAt || contract.accepted_at;
+
+                return (
+                  <div 
+                    key={contract.id}
+                    onClick={() => router.push(`/contracts/${contract.id}`)}
+                    className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition cursor-pointer"
+                  >
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <div className="flex gap-2 items-center mb-1">
+                          <span className={`text-[10px] font-bold px-2 py-1 rounded ${
+                            contractType === 'BUYER_DEMAND' 
+                              ? 'bg-purple-100 text-purple-700' 
+                              : 'bg-emerald-100 text-emerald-700'
+                          }`}>
+                            {contractType === 'BUYER_DEMAND' ? (
+                              <><i className="fa-solid fa-handshake mr-1"></i>Buyer Demand</>
+                            ) : (
+                              <><i className="fa-solid fa-seedling mr-1"></i>My Offer</>
+                            )}
+                          </span>
+                          {ipfsCid && (
+                            <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded">
+                              <i className="fa-solid fa-file-pdf mr-1"></i>PDF Ready
+                            </span>
+                          )}
+                        </div>
+                        <h3 className="font-bold text-lg text-gray-800">{contract.crop}</h3>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-gray-400">Price</p>
+                        <p className="font-bold text-gray-800">₹{strikePrice}/{contract.unit}</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 text-sm border-t border-gray-100 pt-3">
+                      <div>
+                        <p className="text-xs text-gray-400">Quantity</p>
+                        <p className="font-bold text-gray-700">{contract.quantity} {contract.unit}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-gray-400">Delivery</p>
+                        <p className="font-bold text-gray-700 text-xs">{deliveryWindow || '30 days'}</p>
+                      </div>
+                    </div>
+
+                    {acceptedAt && (
+                      <div className="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
+                        <p className="text-xs text-gray-500">
+                          <i className="fa-solid fa-check-circle text-green-500 mr-1"></i>
+                          Accepted {new Date(acceptedAt).toLocaleDateString()}
+                        </p>
+                        <span className="text-xs text-blue-600 font-medium flex items-center gap-1">
+                          View Details
+                          <i className="fa-solid fa-arrow-right text-[10px]"></i>
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Action Buttons */}

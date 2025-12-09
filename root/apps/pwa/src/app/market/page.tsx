@@ -109,6 +109,7 @@ export default function MarketPage() {
 
         {/* Market Analysis */}
         {/* Removed static demo analysis. Judges should use Forecast for real ML-backed analysis. */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-5">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
               <BarChart3 className="w-4 h-4 text-blue-600" />
@@ -123,10 +124,10 @@ export default function MarketPage() {
                 <p className="text-sm font-semibold text-gray-900 mb-1">{t('marketPage.priceTrendTitle')}</p>
                 <p className="text-xs text-gray-600">
                   {selectedForecast?.trend === 'bullish' 
-                    ? `${selectedCommodity} shows strong upward momentum with predicted ${selectedForecast.confidence}% confidence in price appreciation.`
+                    ? `Market shows strong upward momentum with predicted ${selectedForecast.confidence}% confidence in price appreciation.`
                     : selectedForecast?.trend === 'bearish'
-                    ? `${selectedCommodity} indicates downward pressure with ${selectedForecast.confidence}% model confidence for price correction.`
-                    : `${selectedCommodity} demonstrates stable pricing patterns with minimal volatility expected.`}
+                    ? `Market indicates downward pressure with ${selectedForecast.confidence}% model confidence for price correction.`
+                    : `Market demonstrates stable pricing patterns with minimal volatility expected.`}
                 </p>
               </div>
             </div>

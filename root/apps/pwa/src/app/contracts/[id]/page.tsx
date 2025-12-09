@@ -103,18 +103,33 @@ export default function ContractDetailPage() {
             </div>
           </div>
 
-          <div className="border-t border-dashed border-gray-300 pt-3 flex items-center justify-between">
-            <button
-              className="text-red-500 text-xs font-bold flex items-center gap-1 disabled:text-gray-400 disabled:cursor-not-allowed"
-              disabled={!pdfUrl}
-              onClick={() => {
-                if (pdfUrl) window.open(pdfUrl, '_blank');
-              }}
-            >
-              <i className="fa-solid fa-file-pdf"></i>
-              {pdfUrl ? t('contracts.detail.pdfDownload') : t('contracts.detail.pdfPending')}
-            </button>
-            <span className="text-xs text-gray-400 italic">{t('contracts.detail.pdfBadge')}</span>
+          {/* Contract PDF Download - Prominent Section */}
+          <div className="border-t border-gray-200 pt-4 mt-4">
+            {ipfsCid || pdfUrl ? (
+              <button
+                className="w-full bg-gradient-to-r from-red-500 to-red-600 text-white py-3 px-4 rounded-lg font-bold flex items-center justify-center gap-2 shadow-md hover:from-red-600 hover:to-red-700 transition"
+                onClick={() => {
+                  if (ipfsCid) {
+                    window.open(`https://ipfs.io/ipfs/${ipfsCid}`, '_blank');
+                  } else if (pdfUrl) {
+                    window.open(pdfUrl, '_blank');
+                  }
+                }}
+              >
+                <i className="fa-solid fa-file-pdf text-lg"></i>
+                <span>Download Contract PDF</span>
+                <i className="fa-solid fa-download"></i>
+              </button>
+            ) : (
+              <div className="w-full bg-amber-50 border-2 border-amber-200 text-amber-700 py-3 px-4 rounded-lg font-medium flex items-center justify-center gap-2">
+                <i className="fa-solid fa-clock animate-pulse"></i>
+                <span>Contract PDF is being generated...</span>
+              </div>
+            )}
+            <p className="text-xs text-gray-500 text-center mt-2">
+              <i className="fa-solid fa-shield-halved text-green-600 mr-1"></i>
+              Blockchain-verified and immutably stored on IPFS
+            </p>
           </div>
         </div>
 

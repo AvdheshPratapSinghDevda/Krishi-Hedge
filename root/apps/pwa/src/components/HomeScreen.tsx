@@ -260,45 +260,31 @@ export default function HomeScreen() {
             </div>
           </button>
           
-          {/* CONTRACTS Button */}
+          {/* CREATE SELL OFFER Button */}
           <button 
-            onClick={() => router.push('/contracts')} 
-            className="bg-gradient-to-br from-emerald-500 via-green-600 to-teal-700 text-white p-4 rounded-2xl shadow-lg font-bold text-left flex flex-col justify-between h-32 active:scale-95 transition-all group hover:shadow-emerald-500/30 border border-emerald-400/30"
-          >
-            <div className="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-              <FileText className="w-4 h-4" />
-            </div>
-            <div>
-              <span className="text-sm font-bold block mb-1 drop-shadow-sm">{t('home.contractsTitle')}</span>
-              <span className="text-xs text-emerald-100 opacity-90">{t('home.contractsSubtitle')}</span>
-            </div>
-          </button>
-          
-          {/* BUYER MARKETPLACE Button */}
-          <button 
-            onClick={() => router.push('/buyer/marketplace')} 
+            onClick={() => router.push('/farmer/create-offer')} 
             className="bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700 text-white p-4 rounded-2xl shadow-lg font-bold text-left flex flex-col justify-between h-32 active:scale-95 transition-all group hover:shadow-blue-500/30 border border-blue-400/30"
           >
             <div className="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-              <i className="fa-solid fa-store text-lg"></i>
+              <i className="fa-solid fa-plus-circle text-lg"></i>
             </div>
             <div>
-              <span className="text-sm font-bold block mb-1 drop-shadow-sm">Buyer Market</span>
-              <span className="text-xs text-blue-100 opacity-90">Browse contracts</span>
+              <span className="text-sm font-bold block mb-1 drop-shadow-sm">Create Sell Offer</span>
+              <span className="text-xs text-blue-100 opacity-90">Offer crops to buyers</span>
             </div>
           </button>
           
-          {/* CONTRACTS Button */}
+          {/* BROWSE BUYER DEMANDS Button */}
           <button 
-            onClick={() => router.push('/contracts')} 
+            onClick={() => router.push('/farmer/buyer-demands')} 
             className="bg-gradient-to-br from-emerald-500 via-green-600 to-teal-700 text-white p-4 rounded-2xl shadow-lg font-bold text-left flex flex-col justify-between h-32 active:scale-95 transition-all group hover:shadow-emerald-500/30 border border-emerald-400/30"
           >
             <div className="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-              <FileText className="w-4 h-4" />
+              <i className="fa-solid fa-handshake text-lg"></i>
             </div>
             <div>
-              <span className="text-sm font-bold block mb-1 drop-shadow-sm">{t('home.contractsTitle')}</span>
-              <span className="text-xs text-emerald-100 opacity-90">{t('home.contractsSubtitle')}</span>
+              <span className="text-sm font-bold block mb-1 drop-shadow-sm">Buyer Demands</span>
+              <span className="text-xs text-emerald-100 opacity-90">Accept buyer requests</span>
             </div>
           </button>
           

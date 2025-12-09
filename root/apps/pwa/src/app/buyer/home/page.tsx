@@ -96,25 +96,69 @@ export default function BuyerHomePage() {
           </p>
         </div>
 
-        {/* Action Card */}
+        {/* Browse Farmer Offers */}
         <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
-              <i className="fa-solid fa-layer-group"></i>
+            <div className="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600">
+              <i className="fa-solid fa-seedling"></i>
             </div>
             <div>
-              <h3 className="font-bold text-slate-800">Order Book</h3>
-              <p className="text-xs text-slate-500">Browse farmer forwards</p>
+              <h3 className="font-bold text-slate-800">Farmer Offers</h3>
+              <p className="text-xs text-slate-500">Browse farmer sell offers</p>
             </div>
           </div>
           <p className="text-sm text-slate-600 mb-4">
-            See anonymised farmer contracts, then accept or mark interested.
+            See available farmer contracts and accept the ones you need.
           </p>
           <Link
-            href="/market"
-            className="block w-full bg-slate-900 text-white text-center font-bold py-3 rounded-lg shadow-md hover:bg-slate-800 transition"
+            href="/buyer/farmer-offers"
+            className="block w-full bg-emerald-600 text-white text-center font-bold py-3 rounded-lg shadow-md hover:bg-emerald-700 transition"
           >
-            View Marketplace
+            View Farmer Marketplace
+          </Link>
+        </div>
+
+        {/* Create Demand Contract */}
+        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 border-l-4 border-l-green-500">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center text-green-600">
+              <i className="fa-solid fa-plus-circle"></i>
+            </div>
+            <div>
+              <h3 className="font-bold text-slate-800">Create Demand</h3>
+              <p className="text-xs text-slate-500">Post what you want to buy</p>
+            </div>
+          </div>
+          <p className="text-sm text-slate-600 mb-4">
+            Create a demand contract and let farmers accept your offer.
+          </p>
+          <Link
+            href="/buyer/create-demand"
+            className="block w-full bg-green-600 text-white text-center font-bold py-3 rounded-lg shadow-md hover:bg-green-700 transition"
+          >
+            Create Demand Contract
+          </Link>
+        </div>
+
+        {/* My Contracts - View All */}
+        <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 bg-purple-50 rounded-full flex items-center justify-center text-purple-600">
+              <i className="fa-solid fa-file-contract"></i>
+            </div>
+            <div>
+              <h3 className="font-bold text-slate-800">My Contracts</h3>
+              <p className="text-xs text-slate-500">View & download contract PDFs</p>
+            </div>
+          </div>
+          <p className="text-sm text-slate-600 mb-4">
+            Access all your accepted contracts with blockchain-verified PDFs.
+          </p>
+          <Link
+            href="/buyer/contracts"
+            className="block w-full bg-purple-600 text-white text-center font-bold py-3 rounded-lg shadow-md hover:bg-purple-700 transition"
+          >
+            View All Contracts
           </Link>
         </div>
 
@@ -128,14 +172,21 @@ export default function BuyerHomePage() {
           ) : (
             <div className="space-y-3">
               {positions.map((p) => (
-                <div key={p.id} className="border border-slate-100 rounded-lg p-3 flex justify-between items-center">
+                <div 
+                  key={p.id} 
+                  onClick={() => router.push(`/contracts/${p.id}`)}
+                  className="border border-slate-100 rounded-lg p-3 flex justify-between items-center cursor-pointer hover:bg-slate-50 transition"
+                >
                   <div>
                     <p className="font-bold text-slate-800">{p.crop}</p>
                     <p className="text-xs text-slate-500">{p.quantity} {p.unit} @ ₹{p.strikePrice}</p>
                   </div>
-                  <span className="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded">
-                    FULFILLED
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded">
+                      FULFILLED
+                    </span>
+                    <i className="fa-solid fa-chevron-right text-slate-400 text-xs"></i>
+                  </div>
                 </div>
               ))}
             </div>

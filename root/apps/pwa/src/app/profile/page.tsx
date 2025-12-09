@@ -74,6 +74,15 @@ export default function ProfilePage() {
 
   const loadProfileData = async () => {
     try {
+      // First check localStorage for userId
+      const localUserId = localStorage.getItem('kh_user_id');
+      
+      if (!localUserId) {
+        console.log('[PROFILE] No userId in localStorage, redirecting to splash');
+        router.push('/splash');
+        return;
+      }
+
       const supabase = createClient();
       
       // Get current user with retry logic
@@ -89,15 +98,17 @@ export default function ProfilePage() {
           // Wait a bit and retry
           await new Promise(resolve => setTimeout(resolve, 500));
           attempts++;
-        } else if (!user) {
+        } else {
           break;
         }
       }
       
-      if (!user) {
-        // Only redirect if really no user after retries
-        console.log('No user found after retries');
-        router.push('/auth/login');
+      // Use localStorage userId as fallback if Supabase session is not found
+      const userId = user?.id || localUserId;
+      
+      if (!userId) {
+        console.log('[PROFILE] No user ID available, redirecting to splash');
+        router.push('/splash');
         return;
       }
 
@@ -105,7 +116,7 @@ export default function ProfilePage() {
       const { data: profileData, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user.id)
+        .eq('id', userId)
         .single();
 
       if (error) {
