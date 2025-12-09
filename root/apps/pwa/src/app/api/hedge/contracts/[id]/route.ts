@@ -8,7 +8,7 @@ export async function GET(
   try {
     const contractId = params.id;
     
-    const supabase = createClient();
+    const supabase = await createClient();
     
     const { data: contract, error } = await supabase
       .from('hedge_contracts')

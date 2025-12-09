@@ -248,7 +248,7 @@ export default function HedgePlanningCalculator() {
                   <p className="text-gray-700 text-sm">
                     You're protecting against <strong>downside risk</strong>, which is the main goal. 
                     Missing upside when you've already locked in profit is better than losing money. 
-                    You still have {100 - (parseFloat(inputs.bushelsToHedge) / 150000 * 100).toFixed(0)}% of crop unhedged to benefit from price rallies.
+                    You still have {(100 - (parseFloat(inputs.bushelsToHedge) / 150000 * 100)).toFixed(0)}% of crop unhedged to benefit from price rallies.
                   </p>
                 </div>
               </div>

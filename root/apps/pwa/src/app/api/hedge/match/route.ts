@@ -11,7 +11,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Contract ID required' }, { status: 400 });
     }
     
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Get current user (buyer)
     const { data: { user } } = await supabase.auth.getUser();
@@ -70,7 +70,7 @@ export async function GET(request: Request) {
     const contractId = searchParams.get('contractId');
     const buyerId = searchParams.get('buyerId');
     
-    const supabase = createClient();
+    const supabase = await createClient();
     
     let query = supabase
       .from('hedge_contract_matches')
@@ -113,7 +113,7 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: 'Match ID and action required' }, { status: 400 });
     }
     
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Get current user
     const { data: { user } } = await supabase.auth.getUser();

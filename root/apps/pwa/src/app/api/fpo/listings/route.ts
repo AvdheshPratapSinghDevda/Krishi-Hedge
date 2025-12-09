@@ -5,7 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 
 export async function GET(req: NextRequest) {
   try {
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
     const maxPrice = searchParams.get('max_price');
     const limit = parseInt(searchParams.get('limit') || '50');
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     let query = supabase
       .from('fpo_commodity_listings')
@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const insertData = {
       fpo_id,
@@ -154,7 +154,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'Listing ID is required' }, { status: 400 });
     }
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { data, error } = await supabase
       .from('fpo_commodity_listings')
@@ -191,7 +191,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'Listing ID is required' }, { status: 400 });
     }
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const { error } = await supabase
       .from('fpo_commodity_listings')

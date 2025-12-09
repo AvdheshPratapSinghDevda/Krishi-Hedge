@@ -8,7 +8,7 @@ export async function GET(request: Request) {
     const userId = searchParams.get('userId');
     const status = searchParams.get('status');
     
-    const supabase = createClient();
+    const supabase = await createClient();
     
     let query = supabase
       .from('hedge_contracts')
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
       );
     }
     
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Get current user (farmer)
     const { data: { user } } = await supabase.auth.getUser();

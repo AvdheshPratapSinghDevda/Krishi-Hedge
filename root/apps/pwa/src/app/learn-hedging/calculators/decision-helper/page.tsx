@@ -11,7 +11,7 @@ export default function DecisionHelperCalculator() {
     expectedYield: '',
     acres: '',
     cropOutlook: 'good' as 'good' | 'uncertain' | 'poor',
-    marketSentiment: 'bullish' | 'bearish' | 'neutral' as 'bullish' | 'bearish' | 'neutral'
+    marketSentiment: 'bullish' as 'bullish' | 'bearish' | 'neutral'
   });
 
   const [result, setResult] = useState<{

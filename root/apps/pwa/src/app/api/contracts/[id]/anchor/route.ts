@@ -45,7 +45,7 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ id: s
 
   await supabase
     .from("contracts")
-    .update({ anchor_tx_hash: txHash, anchor_explorer_url: explorerUrl })
+    .update({ anchor_tx_hash: txHash, anchor_explorer_url: explorerUrl, document_hash: documentHash })
     .eq("id", id);
 
   return NextResponse.json(

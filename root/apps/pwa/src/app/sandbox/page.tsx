@@ -6,9 +6,11 @@ import { sandboxStorage } from '@/lib/sandbox/storage';
 import { SandboxPlayer } from '@/lib/sandbox/types';
 import { progressionManager, LEVELS } from '@/lib/sandbox/progression';
 import { marketEngine } from '@/lib/sandbox/market-engine';
+import { useI18n } from '@/i18n/LanguageProvider';
 
 export default function SandboxDashboard() {
   const router = useRouter();
+  const { t } = useI18n();
   const [player, setPlayer] = useState<SandboxPlayer | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -69,12 +71,12 @@ export default function SandboxDashboard() {
             </button>
             <div className="flex items-center gap-2">
               <i className="fa-solid fa-gamepad text-yellow-300"></i>
-              <span className="text-sm font-bold text-yellow-300">PRACTICE MODE</span>
+              <span className="text-sm font-bold text-yellow-300">{t('sandbox.badge')}</span>
             </div>
           </div>
 
-          <h1 className="text-2xl font-bold mb-1">Sandbox Trading</h1>
-          <p className="text-purple-200 text-sm mb-6">Learn risk-free before real trading</p>
+          <h1 className="text-2xl font-bold mb-1">{t('sandbox.title')}</h1>
+          <p className="text-purple-200 text-sm mb-6">{t('sandbox.subtitle')}</p>
 
           <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
             <div className="flex items-center justify-between mb-3">
@@ -107,6 +109,11 @@ export default function SandboxDashboard() {
             )}
           </div>
         </div>
+
+        <div className="mt-4 inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-3 py-1 text-[11px] text-yellow-100 border border-yellow-200/40">
+          <i className="fa-solid fa-triangle-exclamation"></i>
+          <span>{t('sandbox.disclaimer')}</span>
+        </div>
       </header>
 
       <div className="px-6 -mt-8 relative z-10 space-y-4">
@@ -117,7 +124,7 @@ export default function SandboxDashboard() {
                 <i className="fa-solid fa-chart-line text-lg"></i>
               </div>
             </div>
-            <p className="text-xs text-gray-500 mb-1">Total Trades</p>
+            <p className="text-xs text-gray-500 mb-1">{t('sandbox.stats.totalTrades')}</p>
             <p className="text-2xl font-bold text-gray-800">{player.stats.totalTrades}</p>
           </div>
           <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
@@ -126,7 +133,7 @@ export default function SandboxDashboard() {
                 <i className="fa-solid fa-bullseye text-lg"></i>
               </div>
             </div>
-            <p className="text-xs text-gray-500 mb-1">Win Rate</p>
+            <p className="text-xs text-gray-500 mb-1">{t('sandbox.stats.winRate')}</p>
             <p className="text-2xl font-bold text-gray-800">{player.stats.winRate}%</p>
           </div>
           <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
@@ -135,7 +142,7 @@ export default function SandboxDashboard() {
                 <i className="fa-solid fa-wallet text-lg"></i>
               </div>
             </div>
-            <p className="text-xs text-gray-500 mb-1">Total Profit</p>
+            <p className="text-xs text-gray-500 mb-1">{t('sandbox.stats.totalProfit')}</p>
             <p className="text-2xl font-bold text-gray-800">₹{(player.stats.totalProfit / 1000).toFixed(0)}K</p>
           </div>
           <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
@@ -144,15 +151,15 @@ export default function SandboxDashboard() {
                 <i className="fa-solid fa-fire text-lg"></i>
               </div>
             </div>
-            <p className="text-xs text-gray-500 mb-1">Current Streak</p>
+            <p className="text-xs text-gray-500 mb-1">{t('sandbox.stats.currentStreak')}</p>
             <p className="text-2xl font-bold text-gray-800">{player.stats.currentStreak}</p>
           </div>
         </div>
 
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-purple-100">
           <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4">
-            <h2 className="font-bold text-lg mb-1">Practice Modes</h2>
-            <p className="text-sm text-purple-100">Learn different aspects of trading</p>
+            <h2 className="font-bold text-lg mb-1">{t('sandbox.practice.title')}</h2>
+            <p className="text-sm text-purple-100">{t('sandbox.practice.subtitle')}</p>
           </div>
 
           <div className="p-4 space-y-3">
@@ -165,10 +172,10 @@ export default function SandboxDashboard() {
                   <div className="w-12 h-12 bg-green-500 text-white rounded-xl flex items-center justify-center group-hover:scale-110 transition">
                     <i className="fa-solid fa-user-tie text-xl"></i>
                   </div>
-                  <div className="text-left">
-                    <h3 className="font-bold text-gray-800">Play as Seller</h3>
-                    <p className="text-xs text-gray-600">Create contracts, get AI feedback</p>
-                  </div>
+                    <div className="text-left">
+                      <h3 className="font-bold text-gray-800">{t('sandbox.practice.playSellerTitle')}</h3>
+                      <p className="text-xs text-gray-600">{t('sandbox.practice.playSellerSubtitle')}</p>
+                    </div>
                 </div>
                 <i className="fa-solid fa-arrow-right text-green-600 group-hover:translate-x-1 transition"></i>
               </div>
@@ -183,10 +190,10 @@ export default function SandboxDashboard() {
                   <div className="w-12 h-12 bg-blue-500 text-white rounded-xl flex items-center justify-center group-hover:scale-110 transition">
                     <i className="fa-solid fa-shopping-cart text-xl"></i>
                   </div>
-                  <div className="text-left">
-                    <h3 className="font-bold text-gray-800">Play as Buyer</h3>
-                    <p className="text-xs text-gray-600">Browse AI contracts, find deals</p>
-                  </div>
+                    <div className="text-left">
+                      <h3 className="font-bold text-gray-800">{t('sandbox.practice.playBuyerTitle')}</h3>
+                      <p className="text-xs text-gray-600">{t('sandbox.practice.playBuyerSubtitle')}</p>
+                    </div>
                 </div>
                 <i className="fa-solid fa-arrow-right text-blue-600 group-hover:translate-x-1 transition"></i>
               </div>
@@ -201,10 +208,10 @@ export default function SandboxDashboard() {
                   <div className="w-12 h-12 bg-orange-500 text-white rounded-xl flex items-center justify-center group-hover:scale-110 transition">
                     <i className="fa-solid fa-chart-candlestick text-xl"></i>
                   </div>
-                  <div className="text-left">
-                    <h3 className="font-bold text-gray-800">Futures Trading</h3>
-                    <p className="text-xs text-gray-600">Practice margin trading & P/L</p>
-                  </div>
+                    <div className="text-left">
+                      <h3 className="font-bold text-gray-800">{t('sandbox.practice.futuresTitle')}</h3>
+                      <p className="text-xs text-gray-600">{t('sandbox.practice.futuresSubtitle')}</p>
+                    </div>
                 </div>
                 <i className="fa-solid fa-arrow-right text-orange-600 group-hover:translate-x-1 transition"></i>
               </div>
@@ -216,13 +223,13 @@ export default function SandboxDashboard() {
           <div className="flex items-start gap-3">
             <i className="fa-solid fa-lightbulb text-yellow-600 text-xl"></i>
             <div>
-              <h4 className="font-bold text-gray-800 text-sm mb-1">Quick Tip</h4>
+              <h4 className="font-bold text-gray-800 text-sm mb-1">{t('sandbox.quickTip.title')}</h4>
               <p className="text-xs text-gray-700">
                 {player.stats.totalTrades === 0 
-                  ? "Start with Seller mode to learn pricing. AI will give you instant feedback!"
+                  ? t('sandbox.quickTip.start')
                   : player.stats.winRate < 50
-                  ? "Try to match market prices closely. Check the live prices before setting your price."
-                  : "Great job! Try Buyer mode to practice identifying profitable deals from the other side."
+                  ? t('sandbox.quickTip.lowWinRate')
+                  : t('sandbox.quickTip.goodWinRate')
                 }
               </p>
             </div>

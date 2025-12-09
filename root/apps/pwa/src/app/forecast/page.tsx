@@ -829,9 +829,27 @@ export default function ForecastPage() {
           </div>
         </div>
 
+        {/* Model Card / Info Panel */}
+        <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-4 space-y-2 text-xs text-gray-700">
+          <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
+            <AlertCircle className="text-amber-500" size={16} />
+            <span>{t('forecast.modelCard.title')}</span>
+          </div>
+          <p>{t('forecast.modelCard.data')}</p>
+          <p>{t('forecast.modelCard.model')}</p>
+          <p>{t('forecast.modelCard.refresh')}</p>
+          <p>{t('forecast.modelCard.disclaimer')}</p>
+        </div>
+
         {/* CTA Button */}
         <button 
-          onClick={() => router.push('/contracts/new')} 
+          onClick={() => {
+            const uiName = (COMMODITY_MAP as any)[selectedCommodity] || selectedCommodity;
+            const params = new URLSearchParams();
+            if (uiName) params.set('crop', uiName);
+            if (currentPrice) params.set('price', String(Math.round(currentPrice)));
+            router.push(`/contracts/new?${params.toString()}`);
+          }} 
           className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-green-900 font-bold py-5 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
         >
           {t('forecast.ctaCreateContract')}
@@ -840,7 +858,6 @@ export default function ForecastPage() {
     </div>
   );
 }
-
 // Helper Functions
 
 function generateMockHistoricalData(commodity: string, timeframe: string): HistoricalDataPoint[] {

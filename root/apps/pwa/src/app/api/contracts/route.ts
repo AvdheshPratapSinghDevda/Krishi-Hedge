@@ -47,6 +47,7 @@ export async function GET(req: NextRequest) {
       pdfUrl: row.pdf_url,
       anchorTxHash: row.anchor_tx_hash,
       anchorExplorerUrl: row.anchor_explorer_url,
+      documentHash: (row as any).document_hash,
     }));
 
     return NextResponse.json(mapped, { status: 200 });

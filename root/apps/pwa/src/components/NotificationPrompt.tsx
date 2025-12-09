@@ -28,13 +28,10 @@ export default function NotificationPrompt() {
     try {
       const granted = await requestNotificationPermission();
       if (granted) {
-        const userId = localStorage.getItem('krishi_userId');
-        if (userId) {
-          const success = await subscribeToPushNotifications(userId);
-          if (success) {
-            setPermission('granted');
-            setShowPrompt(false);
-          }
+        const success = await subscribeToPushNotifications();
+        if (success) {
+          setPermission('granted');
+          setShowPrompt(false);
         }
       } else {
         setPermission('denied');

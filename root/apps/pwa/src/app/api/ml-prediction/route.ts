@@ -119,6 +119,9 @@ export async function POST(request: NextRequest) {
     const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
     const intercept = (sumY - slope * sumX) / n;
 
+    // Calculate volatility once for all predictions
+    const priceVolatility = calculateVolatility(prices);
+
     // Generate predictions
     const predictions = [];
     const lastDate = new Date(recentData[recentData.length - 1].date);
@@ -131,9 +134,8 @@ export async function POST(request: NextRequest) {
       const predictedPrice = intercept + slope * (n + i - 1);
       
       // Add some randomness and bounds
-      const volatility = calculateVolatility(prices);
-      const upperBound = predictedPrice + (volatility * 1.5);
-      const lowerBound = Math.max(predictedPrice - (volatility * 1.5), currentPrice * 0.7);
+      const upperBound = predictedPrice + (priceVolatility * 1.5);
+      const lowerBound = Math.max(predictedPrice - (priceVolatility * 1.5), currentPrice * 0.7);
       
       predictions.push({
         date: predDate.toISOString().split('T')[0],
@@ -146,7 +148,7 @@ export async function POST(request: NextRequest) {
 
     // Determine trend
     const priceTrend = slope > 50 ? 'Bullish' : slope < -50 ? 'Bearish' : 'Neutral';
-    const avgVolatility = volatility / avgPrice * 100;
+    const avgVolatility = priceVolatility / avgPrice * 100;
     const volatilityLevel = avgVolatility > 10 ? 'High' : avgVolatility > 5 ? 'Medium' : 'Low';
 
     return NextResponse.json({
@@ -158,8 +160,8 @@ export async function POST(request: NextRequest) {
         model: 'Linear Regression (Trend Analysis)',
         accuracy: 75 + Math.random() * 10,
         confidence: 80 + Math.random() * 10,
-        rmse: Math.round(volatility * 100) / 100,
-        mae: Math.round(volatility * 0.7 * 100) / 100,
+        rmse: Math.round(priceVolatility * 100) / 100,
+        mae: Math.round(priceVolatility * 0.7 * 100) / 100,
         trend: priceTrend,
         volatility: volatilityLevel
       }

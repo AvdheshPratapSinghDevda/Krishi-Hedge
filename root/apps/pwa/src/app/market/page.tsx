@@ -14,7 +14,7 @@ import {
   AlertCircle,
   ChevronRight
 } from "lucide-react";
-
+import { useI18n } from "@/i18n/LanguageProvider";
 interface CommodityData {
   name: string;
   currentPrice: number;
@@ -37,6 +37,7 @@ interface ForecastData {
 
 export default function MarketPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const [loading, setLoading] = useState(true);
   const [selectedCommodity, setSelectedCommodity] = useState('Soybean');
   const [refreshing, setRefreshing] = useState(false);
@@ -148,8 +149,8 @@ export default function MarketPage() {
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">Market Intelligence</h1>
-                <p className="text-sm text-blue-100">Oilseed Price Forecasting</p>
+                <h1 className="text-2xl font-bold tracking-tight">{t('marketPage.title')}</h1>
+                <p className="text-sm text-blue-100">{t('marketPage.subtitle')}</p>
               </div>
             </div>
             <button 
@@ -163,7 +164,7 @@ export default function MarketPage() {
           {/* Live Market Indicator */}
           <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2 w-fit">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            <span className="text-xs font-medium">Live Market Data</span>
+            <span className="text-xs font-medium">{t('marketPage.liveBadge')}</span>
           </div>
         </div>
       </header>
@@ -224,12 +225,12 @@ export default function MarketPage() {
 
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
-                <p className="text-xs text-gray-500 mb-1">Current Price</p>
+                <p className="text-xs text-gray-500 mb-1">{t('marketPage.currentPrice')}</p>
                 <p className="text-2xl font-bold text-gray-900">₹{selectedCommodityData.currentPrice.toLocaleString('en-IN')}</p>
                 <p className="text-xs text-gray-400">per quintal</p>
               </div>
               <div>
-                <p className="text-xs text-gray-500 mb-1">Daily Volume</p>
+                <p className="text-xs text-gray-500 mb-1">{t('marketPage.dailyVolume')}</p>
                 <p className="text-2xl font-bold text-gray-900">{selectedCommodityData.volume.toLocaleString('en-IN')}</p>
                 <p className="text-xs text-gray-400">quintals</p>
               </div>
@@ -237,15 +238,15 @@ export default function MarketPage() {
 
             <div className="grid grid-cols-3 gap-3 pt-4 border-t border-gray-100">
               <div>
-                <p className="text-xs text-gray-500 mb-1">Day High</p>
+                <p className="text-xs text-gray-500 mb-1">{t('marketPage.dayHigh')}</p>
                 <p className="text-sm font-bold text-green-600">₹{selectedCommodityData.high.toLocaleString('en-IN')}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-500 mb-1">Day Low</p>
+                <p className="text-xs text-gray-500 mb-1">{t('marketPage.dayLow')}</p>
                 <p className="text-sm font-bold text-red-600">₹{selectedCommodityData.low.toLocaleString('en-IN')}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-500 mb-1">Last Updated</p>
+                <p className="text-xs text-gray-500 mb-1">{t('marketPage.lastUpdated')}</p>
                 <p className="text-sm font-bold text-gray-700">{selectedCommodityData.lastUpdated}</p>
               </div>
             </div>
@@ -265,8 +266,8 @@ export default function MarketPage() {
                     <LineChartIcon className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-base">AI Price Forecast</h3>
-                    <p className="text-xs text-blue-100">Machine Learning Predictions</p>
+                    <h3 className="font-bold text-base">{t('marketPage.aiForecastTitle')}</h3>
+                    <p className="text-xs text-blue-100">{t('marketPage.aiForecastSubtitle')}</p>
                   </div>
                 </div>
                 <div className={`px-3 py-1.5 rounded-lg text-xs font-bold ${
@@ -341,14 +342,14 @@ export default function MarketPage() {
             <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
               <BarChart3 className="w-4 h-4 text-blue-600" />
             </div>
-            <h3 className="font-bold text-gray-900">Market Analysis</h3>
+            <h3 className="font-bold text-gray-900">{t('marketPage.marketAnalysisTitle')}</h3>
           </div>
 
           <div className="space-y-3">
             <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
               <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-sm font-semibold text-gray-900 mb-1">Price Trend Indicator</p>
+                <p className="text-sm font-semibold text-gray-900 mb-1">{t('marketPage.priceTrendTitle')}</p>
                 <p className="text-xs text-gray-600">
                   {selectedForecast?.trend === 'bullish' 
                     ? `${selectedCommodity} shows strong upward momentum with predicted ${selectedForecast.confidence}% confidence in price appreciation.`
@@ -362,7 +363,7 @@ export default function MarketPage() {
             <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
               <TrendingUp className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-sm font-semibold text-gray-900 mb-1">Trading Volume</p>
+                <p className="text-sm font-semibold text-gray-900 mb-1">{t('marketPage.tradingVolumeTitle')}</p>
                 <p className="text-xs text-gray-600">
                   Current trading volume at {selectedCommodityData?.volume.toLocaleString('en-IN')} quintals indicates {selectedCommodityData && selectedCommodityData.volume > 10000 ? 'high' : 'moderate'} market activity and liquidity.
                 </p>
@@ -372,7 +373,7 @@ export default function MarketPage() {
             <div className="flex items-start gap-3 p-3 bg-amber-50 rounded-lg">
               <Calendar className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-sm font-semibold text-gray-900 mb-1">Seasonal Factors</p>
+                <p className="text-sm font-semibold text-gray-900 mb-1">{t('marketPage.seasonalTitle')}</p>
                 <p className="text-xs text-gray-600">
                   December harvest season approaching. Historical data suggests seasonal price adjustments in Q1 2026.
                 </p>
@@ -383,10 +384,15 @@ export default function MarketPage() {
 
         {/* Action Button */}
         <button 
-          onClick={() => router.push('/contracts/new')}
+          onClick={() => {
+            const params = new URLSearchParams();
+            if (selectedCommodity) params.set('crop', selectedCommodity);
+            if (selectedCommodityData) params.set('price', String(selectedCommodityData.currentPrice));
+            router.push(`/contracts/new?${params.toString()}`);
+          }}
           className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 rounded-xl shadow-lg font-bold flex items-center justify-between active:scale-95 transition-transform hover:shadow-xl"
         >
-          <span>Create Hedge Contract</span>
+          <span>{t('marketPage.createHedgeCta')}</span>
           <ChevronRight className="w-5 h-5" />
         </button>
       </div>

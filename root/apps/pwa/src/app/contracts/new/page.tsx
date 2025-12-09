@@ -9,10 +9,18 @@ function CreateContractContent() {
   const isSandbox = searchParams.get('mode') === 'sandbox';
   
   const [loading, setLoading] = useState(false);
-  const [quantity, setQuantity] = useState(50);
-  const [price, setPrice] = useState(4800);
-  const [crop, setCrop] = useState("Soybean");
 
+  const initialCrop = searchParams.get('crop') || "Soybean";
+  const initialQuantityParam = searchParams.get('quantity');
+  const initialPriceParam = searchParams.get('price');
+
+  const [quantity, setQuantity] = useState(
+    initialQuantityParam ? Number(initialQuantityParam) || 50 : 50
+  );
+  const [price, setPrice] = useState(
+    initialPriceParam ? Number(initialPriceParam) || 4800 : 4800
+  );
+  const [crop, setCrop] = useState(initialCrop);
   async function handlePublish() {
     setLoading(true);
     

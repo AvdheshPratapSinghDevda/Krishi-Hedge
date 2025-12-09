@@ -52,8 +52,6 @@ class AuthService {
         phone,
         options: {
           data: {
-            user_type: userData.user_type,
-            full_name: userData.full_name,
             ...userData,
           },
         },
@@ -78,8 +76,6 @@ class AuthService {
         password,
         options: {
           data: {
-            user_type: userData.user_type,
-            full_name: userData.full_name,
             ...userData,
           },
         },
@@ -145,6 +141,11 @@ class AuthService {
           user: { 
             id: session.userId, 
             phone,
+            email: '',
+            aud: 'authenticated',
+            role: 'authenticated',
+            created_at: new Date().toISOString(),
+            app_metadata: {},
             user_metadata: { user_type: role }
           } as User 
         };

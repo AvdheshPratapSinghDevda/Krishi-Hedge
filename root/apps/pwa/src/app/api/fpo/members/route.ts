@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase-server';
+import { createClient } from '@/lib/supabase/server';
 
 export async function GET(req: NextRequest) {
   try {
@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
     const farmerPhone = searchParams.get('farmer_phone');
     const status = searchParams.get('status');
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     let query = supabase
       .from('fpo_members')
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check if already a member
     const { data: existing } = await supabase
@@ -143,7 +143,7 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const updateData: any = { status };
 

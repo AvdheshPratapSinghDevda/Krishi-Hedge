@@ -3,9 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getNotifications, markAsRead, type Notification } from "@/lib/notifications";
-
+import { useI18n } from "@/i18n/LanguageProvider";
 export default function NotificationsPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -57,16 +58,16 @@ export default function NotificationsPage() {
         <button onClick={() => router.push('/')} className="text-gray-600">
           <i className="fa-solid fa-arrow-left"></i>
         </button>
-        <h2 className="font-bold text-lg">Notifications</h2>
+        <h2 className="font-bold text-lg">{t('notifications.title')}</h2>
       </div>
 
       <div className="p-4 space-y-3">
         {loading ? (
-          <div className="text-center py-10 text-gray-400">Loading...</div>
+          <div className="text-center py-10 text-gray-400">{t('notifications.loading')}</div>
         ) : notifications.length === 0 ? (
           <div className="text-center py-10 text-gray-400">
             <div className="text-4xl mb-2"></div>
-            <p>No notifications yet</p>
+            <p>{t('notifications.empty')}</p>
           </div>
         ) : (
           notifications.map(notification => (

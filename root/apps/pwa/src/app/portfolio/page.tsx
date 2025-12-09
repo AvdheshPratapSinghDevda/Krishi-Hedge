@@ -16,7 +16,7 @@ import {
   AlertCircle,
   CheckCircle2
 } from "lucide-react";
-
+import { useI18n } from "@/i18n/LanguageProvider";
 interface PortfolioStats {
   totalInvestment: number;
   currentValue: number;
@@ -38,6 +38,7 @@ interface ContractBreakdown {
 
 export default function PortfolioPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<PortfolioStats>({
     totalInvestment: 250000,
@@ -78,8 +79,8 @@ export default function PortfolioPage() {
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight drop-shadow-sm">My Portfolio</h1>
-              <p className="text-sm text-gray-800 opacity-90">Track your investments & performance</p>
+              <h1 className="text-2xl font-bold tracking-tight drop-shadow-sm">{t('portfolio.title')}</h1>
+              <p className="text-sm text-gray-800 opacity-90">{t('portfolio.subtitle')}</p>
             </div>
           </div>
 
@@ -87,7 +88,7 @@ export default function PortfolioPage() {
           <div className="bg-white/30 backdrop-blur-lg rounded-2xl p-6 border-2 border-amber-300/50 shadow-2xl">
             <p className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
-              Total Portfolio Value
+              {t('portfolio.totalValue')}
             </p>
             <div className="flex items-end gap-2 mb-3">
               <h2 className="text-5xl font-bold text-gray-900">
@@ -131,7 +132,7 @@ export default function PortfolioPage() {
               <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
                 <CheckCircle2 className="w-4 h-4 text-green-600" />
               </div>
-              <p className="text-xs font-semibold text-gray-500">Active</p>
+              <p className="text-xs font-semibold text-gray-500">{t('portfolio.active')}</p>
             </div>
             <p className="text-2xl font-bold text-gray-900">{stats.activeContracts}</p>
             <p className="text-xs text-gray-500 mt-1">contracts</p>
@@ -142,7 +143,7 @@ export default function PortfolioPage() {
               <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
                 <Award className="w-4 h-4 text-blue-600" />
               </div>
-              <p className="text-xs font-semibold text-gray-500">Completed</p>
+              <p className="text-xs font-semibold text-gray-500">{t('portfolio.completed')}</p>
             </div>
             <p className="text-2xl font-bold text-gray-900">{stats.completedContracts}</p>
             <p className="text-xs text-gray-500 mt-1">contracts</p>
@@ -153,7 +154,7 @@ export default function PortfolioPage() {
               <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
                 <Target className="w-4 h-4 text-amber-600" />
               </div>
-              <p className="text-xs font-semibold text-gray-500">Hedged Qty</p>
+              <p className="text-xs font-semibold text-gray-500">{t('portfolio.hedgedQty')}</p>
             </div>
             <p className="text-2xl font-bold text-gray-900">{stats.hedgedQuantity}</p>
             <p className="text-xs text-gray-500 mt-1">quintals</p>
@@ -164,7 +165,7 @@ export default function PortfolioPage() {
               <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
                 <IndianRupee className="w-4 h-4 text-purple-600" />
               </div>
-              <p className="text-xs font-semibold text-gray-500">Avg Price</p>
+              <p className="text-xs font-semibold text-gray-500">{t('portfolio.avgPrice')}</p>
             </div>
             <p className="text-2xl font-bold text-gray-900">₹{stats.averageStrikePrice}</p>
             <p className="text-xs text-gray-500 mt-1">per quintal</p>
@@ -177,7 +178,7 @@ export default function PortfolioPage() {
             <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
               <PieChart className="w-4 h-4 text-white" />
             </div>
-            <h3 className="text-base font-bold text-gray-900">Crop-wise Distribution</h3>
+            <h3 className="text-base font-bold text-gray-900">{t('portfolio.cropDistribution')}</h3>
           </div>
 
           <div className="space-y-4">
@@ -224,7 +225,7 @@ export default function PortfolioPage() {
               <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
                 <Activity className="w-5 h-5" />
               </div>
-              <h3 className="text-lg font-bold">Investment Summary</h3>
+              <h3 className="text-lg font-bold">{t('portfolio.investmentSummary')}</h3>
             </div>
 
             <div className="space-y-3">
@@ -261,7 +262,7 @@ export default function PortfolioPage() {
             <div className="w-8 h-8 bg-emerald-200 rounded-lg flex items-center justify-center">
               <AlertCircle className="w-4 h-4 text-emerald-700" />
             </div>
-            <h3 className="font-bold text-emerald-900 text-sm">Performance Insights</h3>
+            <h3 className="font-bold text-emerald-900 text-sm">{t('portfolio.performanceInsights')}</h3>
           </div>
           
           <ul className="space-y-2.5 text-sm text-emerald-800">
@@ -291,7 +292,7 @@ export default function PortfolioPage() {
             className="bg-gradient-to-br from-green-600 to-emerald-700 text-white p-4 rounded-xl shadow-lg font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform hover:shadow-xl"
           >
             <CheckCircle2 className="w-5 h-5" />
-            View Contracts
+            {t('portfolio.viewContracts')}
           </button>
           
           <button 
@@ -299,7 +300,7 @@ export default function PortfolioPage() {
             className="bg-gradient-to-br from-amber-400 to-yellow-500 text-gray-900 p-4 rounded-xl shadow-lg font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform hover:shadow-xl border-2 border-amber-300"
           >
             <Target className="w-5 h-5" />
-            New Contract
+            {t('portfolio.newContract')}
           </button>
         </div>
       </div>

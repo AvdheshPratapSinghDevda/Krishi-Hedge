@@ -29,6 +29,7 @@ export async function GET(
     pdfUrl: data.pdf_url,
     anchorTxHash: data.anchor_tx_hash,
     anchorExplorerUrl: data.anchor_explorer_url,
+    documentHash: (data as any).document_hash,
   };
 
   return NextResponse.json(contract, { status: 200 });
