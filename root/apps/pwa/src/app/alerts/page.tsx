@@ -14,12 +14,10 @@ interface Alert {
 }
 
 const COMMODITIES = [
-  { name: 'Soybean', currentPrice: 4850, symbol: '🌱', change: 120 },
-  { name: 'Groundnut', currentPrice: 5200, symbol: '🥜', change: -80 },
-  { name: 'Sunflower', currentPrice: 6100, symbol: '🌻', change: 200 },
-  { name: 'Mustard', currentPrice: 5450, symbol: '🌾', change: 50 },
-  { name: 'Cotton', currentPrice: 7200, symbol: '☁️', change: -150 },
-  { name: 'Sesame', currentPrice: 9800, symbol: '🌰', change: 300 },
+  { name: 'Soybean' },
+  { name: 'Groundnut' },
+  { name: 'Sunflower' },
+  { name: 'Mustard' },
 ];
 
 export default function AlertsPage() {
@@ -49,7 +47,7 @@ export default function AlertsPage() {
       const permission = await Notification.requestPermission();
       setNotificationsEnabled(permission === 'granted');
       if (permission === 'granted') {
-        new Notification('KrishiHedge Alerts Enabled! 🔔', {
+        new Notification('KrishiHedge alerts enabled', {
           body: 'You will now receive price alerts',
           icon: '/icon-192.png',
         });
@@ -69,7 +67,7 @@ export default function AlertsPage() {
       commodity: selectedCommodity.name,
       threshold: thresholdPrice,
       direction,
-      currentPrice: selectedCommodity.currentPrice,
+      currentPrice: thresholdPrice,
       triggered: false,
       createdAt: Date.now(),
     };
@@ -89,28 +87,7 @@ export default function AlertsPage() {
     localStorage.setItem('kh_price_alerts', JSON.stringify(updatedAlerts));
   };
 
-  const triggerDemoAlert = () => {
-    if (!notificationsEnabled) {
-      alert('Please enable notifications first!');
-      return;
-    }
-
-    // Create a demo notification
-    new Notification('🚨 Price Alert Triggered!', {
-      body: `${selectedCommodity.symbol} ${selectedCommodity.name} reached ₹${selectedCommodity.currentPrice}/quintal`,
-      icon: '/icon-192.png',
-      badge: '/icon-192.png',
-    });
-
-    // Mark first active alert as triggered
-    if (alerts.length > 0 && !alerts[0].triggered) {
-      const updatedAlerts = alerts.map((a, i) => 
-        i === 0 ? { ...a, triggered: true } : a
-      );
-      setAlerts(updatedAlerts);
-      localStorage.setItem('kh_price_alerts', JSON.stringify(updatedAlerts));
-    }
-  };
+  // Demo trigger removed: alerts will only fire via browser-level logic tied to real data in future.
 
   const activeAlerts = alerts.filter(a => !a.triggered);
   const triggeredAlerts = alerts.filter(a => a.triggered);
@@ -194,26 +171,13 @@ export default function AlertsPage() {
                       : 'border-gray-200 bg-gray-50'
                   }`}
                 >
-                  <div className="text-xl mb-1">{comm.symbol}</div>
-                  <div className="text-xs font-bold text-gray-800">{comm.name}</div>
-                  <div className="text-xs text-gray-600">₹{comm.currentPrice}</div>
+                    <div className="text-xs font-bold text-gray-800">{comm.name}</div>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Current Price Display */}
-          <div className="bg-gray-50 rounded-xl p-3 mb-4 border border-gray-200">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Current Price:</span>
-              <div className="text-right">
-                <div className="font-bold text-gray-800">₹{selectedCommodity.currentPrice}/quintal</div>
-                <div className={`text-xs ${selectedCommodity.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {selectedCommodity.change >= 0 ? '+' : ''}₹{selectedCommodity.change} today
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Current Price Display disabled until wired to live data */}
 
           {/* Direction Selector */}
           <div className="mb-4">
@@ -267,24 +231,15 @@ export default function AlertsPage() {
           </button>
         </div>
 
-        {/* Demo Alert Button */}
-        {notificationsEnabled && (
-          <button
-            onClick={triggerDemoAlert}
-            className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-white py-3 rounded-xl font-bold hover:shadow-lg transition"
-          >
-            <i className="fa-solid fa-bolt mr-2"></i>
-            Trigger Demo Alert
-          </button>
-        )}
+        {/* Demo Alert Button removed to avoid fake alerts; real triggers will be wired to live data later. */}
 
         {/* Active Alerts */}
         {activeAlerts.length > 0 && (
           <div className="bg-white rounded-2xl shadow-lg p-5 border border-blue-100">
-            <h3 className="font-bold text-lg mb-4 text-gray-800 flex items-center gap-2">
-              <i className="fa-solid fa-clock text-orange-500"></i>
-              Active Alerts ({activeAlerts.length})
-            </h3>
+          <h3 className="font-bold text-lg mb-4 text-gray-800 flex items-center gap-2">
+            <i className="fa-solid fa-clock text-orange-500"></i>
+            Active alerts ({activeAlerts.length})
+          </h3>
             
             <div className="space-y-3">
               {activeAlerts.map(alert => (
@@ -321,7 +276,7 @@ export default function AlertsPage() {
           <div className="bg-white rounded-2xl shadow-lg p-5 border border-green-100">
             <h3 className="font-bold text-lg mb-4 text-gray-800 flex items-center gap-2">
               <i className="fa-solid fa-check-circle text-green-500"></i>
-              Triggered Alerts
+              Triggered alerts
             </h3>
             
             <div className="space-y-2">
@@ -360,27 +315,7 @@ export default function AlertsPage() {
           </div>
         </div>
 
-        {/* Market Overview */}
-        <div className="bg-white rounded-2xl shadow-lg p-5 border border-blue-100">
-          <h3 className="font-bold text-lg mb-4 text-gray-800">Today's Market</h3>
-          
-          <div className="space-y-2">
-            {COMMODITIES.map(comm => (
-              <div key={comm.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="text-2xl">{comm.symbol}</div>
-                  <div>
-                    <div className="text-sm font-bold text-gray-800">{comm.name}</div>
-                    <div className="text-xs text-gray-600">₹{comm.currentPrice}/quintal</div>
-                  </div>
-                </div>
-                <div className={`text-sm font-bold ${comm.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {comm.change >= 0 ? '+' : ''}₹{comm.change}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* Market Overview removed to avoid hardcoded demo prices. */}
       </div>
     </div>
   );

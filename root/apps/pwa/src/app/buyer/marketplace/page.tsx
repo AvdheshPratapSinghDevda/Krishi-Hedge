@@ -22,7 +22,7 @@ interface HedgeContract {
   location?: string;
 }
 
-const COMMODITIES = ['All', 'Wheat', 'Rice', 'Groundnut', 'Soybean', 'Cotton', 'Maize'];
+const COMMODITIES = ['All', 'Groundnut', 'Soybean', 'Mustard', 'Sunflower'];
 
 export default function BuyerMarketplace() {
   const router = useRouter();
@@ -44,75 +44,8 @@ export default function BuyerMarketplace() {
         const data = await response.json();
         setContracts(data);
       } else {
-        // Sample data
-        setContracts([
-          {
-            id: '1',
-            farmerId: 'f1',
-            farmerName: 'Rajesh Kumar',
-            fpoId: 'fpo-1',
-            fpoName: 'Gujarat Groundnut FPO',
-            commodity: 'Groundnut',
-            quantity: 50,
-            strikePrice: 5200,
-            currentMarketPrice: 4800,
-            contractDate: '2025-01-15',
-            expiryDate: '2025-04-15',
-            status: 'open',
-            hedgeType: 'price_floor',
-            premium: 150,
-            location: 'Gujarat'
-          },
-          {
-            id: '2',
-            farmerId: 'f2',
-            farmerName: 'Suresh Patel',
-            commodity: 'Soybean',
-            quantity: 100,
-            strikePrice: 4500,
-            currentMarketPrice: 4200,
-            contractDate: '2025-01-20',
-            expiryDate: '2025-05-20',
-            status: 'open',
-            hedgeType: 'fixed_price',
-            premium: 200,
-            location: 'Madhya Pradesh'
-          },
-          {
-            id: '3',
-            farmerId: 'f3',
-            farmerName: 'Vikram Singh',
-            fpoId: 'fpo-2',
-            fpoName: 'Punjab Wheat Cooperative',
-            commodity: 'Wheat',
-            quantity: 200,
-            strikePrice: 2400,
-            currentMarketPrice: 2350,
-            contractDate: '2025-01-10',
-            expiryDate: '2025-03-30',
-            status: 'open',
-            hedgeType: 'price_floor',
-            premium: 100,
-            location: 'Punjab'
-          },
-          {
-            id: '4',
-            farmerId: 'f4',
-            farmerName: 'Amit Deshmukh',
-            fpoId: 'fpo-3',
-            fpoName: 'Maharashtra Cotton Producers',
-            commodity: 'Cotton',
-            quantity: 80,
-            strikePrice: 6800,
-            currentMarketPrice: 6500,
-            contractDate: '2025-01-18',
-            expiryDate: '2025-06-18',
-            status: 'open',
-            hedgeType: 'price_ceiling',
-            premium: 170,
-            location: 'Maharashtra'
-          }
-        ]);
+        // If API fails, do not show fabricated sample contracts.
+        setContracts([]);
       }
     } catch (error) {
       console.error('Failed to load contracts:', error);
@@ -169,7 +102,7 @@ export default function BuyerMarketplace() {
           >
             ← Back
           </button>
-          <h1 className="text-3xl font-bold mb-2">🏪 Buyer Marketplace</h1>
+          <h1 className="text-3xl font-bold mb-2">Buyer Marketplace</h1>
           <p className="text-blue-100">Browse and match farmer hedge contracts</p>
         </div>
       </div>

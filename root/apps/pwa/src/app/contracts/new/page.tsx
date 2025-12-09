@@ -10,7 +10,7 @@ function CreateContractContent() {
   
   const [loading, setLoading] = useState(false);
 
-  const initialCrop = searchParams.get('crop') || "Soybean";
+  const initialCrop = searchParams.get('crop') || 'Soybean';
   const initialQuantityParam = searchParams.get('quantity');
   const initialPriceParam = searchParams.get('price');
 
@@ -21,6 +21,7 @@ function CreateContractContent() {
     initialPriceParam ? Number(initialPriceParam) || 4800 : 4800
   );
   const [crop, setCrop] = useState(initialCrop);
+
   async function handlePublish() {
     setLoading(true);
     
@@ -47,14 +48,15 @@ function CreateContractContent() {
       const userId = window.localStorage.getItem("kh_user_id");
       console.log('[CONTRACT CREATE] User ID:', userId);
       
-      const payload = {
+      const payload: any = {
         crop,
         quantity,
         unit: 'Qtl',
         targetPrice: price,
         deliveryWindow: '30 Days',
-        userId
+        userId,
       };
+
       console.log('[CONTRACT CREATE] Payload:', payload);
       
       const res = await fetch('/api/contracts', {
@@ -123,17 +125,19 @@ function CreateContractContent() {
       <div className="p-5 space-y-6">
         <div>
           <label className="text-xs font-bold text-gray-500 uppercase">Crop</label>
-          <select 
+          <select
             value={crop}
             onChange={(e) => setCrop(e.target.value)}
             className="w-full bg-white p-3 rounded-lg border border-gray-200 mt-1 font-bold"
           >
             <option value="Soybean">Soybean</option>
-            <option value="Wheat">Wheat</option>
-            <option value="Chana">Chana</option>
-            <option value="Maize">Maize</option>
+            <option value="Mustard">Mustard</option>
+            <option value="Groundnut">Groundnut</option>
+            <option value="Sunflower">Sunflower</option>
           </select>
         </div>
+
+        {/* Hedge type buttons removed for now – simple fixed-price forward contract */}
 
         <div>
           <label className="text-xs font-bold text-gray-500 uppercase">Quantity (Quintals)</label>
@@ -172,11 +176,11 @@ function CreateContractContent() {
 
         <div className="bg-green-900 text-white p-4 rounded-xl shadow-lg">
           <div className="flex justify-between items-center mb-2 border-b border-green-700 pb-2">
-            <span className="text-xs text-green-300">Est. Earnings</span>
+            <span className="text-xs text-green-300">Est. contract value</span>
             <span className="font-bold text-lg">₹{(quantity * price).toLocaleString()}</span>
           </div>
-          <p className="text-xs text-green-200 leading-tight">
-            You are offering to sell <strong>{quantity} Qtl</strong> Soybean at <strong>₹{price.toLocaleString()}</strong>. This contract will be valid for 30 days.
+          <p className="text-xs text-green-200 leading-tight mb-1">
+            You are offering to sell <strong>{quantity} Qtl</strong> {crop} at <strong>₹{price.toLocaleString()}</strong>. This contract will be valid for 30 days.
           </p>
         </div>
 

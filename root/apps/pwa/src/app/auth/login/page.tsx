@@ -80,21 +80,24 @@ export default function LoginPage() {
         
         const profile = await authService.getProfile(user.id);
         
-        if (profile?.onboarded) {
+        // For SIH farmer flow, always send farmers straight to home and skip onboarding screens.
+        if (role === 'farmer') {
+          router.push('/');
+        } else if (profile?.onboarded) {
           const paths = {
             farmer: '/',
             buyer: '/buyer/dashboard',
             fpo: '/fpo/dashboard',
-            admin: '/admin'
-          };
+            admin: '/admin',
+          } as const;
           router.push(paths[profile.user_type] || '/');
         } else {
           const onboardingPaths = {
             farmer: '/onboarding/farmer',
             buyer: '/onboarding/buyer',
             fpo: '/fpo/dashboard',
-            admin: '/admin'
-          };
+            admin: '/admin',
+          } as const;
           router.push(onboardingPaths[role] || '/');
         }
       }

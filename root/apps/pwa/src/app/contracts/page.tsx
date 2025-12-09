@@ -131,73 +131,9 @@ export default function ContractsPage() {
         }
       }
 
-      // Fallback: use local demo data if API or userId not available
-      const stored = typeof window !== 'undefined' ? window.localStorage.getItem('kh_contracts') : null;
-      if (stored) {
-        const data: Contract[] = JSON.parse(stored);
-        setContracts(data);
-        calculateStats(data);
-      } else {
-        // Demo data (used only as last resort)
-        const demoContracts: Contract[] = [
-          {
-            id: '1',
-            contractNumber: 'CON-2024-001',
-            commodity: 'Soybean',
-            quantity: 100,
-            unit: 'quintals',
-            strikePrice: 4250,
-            currentPrice: 4350,
-            contractType: 'hedge',
-            status: 'active',
-            startDate: '2024-11-01',
-            expiryDate: '2025-01-31',
-            premium: 5000,
-            counterparty: 'ABC Trading Co.',
-            profitLoss: 10000,
-            createdAt: '2024-11-01T10:00:00Z'
-          },
-          {
-            id: '2',
-            contractNumber: 'CON-2024-002',
-            commodity: 'Mustard',
-            quantity: 50,
-            unit: 'quintals',
-            strikePrice: 5500,
-            currentPrice: 5450,
-            contractType: 'sell',
-            status: 'pending',
-            startDate: '2024-12-01',
-            expiryDate: '2025-02-28',
-            premium: 3000,
-            counterparty: 'XYZ Oil Mill',
-            profitLoss: -2500,
-            createdAt: '2024-12-01T10:00:00Z'
-          },
-          {
-            id: '3',
-            contractNumber: 'CON-2024-003',
-            commodity: 'Groundnut',
-            quantity: 75,
-            unit: 'quintals',
-            strikePrice: 6200,
-            currentPrice: 6150,
-            contractType: 'buy',
-            status: 'completed',
-            startDate: '2024-10-01',
-            expiryDate: '2024-11-30',
-            premium: 4500,
-            counterparty: 'LMN Traders',
-            profitLoss: -3750,
-            createdAt: '2024-10-01T10:00:00Z'
-          }
-        ];
-        setContracts(demoContracts);
-        calculateStats(demoContracts);
-        if (typeof window !== 'undefined') {
-          window.localStorage.setItem('kh_contracts', JSON.stringify(demoContracts));
-        }
-      }
+      // If no API data or no userId, show an empty list and rely on the empty-state UI.
+      setContracts([]);
+      calculateStats([]);
     } catch (error) {
       console.error('Error loading contracts:', error);
     } finally {
@@ -300,8 +236,8 @@ export default function ContractsPage() {
                 <ChevronRight size={20} className="rotate-180 text-gray-600" />
               </button>
               <div>
-                <h1 className="text-lg font-semibold text-gray-900">Contracts Management</h1>
-                <p className="text-xs text-gray-500">Agricultural Commodity Contracts Portal</p>
+                <h1 className="text-lg font-semibold text-gray-900">Hedge Contracts</h1>
+                <p className="text-xs text-gray-500">Forward + option-style price protection for oilseeds</p>
               </div>
             </div>
 
@@ -326,22 +262,6 @@ export default function ContractsPage() {
                 {(statusFilter !== 'all' || commodityFilter !== 'all') && (
                   <span className="absolute top-1 right-1 w-2 h-2 bg-blue-600 rounded-full"></span>
                 )}
-              </button>
-
-              {/* Verify Contract Button */}
-              <button
-                onClick={() => router.push('/contracts/verify')}
-                className="hidden sm:flex items-center gap-2 px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors shadow-sm"
-              >
-                <CheckCircle size={16} />
-                <span>Verify</span>
-              </button>
-              <button
-                onClick={() => router.push('/contracts/verify')}
-                className="sm:hidden p-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-sm"
-                aria-label="Verify contract"
-              >
-                <CheckCircle size={18} />
               </button>
 
               {/* New Contract Button */}
@@ -553,7 +473,7 @@ export default function ContractsPage() {
                         </p>
                       </div>
                       <div className="min-w-0">
-                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Strike Price</p>
+                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Strike Price</p>
                         <p className="text-lg font-bold text-gray-900 truncate">
                           {formatCurrency(contract.strikePrice)}
                           <span className="text-sm font-normal text-gray-600">/qtl</span>

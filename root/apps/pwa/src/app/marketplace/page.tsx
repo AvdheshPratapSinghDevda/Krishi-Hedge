@@ -86,7 +86,7 @@ export default function MarketplacePage() {
   );
 
   const states = ['Gujarat', 'Madhya Pradesh', 'Telangana', 'Maharashtra', 'Punjab', 'Haryana', 'Rajasthan'];
-  const crops = ['Groundnut', 'Soybean', 'Wheat', 'Rice', 'Cotton', 'Mustard', 'Chickpea'];
+  const crops = ['Groundnut', 'Soybean', 'Mustard', 'Sunflower'];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 pb-20">

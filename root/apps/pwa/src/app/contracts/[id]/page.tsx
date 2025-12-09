@@ -59,6 +59,8 @@ export default function ContractDetailPage() {
   const explorerUrl: string | undefined = contract.anchorExplorerUrl || contract.anchor_explorer_url;
   const pdfUrl: string | undefined = contract.pdfUrl || contract.pdf_url;
   const documentHash: string | undefined = contract.documentHash || contract.document_hash;
+  const ipfsCid: string | undefined = contract.ipfsCid || contract.ipfs_cid;
+  const isAnchored: boolean = Boolean(txHash && documentHash);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -117,12 +119,30 @@ export default function ContractDetailPage() {
         </div>
 
         <div className="bg-gray-900 text-gray-300 p-4 rounded-xl text-xs font-mono">
-          <div className="flex items-center gap-2 mb-2 text-purple-400 font-bold uppercase tracking-wider">
-            <i className="fa-solid fa-link"></i> {t('contracts.detail.blockchainTitle')}
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2 text-purple-400 font-bold uppercase tracking-wider">
+              <i className="fa-solid fa-link"></i> {t('contracts.detail.blockchainTitle')}
+            </div>
+            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-semibold ${
+              isAnchored ? 'bg-green-200 text-green-900' : 'bg-yellow-200 text-yellow-900'
+            }`}>
+              {isAnchored ? (
+                <>
+                  <i className="fa-solid fa-check"></i>
+                  <span>Anchored</span>
+                </>
+              ) : (
+                <>
+                  <i className="fa-solid fa-clock"></i>
+                  <span>Pending anchor</span>
+                </>
+              )}
+            </span>
           </div>
+
           <div className="mb-1 text-gray-500">{t('contracts.detail.txHashLabel')}</div>
           <div className="break-all text-white bg-gray-800 p-2 rounded mb-3">
-            {txHash || '0x71C9...8a2B9d4e1'}
+            {txHash || 'Not anchored yet'}
           </div>
 
           <div className="mb-1 text-gray-500 mt-2">{t('contracts.detail.docHashLabel')}</div>
@@ -130,15 +150,35 @@ export default function ContractDetailPage() {
             {documentHash || t('contracts.detail.docHashPlaceholder')}
           </div>
 
-          <button
-            className="w-full border border-gray-600 text-gray-300 py-2 rounded hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={!explorerUrl}
-            onClick={() => {
-              if (explorerUrl) window.open(explorerUrl, '_blank');
-            }}
-> 
-            {t('contracts.detail.viewOnExplorer')} <i className="fa-solid fa-external-link-alt ml-1"></i>
-          </button>
+          {ipfsCid && (
+            <div className="mb-3 text-[11px] text-blue-200 flex items-center gap-2">
+              <i className="fa-solid fa-database"></i>
+              <button
+                className="underline underline-offset-2 hover:text-white"
+                onClick={() => window.open(`https://ipfs.io/ipfs/${ipfsCid}`, '_blank')}
+              >
+                View contract JSON on IPFS
+              </button>
+            </div>
+          )}
+
+          <div className="flex flex-col sm:flex-row gap-2 mt-1">
+            <button
+              className="flex-1 border border-gray-600 text-gray-300 py-2 rounded hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!explorerUrl}
+              onClick={() => {
+                if (explorerUrl) window.open(explorerUrl, '_blank');
+              }}
+            >
+              {t('contracts.detail.viewOnExplorer')} <i className="fa-solid fa-external-link-alt ml-1"></i>
+            </button>
+            <button
+              className="flex-1 border border-dashed border-gray-700 text-gray-400 py-2 rounded hover:bg-gray-800 text-[11px]"
+              onClick={() => window.open('/contracts/verify', '_blank')}
+            >
+              Advanced IPFS verification
+            </button>
+          </div>
         </div>
 
         <div className="fixed bottom-0 left-0 w-full bg-white p-4 border-t border-gray-200 flex gap-3">

@@ -41,26 +41,84 @@ export default function PortfolioPage() {
   const { t } = useI18n();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<PortfolioStats>({
-    totalInvestment: 250000,
-    currentValue: 287500,
-    totalProfitLoss: 37500,
-    profitLossPercent: 15,
-    activeContracts: 5,
-    completedContracts: 12,
-    hedgedQuantity: 150,
-    averageStrikePrice: 4250
+    totalInvestment: 0,
+    currentValue: 0,
+    totalProfitLoss: 0,
+    profitLossPercent: 0,
+    activeContracts: 0,
+    completedContracts: 0,
+    hedgedQuantity: 0,
+    averageStrikePrice: 0,
   });
 
-  const [breakdown, setBreakdown] = useState<ContractBreakdown[]>([
-    { crop: 'Soybean', quantity: 60, value: 150000, percentage: 52, profitLoss: 22500 },
-    { crop: 'Mustard', quantity: 45, value: 90000, percentage: 31, profitLoss: 10000 },
-    { crop: 'Groundnut', quantity: 30, value: 37500, percentage: 13, profitLoss: 3750 },
-    { crop: 'Sunflower', quantity: 15, value: 10000, percentage: 4, profitLoss: 1250 }
-  ]);
+  const [breakdown, setBreakdown] = useState<ContractBreakdown[]>([]);
 
   useEffect(() => {
-    // Simulate data loading
-    setTimeout(() => setLoading(false), 800);
+    async function loadFromContracts() {
+      try {
+        const userId = typeof window !== 'undefined' ? window.localStorage.getItem('kh_user_id') : null;
+        if (!userId) {
+          setLoading(false);
+          return;
+        }
+        const res = await fetch(`/api/contracts?role=farmer&userId=${encodeURIComponent(userId)}`);
+        if (!res.ok) {
+          setLoading(false);
+          return;
+        }
+        const data: any[] = await res.json();
+        if (!data || data.length === 0) {
+          setLoading(false);
+          return;
+        }
+
+        // Aggregate simple portfolio stats from real contracts
+        const active = data.filter(c => (c.status || '').toString().toUpperCase() !== 'CANCELLED');
+        const totalInvestment = active.reduce((sum, c) => sum + (Number(c.quantity || 0) * Number(c.strikePrice || c.strike_price || 0)), 0);
+        const currentValue = totalInvestment; // no live MTM yet
+        const activeCount = active.length;
+        const completedCount = data.filter(c => (c.status || '').toString().toUpperCase() === 'SETTLED').length;
+        const hedgedQty = active.reduce((sum, c) => sum + Number(c.quantity || 0), 0);
+        const avgStrike = hedgedQty > 0 ? Math.round(totalInvestment / hedgedQty) : 0;
+
+        setStats({
+          totalInvestment,
+          currentValue,
+          totalProfitLoss: 0,
+          profitLossPercent: 0,
+          activeContracts: activeCount,
+          completedContracts: completedCount,
+          hedgedQuantity: hedgedQty,
+          averageStrikePrice: avgStrike,
+        });
+
+        // Build breakdown by crop
+        const byCrop: Record<string, ContractBreakdown> = {};
+        for (const row of active) {
+          const crop = row.crop || row.commodity || 'Unknown';
+          const qty = Number(row.quantity || 0);
+          const price = Number(row.strikePrice || row.strike_price || 0);
+          const value = qty * price;
+          if (!byCrop[crop]) {
+            byCrop[crop] = { crop, quantity: 0, value: 0, percentage: 0, profitLoss: 0 };
+          }
+          byCrop[crop].quantity += qty;
+          byCrop[crop].value += value;
+        }
+        const list = Object.values(byCrop);
+        const totalValForPct = list.reduce((s, b) => s + b.value, 0) || 1;
+        list.forEach(b => {
+          b.percentage = Math.round((b.value / totalValForPct) * 100);
+        });
+        setBreakdown(list);
+      } catch (e) {
+        console.error('Error loading portfolio from contracts', e);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadFromContracts();
   }, []);
 
   return (

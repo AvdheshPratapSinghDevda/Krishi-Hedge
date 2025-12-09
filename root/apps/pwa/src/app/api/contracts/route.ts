@@ -48,6 +48,9 @@ export async function GET(req: NextRequest) {
       anchorTxHash: row.anchor_tx_hash,
       anchorExplorerUrl: row.anchor_explorer_url,
       documentHash: (row as any).document_hash,
+      hedgeType: (row as any).hedge_type || 'fixed_price',
+      premiumPerQtl: (row as any).premium_per_qtl ?? null,
+      ipfsCid: (row as any).ipfs_cid ?? null,
     }));
 
     return NextResponse.json(mapped, { status: 200 });
@@ -60,7 +63,16 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { crop, quantity, unit, targetPrice, deliveryWindow, userId } = body || {};
+    const {
+      crop,
+      quantity,
+      unit,
+      targetPrice,
+      deliveryWindow,
+      userId,
+      hedgeType,
+      premiumPerQtl,
+    } = body || {};
 
     console.log('[CONTRACTS] POST request:', { crop, quantity, unit, targetPrice, deliveryWindow, userId });
 
@@ -78,7 +90,7 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = supabaseServer();
-    const insertRow = {
+    const insertRow: any = {
       crop,
       quantity: Number(quantity),
       unit,
@@ -87,6 +99,14 @@ export async function POST(req: NextRequest) {
       status: "CREATED",
       farmer_id: isValidUUID ? userId : null,
     };
+
+    // Optional F&O-style hedge fields (columns must exist in Supabase contracts table)
+    if (hedgeType) {
+      insertRow.hedge_type = hedgeType;
+    }
+    if (typeof premiumPerQtl === 'number' && !Number.isNaN(premiumPerQtl)) {
+      insertRow.premium_per_qtl = premiumPerQtl;
+    }
 
     console.log('[CONTRACTS] Inserting:', insertRow);
 
@@ -115,6 +135,8 @@ export async function POST(req: NextRequest) {
       pdfUrl: data.pdf_url,
       anchorTxHash: data.anchor_tx_hash,
       anchorExplorerUrl: data.anchor_explorer_url,
+      hedgeType: (data as any).hedge_type || 'fixed_price',
+      premiumPerQtl: (data as any).premium_per_qtl ?? null,
     };
 
     // Send in-app notification to farmer

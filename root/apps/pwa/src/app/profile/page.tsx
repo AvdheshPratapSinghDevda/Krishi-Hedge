@@ -9,6 +9,7 @@ import {
   Edit3, Save, X, CheckCircle2, AlertCircle,
   ChevronRight, Landmark, Package, LogOut, Settings, Store
 } from 'lucide-react';
+import { useI18n } from '@/i18n/LanguageProvider';
 
 // Storage keys
 const PROFILE_STORAGE_KEY = "kh_profile";
@@ -51,6 +52,7 @@ interface ProfileData {
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { lang, setLang } = useI18n();
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -506,6 +508,37 @@ export default function ProfilePage() {
             </div>
           </div>
         )}
+
+        {/* App Settings */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+            <Settings size={20} className="text-gray-700" />
+            <span>App Settings</span>
+          </h3>
+          <div className="space-y-3">
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-1">Language</p>
+              <p className="text-xs text-gray-500 mb-3">
+                Change the app language for all screens. This will be saved on your phone.
+              </p>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {[{ code: 'en', label: 'English' }, { code: 'hi', label: 'हिन्दी' }, { code: 'mr', label: 'मराठी' }, { code: 'pa', label: 'ਪੰਜਾਬੀ' }].map((opt) => (
+                  <button
+                    key={opt.code}
+                    onClick={() => setLang(opt.code as any)}
+                    className={`px-3 py-2 rounded-lg text-xs font-semibold border transition-all text-left ${
+                      lang === opt.code
+                        ? 'border-green-600 bg-green-50 text-green-800'
+                        : 'border-gray-200 bg-white text-gray-700 hover:border-green-300'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Actions */}
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">

@@ -48,58 +48,8 @@ export default function RealHedgingMarketplace() {
         const data = await response.json();
         setContracts(data);
       } else {
-        // Sample data for demo
-        setContracts([
-          {
-            id: '1',
-            farmerId: 'farmer-1',
-            farmerName: 'Rajesh Kumar',
-            fpoId: 'fpo-1',
-            fpoName: 'Gujarat Groundnut FPO',
-            commodity: 'Groundnut',
-            quantity: 50,
-            strikePrice: 5200,
-            currentMarketPrice: 4800,
-            contractDate: '2025-01-15',
-            expiryDate: '2025-04-15',
-            status: 'open',
-            hedgeType: 'price_floor',
-            premium: 150,
-            potentialBuyers: 8
-          },
-          {
-            id: '2',
-            farmerId: 'farmer-2',
-            farmerName: 'Suresh Patel',
-            commodity: 'Soybean',
-            quantity: 100,
-            strikePrice: 4500,
-            currentMarketPrice: 4200,
-            contractDate: '2025-01-20',
-            expiryDate: '2025-05-20',
-            status: 'open',
-            hedgeType: 'fixed_price',
-            premium: 200,
-            potentialBuyers: 12
-          },
-          {
-            id: '3',
-            farmerId: 'farmer-3',
-            farmerName: 'Vikram Singh',
-            fpoId: 'fpo-2',
-            fpoName: 'Punjab Wheat Cooperative',
-            commodity: 'Wheat',
-            quantity: 200,
-            strikePrice: 2400,
-            currentMarketPrice: 2350,
-            contractDate: '2025-01-10',
-            expiryDate: '2025-03-30',
-            status: 'matched',
-            hedgeType: 'price_floor',
-            premium: 100,
-            potentialBuyers: 5
-          }
-        ]);
+        // API failed – do not inject demo hedge contracts.
+        setContracts([]);
       }
     } catch (error) {
       console.error('Failed to load contracts:', error);
@@ -110,9 +60,9 @@ export default function RealHedgingMarketplace() {
 
   const getHedgeTypeLabel = (type: string) => {
     switch (type) {
-      case 'price_floor': return '📉 Price Floor Protection';
-      case 'price_ceiling': return '📈 Price Ceiling Lock';
-      case 'fixed_price': return '🔒 Fixed Price Contract';
+      case 'price_floor': return 'Price Floor Protection';
+      case 'price_ceiling': return 'Price Ceiling Lock';
+      case 'fixed_price': return 'Fixed Price Contract';
       default: return type;
     }
   };
@@ -163,7 +113,7 @@ export default function RealHedgingMarketplace() {
               </button>
             )}
           </div>
-          <h1 className="text-3xl font-bold mb-2">🛡️ Hedge Marketplace</h1>
+          <h1 className="text-3xl font-bold mb-2">Hedge Marketplace</h1>
           <p className="text-green-100 mb-4">
             {userType === 'farmer' && 'Protect your crop prices with futures contracts'}
             {userType === 'buyer' && 'Browse and match with farmer hedge contracts'}
@@ -351,10 +301,10 @@ export default function RealHedgingMarketplace() {
                 A hedge contract protects farmers from price volatility. Lock in a minimum price today, and if market prices fall, you're protected. If prices rise, you benefit from the upside!
               </p>
               <ul className="text-sm text-gray-600 space-y-1">
-                <li>✅ <strong>Price Floor:</strong> Guaranteed minimum price</li>
-                <li>✅ <strong>Premium:</strong> Small upfront cost for protection</li>
-                <li>✅ <strong>FPO Backed:</strong> Verified through producer organizations</li>
-                <li>✅ <strong>Buyer Network:</strong> Connect with verified commodity buyers</li>
+                <li><strong>Price Floor:</strong> Guaranteed minimum price</li>
+                <li><strong>Premium:</strong> Small upfront cost for protection</li>
+                <li><strong>FPO Backed:</strong> Verified through producer organizations</li>
+                <li><strong>Buyer Network:</strong> Connect with verified commodity buyers</li>
               </ul>
             </div>
           </div>

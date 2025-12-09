@@ -7,8 +7,6 @@ const COMMODITIES_CONFIG = [
   { name: 'Mustard', basePrice: 5500, volatility: 0.15 },
   { name: 'Groundnut', basePrice: 6200, volatility: 0.10 },
   { name: 'Sunflower', basePrice: 5800, volatility: 0.14 },
-  { name: 'Sesame', basePrice: 7500, volatility: 0.18 },
-  { name: 'Castor', basePrice: 5200, volatility: 0.13 }
 ];
 
 class MarketEngine {

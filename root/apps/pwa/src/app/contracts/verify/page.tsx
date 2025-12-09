@@ -87,15 +87,7 @@ export default function ContractVerifyPage() {
     }
   }
 
-  /**
-   * Load sample demo contract
-   */
-  function loadDemo() {
-    // Use a demo CID (replace with actual after first upload)
-    setCid('bafkreihqxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
-    setError('Demo mode: Replace with actual CID after running upload_contract.js');
-  }
-
+  // Demo loader removed: verification now expects a real CID + hash saved by the admin.
   function copyToClipboard(text: string) {
     navigator.clipboard.writeText(text);
     alert('Copied to clipboard!');
@@ -146,12 +138,6 @@ export default function ContractVerifyPage() {
               placeholder="bafkreih..."
               className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent font-mono text-sm"
             />
-            <button
-              onClick={loadDemo}
-              className="px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm"
-            >
-              Demo
-            </button>
           </div>
 
           <button

@@ -135,51 +135,49 @@ export default function ForecastPage() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
-      // Map commodity name for CSV data
+      // Map commodity name for CSV/ML data
       const csvCommodity = COMMODITY_MAP[selectedCommodity] || selectedCommodity;
-      
-      // Fetch historical data from ML dataset
+
+      // 1) Historical data from ML dataset (no synthetic fallback)
       const historicalResponse = await fetch(
         `/api/ml-data?commodity=${encodeURIComponent(csvCommodity)}&timeframe=${timeframe}`
       );
-      
-      let historicalData: HistoricalDataPoint[] = [];
+
+      let historical: HistoricalDataPoint[] = [];
       let mlDataAvailable = false;
-      
+
       if (historicalResponse.ok) {
         const mlData = await historicalResponse.json();
-        
-        if (mlData.success && mlData.data.length > 0) {
+
+        if (mlData.success && Array.isArray(mlData.data) && mlData.data.length > 0) {
           mlDataAvailable = true;
-          historicalData = mlData.data.map((d: any) => ({
+          historical = mlData.data.map((d: any) => ({
             date: d.date,
             timestamp: d.timestamp,
             price: d.price,
             open: d.minPrice,
             high: d.maxPrice,
             low: d.minPrice,
-            volume: d.arrivals
+            volume: d.arrivals,
           }));
-          
-          // Set current price data
-          setCurrentPrice(mlData.currentPrice);
-          setPriceChange(mlData.priceChange);
-          setPriceChangePercent(mlData.priceChangePercent);
+
+          // Set current price data from ML payload
+          setCurrentPrice(mlData.currentPrice ?? 0);
+          setPriceChange(mlData.priceChange ?? 0);
+          setPriceChangePercent(mlData.priceChangePercent ?? 0);
           setLastUpdateTime(new Date().toLocaleTimeString('en-IN'));
         } else {
-          // Fallback to mock data
-          historicalData = generateMockHistoricalData(selectedCommodity, timeframe);
+          setError('Price history not available from ML dataset for this commodity.');
         }
       } else {
-        // Fallback to mock data if API fails
-        historicalData = generateMockHistoricalData(selectedCommodity, timeframe);
+        setError('Failed to load price history from ML service.');
       }
-      
-      setHistoricalData(historicalData);
-      
-      // Fetch predictions from ML API
+
+      setHistoricalData(historical);
+
+      // 2) Predictions from ML API (no synthetic fallback)
       const predictionResponse = await fetch('/api/ml-prediction', {
         method: 'POST',
         headers: {
@@ -187,65 +185,57 @@ export default function ForecastPage() {
         },
         body: JSON.stringify({
           commodity: csvCommodity,
-          days: 7
-        })
+          days: 7,
+        }),
       });
-      
+
       if (predictionResponse.ok) {
         const predData = await predictionResponse.json();
-        
-        if (predData.success) {
-          // Transform prediction data
+
+        if (predData.success && Array.isArray(predData.predictions) && predData.predictions.length > 0) {
           const predictions: PredictionPoint[] = predData.predictions.map((p: any) => ({
             date: new Date(p.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }),
             predictedPrice: p.predictedPrice,
             upperBound: p.upperBound,
             lowerBound: p.lowerBound,
-            confidence: p.confidence
+            confidence: p.confidence,
           }));
-          
+
           setPredictionData(predictions);
-          setMetrics(predData.metrics);
-          
-          // Update current price if not set from historical data
-          if (!mlDataAvailable && historicalData.length > 0) {
-            const latestPrice = historicalData[historicalData.length - 1].price;
-            const previousPrice = historicalData.length > 1 ? historicalData[historicalData.length - 2].price : latestPrice;
+          setMetrics(predData.metrics ?? null);
+
+          // Update current price if not set from historical data but we have a history series
+          if (!mlDataAvailable && historical.length > 0) {
+            const latestPrice = historical[historical.length - 1].price;
+            const previousPrice =
+              historical.length > 1 ? historical[historical.length - 2].price : latestPrice;
             setCurrentPrice(latestPrice);
             setPriceChange(latestPrice - previousPrice);
             setPriceChangePercent(((latestPrice - previousPrice) / previousPrice) * 100);
             setLastUpdateTime(new Date().toLocaleTimeString('en-IN'));
           }
+        } else {
+          // Prediction API responded but without usable predictions
+          setPredictionData([]);
+          setMetrics(null);
         }
       } else {
-        // Generate simple predictions from historical trend
-        const predictions = generateSimplePredictions(historicalData);
-        setPredictionData(predictions);
-        
-        const calculatedMetrics: ModelMetrics = {
-          model: 'Trend Analysis',
-          accuracy: 75,
-          confidence: 70,
-          rmse: 150,
-          mae: 100,
-          trend: 'Neutral',
-          volatility: 'Medium'
-        };
-        setMetrics(calculatedMetrics);
+        // Prediction API not available
+        setPredictionData([]);
+        setMetrics(null);
       }
-      
     } catch (err) {
       console.error('Error fetching data:', err);
-      setError('Using ML dataset. Backend ML service is optional.');
-      
-      // Use fallback data
-      const mockHistoricalData = generateMockHistoricalData(selectedCommodity, timeframe);
-      setHistoricalData(mockHistoricalData);
-      
-      if (mockHistoricalData.length > 0) {
-        const latestPrice = mockHistoricalData[mockHistoricalData.length - 1].price;
-        setCurrentPrice(latestPrice);
-      }
+      setError('ML price service is not available right now. Please try again later.');
+
+      // Clear any previously shown dynamic data; do not fabricate values
+      setHistoricalData([]);
+      setPredictionData([]);
+      setMetrics(null);
+      setCurrentPrice(0);
+      setPriceChange(0);
+      setPriceChangePercent(0);
+      setLastUpdateTime('');
     } finally {
       setLoading(false);
     }
@@ -254,40 +244,30 @@ export default function ForecastPage() {
   // Fetch prices for all commodities (for dropdown)
   const fetchAllPrices = useCallback(async () => {
     const prices: Record<string, { price: number; change: number; changePercent: number }> = {};
-    
+
     for (const commodity of COMMODITIES) {
       try {
         const csvCommodity = COMMODITY_MAP[commodity.id] || commodity.id;
         const response = await fetch(
           `/api/ml-data?commodity=${encodeURIComponent(csvCommodity)}&timeframe=1D`
         );
-        
+
         if (response.ok) {
           const data = await response.json();
           if (data.success && data.currentPrice) {
             prices[commodity.id] = {
               price: data.currentPrice,
               change: data.priceChange || 0,
-              changePercent: data.priceChangePercent || 0
+              changePercent: data.priceChangePercent || 0,
             };
           }
         }
       } catch (err) {
-        // Use fallback prices if API fails
-        const basePrices: Record<string, number> = {
-          soybean: 4250,
-          mustard: 5500,
-          groundnut: 6200,
-          sunflower: 5800,
-        };
-        prices[commodity.id] = {
-          price: basePrices[commodity.id] || 4000,
-          change: 0,
-          changePercent: 0
-        };
+        console.error('Failed to load price for commodity in dropdown', commodity.id, err);
+        // Do not fabricate fallback prices; leave this commodity without price data.
       }
     }
-    
+
     setCommodityPrices(prices);
   }, []);
 
@@ -857,121 +837,5 @@ export default function ForecastPage() {
       </div>
     </div>
   );
-}
-// Helper Functions
-
-function generateMockHistoricalData(commodity: string, timeframe: string): HistoricalDataPoint[] {
-  const basePrices: Record<string, number> = {
-    soybean: 4250,
-    mustard: 5500,
-    groundnut: 6200,
-    sunflower: 5800,
-  };
-  
-  const basePrice = basePrices[commodity] || 4250;
-  const dataPoints = timeframe === '1D' ? 24 : timeframe === '1W' ? 7 : timeframe === '1M' ? 30 : 90;
-  
-  const data: HistoricalDataPoint[] = [];
-  const today = new Date();
-  
-  for (let i = dataPoints; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(date.getDate() - i);
-    
-    const randomVariation = (Math.random() - 0.5) * 200;
-    const price = basePrice + randomVariation + (i % 5) * 50;
-    
-    data.push({
-      date: date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }),
-      timestamp: date.getTime(),
-      price: Math.round(price * 100) / 100,
-      open: price - 20,
-      high: price + 30,
-      low: price - 30,
-      volume: Math.floor(Math.random() * 5000) + 1000,
-    });
-  }
-  
-  return data;
-}
-
-function generateSimplePredictions(historicalData: HistoricalDataPoint[]): PredictionPoint[] {
-  if (historicalData.length < 2) return [];
-  
-  const last30Days = historicalData.slice(-30);
-  const avgPrice = last30Days.reduce((sum, d) => sum + d.price, 0) / last30Days.length;
-  const trend = (last30Days[last30Days.length - 1].price - last30Days[0].price) / last30Days.length;
-  
-  const predictions: PredictionPoint[] = [];
-  for (let i = 1; i <= 7; i++) {
-    const predictedPrice = avgPrice + (trend * i);
-    const volatility = Math.sqrt(last30Days.reduce((sum, d) => sum + Math.pow(d.price - avgPrice, 2), 0) / last30Days.length);
-    
-    predictions.push({
-      date: new Date(Date.now() + i * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }),
-      predictedPrice,
-      upperBound: predictedPrice + volatility * 1.96,
-      lowerBound: predictedPrice - volatility * 1.96,
-      confidence: Math.max(60, 85 - i * 3)
-    });
-  }
-  
-  return predictions;
-}
-
-function transformForecastToPredictions(forecastData: any, historicalData: HistoricalDataPoint[]): PredictionPoint[] {
-  if (!forecastData?.horizons || forecastData.horizons.length === 0) {
-    return [];
-  }
-  
-  const predictions: PredictionPoint[] = [];
-  const lastDate = new Date(historicalData[historicalData.length - 1]?.timestamp || Date.now());
-  
-  // Use 7-day horizon for predictions
-  const horizon7 = forecastData.horizons.find((h: any) => h.days === 7);
-  
-  if (horizon7) {
-    for (let i = 1; i <= 7; i++) {
-      const predDate = new Date(lastDate);
-      predDate.setDate(predDate.getDate() + i);
-      
-      const priceStep = (horizon7.yhat - forecastData.current_price) / 7;
-      const predictedPrice = forecastData.current_price + (priceStep * i);
-      
-      predictions.push({
-        date: predDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }),
-        predictedPrice: Math.round(predictedPrice * 100) / 100,
-        upperBound: Math.round((predictedPrice + (horizon7.upper - horizon7.yhat) * (i / 7)) * 100) / 100,
-        lowerBound: Math.round((predictedPrice - (horizon7.yhat - horizon7.lower) * (i / 7)) * 100) / 100,
-        confidence: 85 - (i * 2), // Decreasing confidence over time
-      });
-    }
-  }
-  
-  return predictions;
-}
-
-function calculateMetrics(forecastData: any, historicalData: HistoricalDataPoint[]): ModelMetrics {
-  const horizon7 = forecastData?.horizons?.find((h: any) => h.days === 7);
-  const currentPrice = forecastData?.current_price || historicalData[historicalData.length - 1]?.price || 4250;
-  
-  const trend: 'Bullish' | 'Bearish' | 'Neutral' = 
-    horizon7?.yhat > currentPrice ? 'Bullish' : 
-    horizon7?.yhat < currentPrice ? 'Bearish' : 'Neutral';
-  
-  const priceRange = horizon7 ? horizon7.upper - horizon7.lower : 0;
-  const volatility: 'Low' | 'Medium' | 'High' = 
-    priceRange < 300 ? 'Low' : 
-    priceRange < 600 ? 'Medium' : 'High';
-  
-  return {
-    model: 'Prophet + ARIMA Ensemble',
-    accuracy: 78.5 + Math.random() * 10,
-    confidence: 82.3 + Math.random() * 5,
-    rmse: 45.2 + Math.random() * 20,
-    mae: 32.1 + Math.random() * 15,
-    trend,
-    volatility,
-  };
 }
 

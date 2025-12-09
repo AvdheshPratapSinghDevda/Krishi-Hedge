@@ -5,12 +5,10 @@ import { useRouter } from 'next/navigation';
 import { Shield, TrendingDown, Lock, AlertCircle, ArrowLeft, CheckCircle } from 'lucide-react';
 
 const COMMODITIES = [
-  { value: 'wheat', label: 'Wheat', icon: '🌾', avgPrice: 2400 },
-  { value: 'rice', label: 'Rice', icon: '🍚', avgPrice: 3200 },
-  { value: 'groundnut', label: 'Groundnut', icon: '🥜', avgPrice: 5200 },
-  { value: 'soybean', label: 'Soybean', icon: '🫘', avgPrice: 4500 },
-  { value: 'cotton', label: 'Cotton', icon: '⚪', avgPrice: 6800 },
-  { value: 'maize', label: 'Maize', icon: '🌽', avgPrice: 1900 },
+  { value: 'soybean', label: 'Soybean', avgPrice: 4500 },
+  { value: 'mustard', label: 'Mustard', avgPrice: 5500 },
+  { value: 'groundnut', label: 'Groundnut', avgPrice: 5200 },
+  { value: 'sunflower', label: 'Sunflower', avgPrice: 5800 },
 ];
 
 const HEDGE_TYPES = [
@@ -168,7 +166,6 @@ export default function CreateHedgeContract() {
                           : 'border-gray-200 hover:border-green-300'
                       }`}
                     >
-                      <div className="text-3xl mb-2">{comm.icon}</div>
                       <div className="font-semibold text-gray-900">{comm.label}</div>
                       <div className="text-xs text-gray-500">Avg: ₹{comm.avgPrice}</div>
                     </button>
@@ -313,7 +310,7 @@ export default function CreateHedgeContract() {
                   <div>
                     <p className="text-sm text-gray-600 mb-1">Commodity</p>
                     <p className="text-lg font-bold text-gray-900">
-                      {selectedCommodity?.icon} {selectedCommodity?.label}
+                      {selectedCommodity?.label}
                     </p>
                   </div>
                   <div>
@@ -368,11 +365,9 @@ export default function CreateHedgeContract() {
                 >
                   <option value="">No FPO (Individual Contract)</option>
                   <option value="fpo-1">Gujarat Groundnut FPO</option>
-                  <option value="fpo-2">Punjab Wheat Cooperative</option>
-                  <option value="fpo-3">Maharashtra Cotton Producers</option>
                 </select>
                 <p className="mt-2 text-sm text-gray-500">
-                  💡 FPO-backed contracts get higher buyer trust and better matching
+                  FPO-backed contracts often get higher buyer trust and better matching.
                 </p>
               </div>
 

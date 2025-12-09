@@ -35,17 +35,60 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ id: s
     created_at: data.created_at,
   };
 
+  const payloadJson = JSON.stringify(payload);
+
   const documentHash = createHash("sha256")
-    .update(JSON.stringify(payload))
+    .update(payloadJson)
     .digest("hex");
+
+  // Optional: upload contract JSON to IPFS via web3.storage (or similar)
+  // Requires WEB3_STORAGE_TOKEN to be set in environment.
+  let ipfsCid: string | null = null;
+  const web3Token = process.env.WEB3_STORAGE_TOKEN;
+
+  if (web3Token) {
+    try {
+      const uploadRes = await fetch("https://api.web3.storage/upload", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${web3Token}`,
+          "Content-Type": "application/json",
+        },
+        body: payloadJson,
+      });
+
+      if (uploadRes.ok) {
+        const uploadJson = await uploadRes.json();
+        if (uploadJson && typeof uploadJson.cid === "string") {
+          ipfsCid = uploadJson.cid;
+        }
+      } else {
+        console.error("[CONTRACT ANCHOR] IPFS upload failed:", await uploadRes.text());
+      }
+    } catch (err) {
+      console.error("[CONTRACT ANCHOR] IPFS upload error:", err);
+    }
+  } else {
+    console.warn("[CONTRACT ANCHOR] WEB3_STORAGE_TOKEN not set; skipping IPFS upload.");
+  }
 
   // Derive a deterministic tx-like hash from the document hash
   const txHash = "0x" + documentHash.slice(0, 64);
   const explorerUrl = `https://amoy.polygonscan.com/tx/${txHash}`;
 
+  const updateFields: any = {
+    anchor_tx_hash: txHash,
+    anchor_explorer_url: explorerUrl,
+    document_hash: documentHash,
+  };
+
+  if (ipfsCid) {
+    updateFields.ipfs_cid = ipfsCid;
+  }
+
   await supabase
     .from("contracts")
-    .update({ anchor_tx_hash: txHash, anchor_explorer_url: explorerUrl, document_hash: documentHash })
+    .update(updateFields)
     .eq("id", id);
 
   return NextResponse.json(
@@ -54,6 +97,7 @@ export async function POST(_req: NextRequest, context: { params: Promise<{ id: s
       documentHash,
       txHash,
       explorerUrl,
+      ipfsCid,
     },
     { status: 200 },
   );

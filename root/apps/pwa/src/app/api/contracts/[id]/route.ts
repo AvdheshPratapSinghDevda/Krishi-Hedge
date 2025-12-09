@@ -30,6 +30,9 @@ export async function GET(
     anchorTxHash: data.anchor_tx_hash,
     anchorExplorerUrl: data.anchor_explorer_url,
     documentHash: (data as any).document_hash,
+    hedgeType: (data as any).hedge_type || 'fixed_price',
+    premiumPerQtl: (data as any).premium_per_qtl ?? null,
+    ipfsCid: (data as any).ipfs_cid ?? null,
   };
 
   return NextResponse.json(contract, { status: 200 });

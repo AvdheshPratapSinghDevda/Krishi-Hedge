@@ -70,8 +70,11 @@ export async function POST(request: NextRequest) {
     const csvPath = path.join(ML_DATA_PATH, 'combined_oilseed_data.csv');
     
     if (!fs.existsSync(csvPath)) {
-      // Return mock prediction if data not available
-      return generateMockPrediction(commodity, days);
+      return NextResponse.json({
+        success: false,
+        commodity,
+        message: 'ML dataset not available on server',
+      }, { status: 503 });
     }
 
     const csvText = fs.readFileSync(csvPath, 'utf-8');
@@ -93,7 +96,11 @@ export async function POST(request: NextRequest) {
     }
 
     if (commodityData.length === 0) {
-      return generateMockPrediction(commodity, days);
+      return NextResponse.json({
+        success: false,
+        commodity,
+        message: 'No ML rows for requested commodity in dataset',
+      }, { status: 404 });
     }
 
     // Sort by date
@@ -180,53 +187,6 @@ function calculateVolatility(prices: number[]): number {
   const mean = prices.reduce((sum, p) => sum + p, 0) / prices.length;
   const variance = prices.reduce((sum, p) => sum + Math.pow(p - mean, 2), 0) / prices.length;
   return Math.sqrt(variance);
-}
-
-function generateMockPrediction(commodity: string, days: number) {
-  const basePrices: Record<string, number> = {
-    'soybean': 4250,
-    'mustard': 5500,
-    'groundnut': 6200,
-    'sunflower': 95000,
-    'castor': 130000,
-    'sesame': 12000
-  };
-
-  const basePrice = basePrices[commodity.toLowerCase()] || 5000;
-  const predictions = [];
-  const today = new Date();
-
-  for (let i = 1; i <= days; i++) {
-    const predDate = new Date(today);
-    predDate.setDate(predDate.getDate() + i);
-    
-    const randomChange = (Math.random() - 0.5) * 200;
-    const predictedPrice = basePrice + randomChange + (i * 10);
-    
-    predictions.push({
-      date: predDate.toISOString().split('T')[0],
-      predictedPrice: Math.round(predictedPrice * 100) / 100,
-      upperBound: Math.round((predictedPrice + 300) * 100) / 100,
-      lowerBound: Math.round((predictedPrice - 300) * 100) / 100,
-      confidence: Math.max(90 - i * 5, 60)
-    });
-  }
-
-  return NextResponse.json({
-    success: true,
-    commodity,
-    currentPrice: basePrice,
-    predictions,
-    metrics: {
-      model: 'Mock Data (ML Pipeline Not Run)',
-      accuracy: 75,
-      confidence: 70,
-      rmse: 150,
-      mae: 100,
-      trend: 'Neutral' as const,
-      volatility: 'Medium' as const
-    }
-  });
 }
 
 function determineTrend(predicted: number, lower: number): 'Bullish' | 'Bearish' | 'Neutral' {
