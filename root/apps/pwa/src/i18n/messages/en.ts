@@ -71,9 +71,9 @@ export const en = {
     cardForecastSubtitle: 'Understanding bands and uncertainty',
   },
   home: {
-    greetingMorning: 'Good morning',
-    greetingAfternoon: 'Good afternoon',
-    greetingEvening: 'Good evening',
+    greetingMorning: 'Good Morning',
+    greetingAfternoon: 'Good Afternoon',
+    greetingEvening: 'Good Evening',
     appTagline: 'Smart hedging for every farmer',
     demoGameTitle: 'Demo Game',
     demoGameSubtitle: 'Practice risk-free trading',

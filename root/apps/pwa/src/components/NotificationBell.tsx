@@ -30,7 +30,7 @@ export function NotificationBell() {
 
   return (
     <button
-      onClick={() => router.push('/notifications')}
+      onClick={() => router.push('/alerts')}
       className="relative"
     >
       <div className="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center hover:bg-white/30 transition-colors">

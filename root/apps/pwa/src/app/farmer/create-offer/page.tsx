@@ -97,11 +97,10 @@ export default function CreateFarmerOfferPage() {
               required
             >
               <option value="Soybean">Soybean</option>
-              <option value="Wheat">Wheat</option>
-              <option value="Chana">Chana</option>
               <option value="Maize">Maize</option>
               <option value="Mustard">Mustard</option>
               <option value="Groundnut">Groundnut</option>
+              <option value="Sunflower">Sunflower</option>
             </select>
           </div>
 

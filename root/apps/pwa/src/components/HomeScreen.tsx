@@ -232,34 +232,6 @@ export default function HomeScreen() {
       <div className="px-5 mt-6 space-y-4">
         {/* 6 Navigation Buttons Grid */}
         <div className="grid grid-cols-2 gap-4">
-          {/* HEDGE MARKETPLACE Button */}
-          <button 
-            onClick={() => router.push('/hedge')} 
-            className="bg-gradient-to-br from-green-500 via-green-600 to-emerald-700 text-white p-4 rounded-2xl shadow-lg font-bold text-left flex flex-col justify-between h-32 active:scale-95 transition-all group hover:shadow-green-500/30 border border-green-400/30"
-          >
-            <div className="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-              <i className="fa-solid fa-shield text-lg"></i>
-            </div>
-            <div>
-              <span className="text-sm font-bold block mb-1 drop-shadow-sm">Hedge Market</span>
-              <span className="text-xs text-green-100 opacity-90">Price protection</span>
-            </div>
-          </button>
-          
-          {/* PORTFOLIO Button */}
-          <button 
-            onClick={() => router.push('/portfolio')} 
-            className="bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 text-gray-900 p-4 rounded-2xl shadow-lg font-bold text-left flex flex-col justify-between h-32 active:scale-95 transition-all group hover:shadow-amber-500/30 border-2 border-amber-300/50"
-          >
-            <div className="w-9 h-9 bg-white/30 backdrop-blur-sm rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-              <BarChart3 className="w-4 h-4 text-gray-900" />
-            </div>
-            <div>
-              <span className="text-sm font-bold block mb-1 drop-shadow-sm">{t('home.portfolioTitle')}</span>
-              <span className="text-xs text-gray-800 opacity-90">{t('home.portfolioSubtitle')}</span>
-            </div>
-          </button>
-          
           {/* CREATE SELL OFFER Button */}
           <button 
             onClick={() => router.push('/farmer/create-offer')} 
@@ -288,46 +260,31 @@ export default function HomeScreen() {
             </div>
           </button>
           
-          {/* FPO DASHBOARD Button */}
+          {/* SANDBOX Button */}
           <button 
-            onClick={() => router.push('/fpo/dashboard')} 
-            className="bg-gradient-to-br from-purple-500 via-purple-600 to-pink-700 text-white p-4 rounded-2xl shadow-lg font-bold text-left flex flex-col justify-between h-32 active:scale-95 transition-all group hover:shadow-purple-500/30 border border-purple-400/30"
+            onClick={() => router.push('/sandbox')} 
+            className="bg-gradient-to-br from-green-500 via-green-600 to-emerald-700 text-white p-4 rounded-2xl shadow-lg font-bold text-left flex flex-col justify-between h-32 active:scale-95 transition-all group hover:shadow-green-500/30 border border-green-400/30"
           >
             <div className="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-              <i className="fa-solid fa-users text-lg"></i>
+              <i className="fa-solid fa-flask text-lg"></i>
             </div>
             <div>
-              <span className="text-sm font-bold block mb-1 drop-shadow-sm">FPO Dashboard</span>
-              <span className="text-xs text-purple-100 opacity-90">Manage members</span>
+              <span className="text-sm font-bold block mb-1 drop-shadow-sm">Sandbox</span>
+              <span className="text-xs text-green-100 opacity-90">Practice trading</span>
             </div>
           </button>
-
-
-          {/* ALERTS Button */}
+          
+          {/* PORTFOLIO Button */}
           <button 
-            onClick={() => router.push('/alerts')} 
-            className="bg-gradient-to-br from-orange-500 via-red-600 to-pink-700 text-white p-4 rounded-2xl shadow-lg font-bold text-left flex flex-col justify-between h-32 active:scale-95 transition-all group hover:shadow-orange-500/30 border border-orange-400/30"
+            onClick={() => router.push('/portfolio')} 
+            className="bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 text-gray-900 p-4 rounded-2xl shadow-lg font-bold text-left flex flex-col justify-between h-32 active:scale-95 transition-all group hover:shadow-amber-500/30 border-2 border-amber-300/50"
           >
-            <div className="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-              <i className="fa-solid fa-bell text-lg"></i>
+            <div className="w-9 h-9 bg-white/30 backdrop-blur-sm rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
+              <BarChart3 className="w-4 h-4 text-gray-900" />
             </div>
             <div>
-              <span className="text-sm font-bold block mb-1 drop-shadow-sm">Price Alerts</span>
-              <span className="text-xs text-orange-100 opacity-90">Real-time notifications</span>
-            </div>
-          </button>
-
-          {/* FORECAST Button */}
-          <button 
-            onClick={() => router.push('/forecast')} 
-            className="bg-gradient-to-br from-teal-500 via-cyan-600 to-blue-700 text-white p-4 rounded-2xl shadow-lg font-bold text-left flex flex-col justify-between h-32 active:scale-95 transition-all group hover:shadow-teal-500/30 border border-teal-400/30"
-          >
-            <div className="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-              <Sparkles className="w-4 h-4" />
-            </div>
-            <div>
-              <span className="text-sm font-bold block mb-1 drop-shadow-sm">AI Forecast</span>
-              <span className="text-xs text-teal-100 opacity-90">Price predictions</span>
+              <span className="text-sm font-bold block mb-1 drop-shadow-sm">{t('home.portfolioTitle')}</span>
+              <span className="text-xs text-gray-800 opacity-90">{t('home.portfolioSubtitle')}</span>
             </div>
           </button>
 
@@ -347,7 +304,7 @@ export default function HomeScreen() {
 
           {/* FUTURES TRADING Button */}
           <button 
-            onClick={() => router.push('/sandbox/futures')} 
+            onClick={() => router.push('/fno')} 
             className="bg-gradient-to-br from-rose-500 via-pink-600 to-red-700 text-white p-4 rounded-2xl shadow-lg font-bold text-left flex flex-col justify-between h-32 active:scale-95 transition-all group hover:shadow-rose-500/30 border border-rose-400/30"
           >
             <div className="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">

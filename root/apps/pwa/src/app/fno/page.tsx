@@ -34,10 +34,10 @@ export default function FnOMarketplace() {
   const [loading, setLoading] = useState(true);
 
   const commodities = [
-    { id: 'soybean', name: 'Soybean', icon: '🌱' },
-    { id: 'groundnut', name: 'Groundnut', icon: '🥜' },
-    { id: 'mustard', name: 'Mustard', icon: '🌾' },
-    { id: 'castor', name: 'Castor', icon: '🫘' }
+    { id: 'soybean', name: 'Soybean' },
+    { id: 'groundnut', name: 'Groundnut' },
+    { id: 'mustard', name: 'Mustard' },
+    { id: 'castor', name: 'Castor' }
   ];
 
   useEffect(() => {
@@ -75,7 +75,7 @@ export default function FnOMarketplace() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 pb-24">
       {/* Header */}
-      <header className="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800 text-white px-6 py-8 shadow-lg">
+      <header className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-green-800 text-white px-6 py-8 shadow-lg">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
@@ -97,8 +97,8 @@ export default function FnOMarketplace() {
         {/* Live Market Stats */}
         <div className="grid grid-cols-3 gap-3 mt-6">
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20">
-            <p className="text-xs text-blue-100 mb-1">NCDEX</p>
-            <p className="text-lg font-bold text-green-300">+2.4%</p>
+            <p className="text-xs text-emerald-100 mb-1">NCDEX</p>
+            <p className="text-lg font-bold text-emerald-300">+2.4%</p>
           </div>
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20">
             <p className="text-xs text-blue-100 mb-1">Volume</p>
@@ -118,13 +118,12 @@ export default function FnOMarketplace() {
             <button
               key={c.id}
               onClick={() => setSelectedCommodity(c.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm whitespace-nowrap transition-all ${
+              className={`px-4 py-2.5 rounded-xl font-semibold text-sm whitespace-nowrap transition-all ${
                 selectedCommodity === c.id
-                  ? 'bg-blue-600 text-white shadow-lg scale-105'
-                  : 'bg-white text-gray-700 border border-gray-200 hover:border-blue-300'
+                  ? 'bg-emerald-600 text-white shadow-lg scale-105'
+                  : 'bg-white text-gray-700 border border-gray-200 hover:border-emerald-300'
               }`}
             >
-              <span className="text-lg">{c.icon}</span>
               {c.name}
             </button>
           ))}
@@ -138,7 +137,7 @@ export default function FnOMarketplace() {
             onClick={() => setActiveTab('futures')}
             className={`flex-1 py-3 rounded-xl font-semibold text-sm transition-all ${
               activeTab === 'futures'
-                ? 'bg-blue-600 text-white shadow-md'
+                ? 'bg-emerald-600 text-white shadow-md'
                 : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
@@ -161,7 +160,7 @@ export default function FnOMarketplace() {
       <div className="px-5 mt-4">
         {loading ? (
           <div className="flex items-center justify-center py-16">
-            <div className="animate-spin w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full" />
+            <div className="animate-spin w-12 h-12 border-4 border-emerald-600 border-t-transparent rounded-full" />
           </div>
         ) : activeTab === 'futures' ? (
           <div className="space-y-3">
@@ -183,8 +182,8 @@ export default function FnOMarketplace() {
                     </div>
                     <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold ${
                       contract.change >= 0 
-                        ? 'bg-green-100 text-green-700' 
-                        : 'bg-red-100 text-red-700'
+                        ? 'bg-emerald-100 text-emerald-700' 
+                        : 'bg-rose-100 text-rose-700'
                     }`}>
                       {contract.change >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
                       {contract.changePercent.toFixed(2)}%
@@ -209,13 +208,13 @@ export default function FnOMarketplace() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => placeOrder(contract.id, 'buy')}
-                      className="flex-1 bg-green-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-green-700 active:scale-95 transition-all"
+                      className="flex-1 bg-emerald-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-emerald-700 active:scale-95 transition-all"
                     >
                       Buy
                     </button>
                     <button
                       onClick={() => placeOrder(contract.id, 'sell')}
-                      className="flex-1 bg-red-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-red-700 active:scale-95 transition-all"
+                      className="flex-1 bg-rose-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-rose-700 active:scale-95 transition-all"
                     >
                       Sell
                     </button>
@@ -251,11 +250,11 @@ export default function FnOMarketplace() {
                   className="grid grid-cols-5 p-3 text-sm border-b border-gray-100 hover:bg-blue-50/50 cursor-pointer"
                   onClick={() => router.push(`/fno/option?strike=${opt.strikePrice}`)}
                 >
-                  <div className="text-right font-semibold text-green-700">₹{opt.callPremium}</div>
+                  <div className="text-right font-semibold text-emerald-700">₹{opt.callPremium}</div>
                   <div className="text-right text-xs text-gray-500">{(opt.callOI / 1000).toFixed(1)}K</div>
                   <div className="text-center font-bold text-gray-900">₹{opt.strikePrice}</div>
                   <div className="text-xs text-gray-500">{(opt.putOI / 1000).toFixed(1)}K</div>
-                  <div className="font-semibold text-red-700">₹{opt.putPremium}</div>
+                  <div className="font-semibold text-rose-700">₹{opt.putPremium}</div>
                 </div>
               ))
             )}
